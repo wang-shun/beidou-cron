@@ -1,0 +1,44 @@
+﻿【任务名】	执行补发转账提醒短信
+【时间驱动】	5 9 * * *	运行超时	90分钟	等待超时	0分钟
+【运行命令】	cd /home/work/beidou-cron/bin; sh resendTransferResultSmsMessage.sh
+【日志地址】/home/work/beidou-cron/log/resendTransferResultSmsMessage.log
+【变更库表】	无
+【任务依赖】  无
+========================================================================================
+【任务描述】
+执行Cron调用com.baidu.beidou.account.ResendTransferResult
+对应Java类：beidou-cron/src/com/baidu/beidou/account/ResendTransferResult.java
+执行userFundService.reSendLimitedTransferReusltSmsMessage()
+1.	//先发送按天的
+	remindService.batchSendDailyLimitedSmsMessage(this.autotransfer_logpath + AUTO_TRANSFER_ALWAYS_LOGFILE_PRE);
+	其中autotransfer_logpath：/home/work/beidou-cron/data/mfc/autofundtransfer/
+	AUTO_TRANSFER_ALWAYS_LOGFILE_PRE：autotransfer_always.log.
+	batchSendDailyLimitedSmsMessage批量发送受限时间内的短信
+	(1)	在同一天，获取文件名，如：autotransfer_always.log.2010083000
+	(2)	genRemindMap(tmap, resultFileName)
+		//生成待提醒Map, Map<Integer, List<TransferResult>> tmap
+		Key值是userid，value是userid转账记录的list，并且只是成功的（目前来看，每天只有一次转账记录）
+	(3)	对于tmap.values()中的每一个元素，sendSms(vo);
+2.	//再发送按小时的
+	remindService.batchSendHourlyLimitedSmsMessage(this.autotransfer_logpath + AUTO_TRANSFER_WHEN_LOGFILE_PRE);
+	其中autotransfer_logpath：/home/work/beidou-cron/data/mfc/autofundtransfer/
+	AUTO_TRANSFER_ALWAYS_LOGFILE_PRE：autotransfer_when.log.
+	batchSendHourlyLimitedSmsMessage批量发送受限时间内的短信
+	（1）	根据timeStringArray（根据from,to生成的时间字符串数组）中的每个时间戳，执行
+		genRemindMap(tmap, filePrefix + timeString);
+		补充：目前设置的免打扰时间是夜间22:00-次日09:00,因此timeStringArray的内容如下所示：
+		2011101622
+		2011101623
+		2011101700
+		2011101701
+		2011101702
+		…
+		2011101709
+	（2）	对于tmap.values()中的每一个元素，sendSms(vo);
+
+
+==========================================================================================
+【报警内容】
+执行补发转账短信失败
+
+【备注】

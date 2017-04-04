@@ -1,0 +1,33 @@
+﻿【任务名】	
+【时间驱动】	5 3 * * *	运行超时	10分钟	等待超时	0分钟
+【运行命令】	cd /home/work/beidou-cron/bin; sh adtrade_export.sh full
+【日志地址】	/home/work/beidou-cron/log/adtrade_export.log
+【变更库表】	beidou.cprounitstate{0-7}
+【任务依赖】  下游任务：60313：BD广告基库下载
+如果参数个数为0，则执行adtrade_export（557），否则执行adtrade_export_full（本任务）
+（1）	开启日志（open_log函数，adtrade_export.log）
+（2）	检查路径（check_path函数）
+（3）	备份文件。将/data/adtrade/export/output下最新的fullbeidouad.txt文件重命名为/data/adtrade/export/backup目录下的fullbeidouad.txt.YYmmddHHMM，并生成相应的md5文件
+（4）	执行8条sql语句
+update cprounitstate{0-7} s, cprogroup g, cproplan p, useraccount u force index(IN_USERACCOUNT_USERID) set s.helpstatus=s.helpstatus|4  where s.helpstatus<>s.helpstatus|4  and s.uid=u.userid and s.gid=g.groupid and s.pid=p.planid  and s.state<>2 and g.groupstate<>2 and p.planstate <>2 and u.ustate=0 and u.ushifenstatid in (2,3,6);
+（5）	如以上操作执行成功，则置标记为sucFlag=1，否则重试（3次），如果仍然失败则报警退出
+（6）	调用子函数alltable_export_full，该函数中8次调用subtable_export_full子函数，subtable_export_full函数执行以下操作
+执行sql语句：
+select s.id, s.targetUrl, t.gid, t.pid, t.uid, IF(s.title='', 'NULL', s.title), IF(s.description1='', 'NULL', s.description1), IF(s.description2='', 'NULL', s.description2) from cprounitstate$1 t, cprounitmater$1 s where t.id = s.id and t.state<>2;
+结果输出到fullbeidouad.txt
+（7）	执行成功则生成md5，否则报警
+（8）	执行close_log（打印日志最后一行记录），内容为：
+adtrade_export * 13402 < - > Normally end process（成功），或者
+adtrade_export * 13402 < - > Abnormally end process（失败）
+
+
+==========================================================================================
+【报警内容】
+1.	adtrade: Before Incremental Export, update helpstatus Error.（执行sql语句失败）
+2.	adtrade: Full Export Error.（执行select语句失败）
+3.	adtrade: Fail to generate md5 for full export.（生成MD5文件失败）
+
+【备注】
+这个任务先后有过两次优化：
+（1）	第一次是更新8张cprounitstate表时，由一句sql拆成8句，频率间隔30秒，以此缓解主从同步延迟
+（2）	第二次是因为单条语句的更新操作，依然很占用DB资源。导致每日凌晨3:06~3:12分左右drd写北斗主库响应时间延长，后来又再SQL语句中添加了强制索引和where判断条件

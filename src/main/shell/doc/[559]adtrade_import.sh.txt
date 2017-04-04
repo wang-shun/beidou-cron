@@ -1,0 +1,86 @@
+﻿【任务名】	联盟站点文件导入
+【时间驱动】	5,35 * * * *	运行超时	4分钟	等待超时	60分钟
+【运行命令】	cd /home/work/beidou-cron/bin/;sh adtrade_import.sh
+【日志地址】	/home/work/beidou-cron/log/adtrade_import.log
+【变更库表】	beidou. cprounitmater{0-7}
+【任务依赖】  上游任务：1169:beidou广告分类监控;
+========================================================================================
+【任务描述】
+（1）开启日志（open_log函数，adtrade_import.log）
+（2）检查路径（check_path函数）
+（3）抓取文件
+	wget -t 3 -q ftp://ftp:ftp@jx-cp-url00.jx.baidu.com/ /home/cpro/scr-catmon/data/beidou/output/adslist.trade.txt 
+	-P /home/work/beidou-cron/data/adtrade/import/adtrade_tmp
+	及对应的adtrade_tmp.md5
+（4）对adslist.trade.txt进行排序得到adslist.trade.txt.sort，同时判断/data/adtrade/export/output目录下是否有557任务已生成的beidouad.txt
+	满足条件时，
+（5）进行join操作
+	文件1：上次备份的文件/data/adtrade/import/adtrade_bak/adslist.trade.txt
+	文件2：第4步得到的adslist.trade.txt.sort
+	执行join -a 2 文件1 文件2 > adslist.trade.txt.join
+	对于得到的文件adslist.trade.txt.join（两列或者三列）
+	如果是两列，直接打印；如果是三列且后两列不同，打印第1，3列，结果输出到adslist.trade.txt.join1
+（6）进行awk操作
+	文件1：beidouad.txt
+	文件2：adslist.trade.txt
+	将adslist.trade.txt中包含beidouad.txt中推广单元id的列打印出来，结果存储到
+	adslist.trade.txt.join2
+（7）将5、6步得到的文件排序去重后存储到adslist.trade.txt.result
+（8）检查adslist.trade.txt.result文件（如果第4步条件不满足，则检查adslist.trade.txt），打印错误信息到verify.err，有三类情况会被检查出错误：
+	a.广告id（adid）<1或非数字
+	b.文件某一行少于2列
+	c.adtradeid小于101（一级行业tradeid）或者大于9900（不存在tradeid）
+	如果verify.err文件存在，则报警
+	符合条件的数据会被打印到adslist.trade.txt.verify
+（9）对于adslist.trade.txt.verify，首先根据第二列adtradeid进行排序，之后按照adtradeid对应的adid组进行分类，例如：
+adslist.trade.txt.verify的文件内容为：
+	10      1703
+	11      1703
+	12      1703
+	1       1902
+	3       1902
+	4       1902
+	6       1902
+	7       1902
+	8       1902
+	9       1903
+	则生成的adslist.trade.txt.group的内容为：
+	10,11,12      1703
+	1,3,4,6,7,8     1902
+	9             1903
+（10）根据分好组的adslist.trade.txt.group生成sql语句：
+	update cprounitmater0 m, cprounitstate0 s set m.adtradeid="$2" where m.id in ("$1") and m.id = s.id and s.helpstatus & 6 = 4;
+	生成的sql文件名为adslist.trade.txt.sql
+（11）执行上述sql文件（重试3次）
+（12）将adslist.trade.txt.sort文件移动到/data/adtrade/import/adtrade_bak目录下
+	将adslist.trade.txt文件移动到/data/adtrade/import/adtrade_bak目录下，并且命名为adslist.trade.txt.YYmmddHHMM，生成相应md5文件
+（13）清空adtrade_tmp下所有文件
+
+==========================================================================================
+【报警内容】
+1.	adtrade: Fail to download adslist.trade.txt（文件抓取失败，或者md5校验失败）
+2.	verifying adslist.trade.txt error:**（文件校验失败，见第8步）
+3.	adtrade: Import Error.（执行生成的sql脚本错误）
+4.	adslist.trade.txt is empty.（文件内容为空）
+
+==========================================================================================
+【备注】
+历史上任务559 “beidou-adtrade-import”执行失败，原因是上游ph模块生成的md5有问题，ph模块回滚，559下一周期执行正常。
+另外需要注意的是，559失败是因为验证md5失败，但是报警却提示下载文件失败，提示信息有误，后续可以着手修改
+
+此外，该任务还有另一个Case
+首先说下，广告分类导入导出的逻辑：
+1. adtrade_export每整点或者半点时导出
+2. adtrade_import也是每半小时执行一次，不过会在herring分完类后执行，执行时会进行前后两个半小时全库文件的diff，然后将 adtrade不同的执行sql更新
+具体到实现逻辑时：
+adtrade_import在进行全库文件diff前，会先判断export生成的beidouad.txt（每半小时的增量文件）是否存在， 如果存在则做diff；不存在，则将全库的分类全部更新一次。
+adtrade_export在select数据库中没有分类的广告之前，会先将beidouad.txt文件mv到其他地方，然后执行 select操作，生成新的beidouad.txt。
+
+这样就出现了2011-11-6 5:30的case：
+1. adtrade_export在mv了beidouad.txt文件之后，执行select操作
+2. 正好，adtrade_import在export的select操作完成之前（50秒内）去判断有没有beidouad.txt，发现没 有，执行全库分类更新
+
+后续解决方案：
+1. RD评估将mv改成cp是否对其他逻辑造成影响，如果不受影响，则进行升级
+2. 另外，继春咱们这个升级是不是能够早点通知op同学操作，尽量避免后面出现类型情况发生
+

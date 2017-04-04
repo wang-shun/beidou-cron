@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN 2.0//EN" "http://www.springframework.org/dtd/spring-beans-2.0.dtd">
+
+<!--
+	- Application context definition for "springapp" DispatcherServlet.
+-->
+
+<beans>	
+	<bean id="auditTaskSendResultSetCallBack" class="com.baidu.beidou.auditmanager.service.impl.AuditTaskSendResultSetCallBack">
+		<property name="userInfoMgr">
+			<ref bean="userInfoMgr" />
+		</property>
+		<property name="auditredisCacheMgr">
+			<ref bean="auditredisCacheMgr" />
+		</property>
+		<property name="blackUserList">
+			<set>
+				<value>9967148</value>
+				<value>9710592</value>
+				<value>8179474</value>
+				<value>7273897</value>
+				<value>7273821</value>
+				<value>6337026</value>
+				<value>5916467</value>
+				<value>3569859</value>
+				<value>1278146</value>
+				<value>9965707</value>
+				<value>7534857</value>
+				<value>7414710</value>
+				<value>7386423</value>
+				<value>7375601</value>
+				<value>6312987</value>
+				<value>6255723</value>
+				<value>6253891</value>
+				<value>5789057</value>
+				<value>5398570</value>
+				<value>3385675</value>
+				<value>7896130</value>
+				<value>10058579</value>
+				<value>10032535</value>
+				<value>9966608</value>
+				<value>9965706</value>
+				<value>9964850</value>
+				<value>9964726</value>
+				<value>9945582</value>
+				<value>9924774</value>
+				<value>9909937</value>
+				<value>791</value>
+				<value>9966394</value>
+				<value>9964940</value>
+				<value>9964793</value>
+				<value>9921987</value>
+				<value>9699516</value>
+				<value>8156072</value>
+				<value>8150333</value>
+				<value>8107446</value>
+				<value>7947088</value>
+				<value>7919462</value>
+				<value>7764000</value>
+				<value>7763980</value>
+				<value>7655688</value>
+				<value>7655212</value>
+				<value>7576417</value>
+				<value>7378213</value>
+				<value>7162116</value>
+				<value>6950075</value>
+				<value>10023910</value>
+				<value>19</value>
+			</set>
+		</property>
+	</bean>
+
+</beans>

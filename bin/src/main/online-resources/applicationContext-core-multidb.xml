@@ -1,0 +1,1405 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN 2.0//EN"
+			  "http://www.springframework.org/dtd/spring-beans-2.0.dtd">
+
+<beans>
+	
+	<!-- ========================= DATABASE RESOURCE  DEFINITIONS ========================= -->
+	<!-- addb data source configure start -->
+	<bean id="addbDataSource" abstract="true"
+		class="com.mchange.v2.c3p0.ComboPooledDataSource"
+		destroy-method="close">
+		<property name="driverClass">
+			<value>${jdbc.driverClassName}</value>
+		</property>
+		<property name="maxPoolSize">
+			<value>${jdbc.maxPoolSize}</value>
+		</property>
+		<property name="minPoolSize">
+			<value>${jdbc.minPoolSize}</value>
+		</property>
+		<property name="idleConnectionTestPeriod">
+			<value>${jdbc.idleConnectionTestPeriod}</value>
+		</property>
+		<property name="maxIdleTime">
+			<value>${jdbc.maxIdleTime}</value>
+		</property>
+	</bean>
+	
+	<bean id="addb000_master" destroy-method="close" parent="addbDataSource">
+		<property name="jdbcUrl">
+			<value>${jdbc.addb000.master.url}</value>
+		</property>
+		<property name="user">
+			<value>${jdbc.addb000.master.username}</value>
+		</property>
+		<property name="password">
+			<value>${jdbc.addb000.master.password}</value>
+		</property>
+	</bean>
+	<bean id="addb000_slave_0" destroy-method="close" parent="addbDataSource">
+		<property name="jdbcUrl">
+			<value>${jdbc.addb000.slave00.url}</value>
+		</property>
+		<property name="user">
+			<value>${jdbc.addb000.slave00.username}</value>
+		</property>
+		<property name="password">
+			<value>${jdbc.addb000.slave00.password}</value>
+		</property>
+	</bean>
+	<bean id="addb000_slave_1" destroy-method="close" parent="addbDataSource">
+		<property name="jdbcUrl">
+			<value>${jdbc.addb000.slave01.url}</value>
+		</property>
+		<property name="user">
+			<value>${jdbc.addb000.slave01.username}</value>
+		</property>
+		<property name="password">
+			<value>${jdbc.addb000.slave01.password}</value>
+		</property>
+	</bean>
+	<bean id="addb000_slave_2" destroy-method="close" parent="addbDataSource">
+		<property name="jdbcUrl">
+			<value>${jdbc.addb000.slave02.url}</value>
+		</property>
+		<property name="user">
+			<value>${jdbc.addb000.slave02.username}</value>
+		</property>
+		<property name="password">
+			<value>${jdbc.addb000.slave02.password}</value>
+		</property>
+	</bean>
+	<bean id="addb000_slave_3" destroy-method="close" parent="addbDataSource">
+		<property name="jdbcUrl">
+			<value>${jdbc.addb000.slave03.url}</value>
+		</property>
+		<property name="user">
+			<value>${jdbc.addb000.slave03.username}</value>
+		</property>
+		<property name="password">
+			<value>${jdbc.addb000.slave03.password}</value>
+		</property>
+	</bean>
+	
+	<bean id="addb001_master" destroy-method="close" parent="addbDataSource">
+		<property name="jdbcUrl">
+			<value>${jdbc.addb001.master.url}</value>
+		</property>
+		<property name="user">
+			<value>${jdbc.addb001.master.username}</value>
+		</property>
+		<property name="password">
+			<value>${jdbc.addb001.master.password}</value>
+		</property>
+	</bean>
+	<bean id="addb001_slave_0" destroy-method="close" parent="addbDataSource">
+		<property name="jdbcUrl">
+			<value>${jdbc.addb001.slave00.url}</value>
+		</property>
+		<property name="user">
+			<value>${jdbc.addb001.slave00.username}</value>
+		</property>
+		<property name="password">
+			<value>${jdbc.addb001.slave00.password}</value>
+		</property>
+	</bean>
+	<bean id="addb001_slave_1" destroy-method="close" parent="addbDataSource">
+		<property name="jdbcUrl">
+			<value>${jdbc.addb001.slave01.url}</value>
+		</property>
+		<property name="user">
+			<value>${jdbc.addb001.slave01.username}</value>
+		</property>
+		<property name="password">
+			<value>${jdbc.addb001.slave01.password}</value>
+		</property>
+	</bean>
+	<bean id="addb001_slave_2" destroy-method="close" parent="addbDataSource">
+		<property name="jdbcUrl">
+			<value>${jdbc.addb001.slave02.url}</value>
+		</property>
+		<property name="user">
+			<value>${jdbc.addb001.slave02.username}</value>
+		</property>
+		<property name="password">
+			<value>${jdbc.addb001.slave02.password}</value>
+		</property>
+	</bean>
+	<bean id="addb001_slave_3" destroy-method="close" parent="addbDataSource">
+		<property name="jdbcUrl">
+			<value>${jdbc.addb001.slave03.url}</value>
+		</property>
+		<property name="user">
+			<value>${jdbc.addb001.slave03.username}</value>
+		</property>
+		<property name="password">
+			<value>${jdbc.addb001.slave03.password}</value>
+		</property>
+	</bean>
+	
+	<bean id="addb010_master" destroy-method="close" parent="addbDataSource">
+		<property name="jdbcUrl">
+			<value>${jdbc.addb010.master.url}</value>
+		</property>
+		<property name="user">
+			<value>${jdbc.addb010.master.username}</value>
+		</property>
+		<property name="password">
+			<value>${jdbc.addb010.master.password}</value>
+		</property>
+	</bean>
+	<bean id="addb010_slave_0" destroy-method="close" parent="addbDataSource">
+		<property name="jdbcUrl">
+			<value>${jdbc.addb010.slave00.url}</value>
+		</property>
+		<property name="user">
+			<value>${jdbc.addb010.slave00.username}</value>
+		</property>
+		<property name="password">
+			<value>${jdbc.addb010.slave00.password}</value>
+		</property>
+	</bean>
+	<bean id="addb010_slave_1" destroy-method="close" parent="addbDataSource">
+		<property name="jdbcUrl">
+			<value>${jdbc.addb010.slave01.url}</value>
+		</property>
+		<property name="user">
+			<value>${jdbc.addb010.slave01.username}</value>
+		</property>
+		<property name="password">
+			<value>${jdbc.addb010.slave01.password}</value>
+		</property>
+	</bean>
+	<bean id="addb010_slave_2" destroy-method="close" parent="addbDataSource">
+		<property name="jdbcUrl">
+			<value>${jdbc.addb010.slave02.url}</value>
+		</property>
+		<property name="user">
+			<value>${jdbc.addb010.slave02.username}</value>
+		</property>
+		<property name="password">
+			<value>${jdbc.addb010.slave02.password}</value>
+		</property>
+	</bean>
+	<bean id="addb010_slave_3" destroy-method="close" parent="addbDataSource">
+		<property name="jdbcUrl">
+			<value>${jdbc.addb010.slave03.url}</value>
+		</property>
+		<property name="user">
+			<value>${jdbc.addb010.slave03.username}</value>
+		</property>
+		<property name="password">
+			<value>${jdbc.addb010.slave03.password}</value>
+		</property>
+	</bean>
+	
+	<bean id="addb011_master" destroy-method="close" parent="addbDataSource">
+		<property name="jdbcUrl">
+			<value>${jdbc.addb011.master.url}</value>
+		</property>
+		<property name="user">
+			<value>${jdbc.addb011.master.username}</value>
+		</property>
+		<property name="password">
+			<value>${jdbc.addb011.master.password}</value>
+		</property>
+	</bean>
+	<bean id="addb011_slave_0" destroy-method="close" parent="addbDataSource">
+		<property name="jdbcUrl">
+			<value>${jdbc.addb011.slave00.url}</value>
+		</property>
+		<property name="user">
+			<value>${jdbc.addb011.slave00.username}</value>
+		</property>
+		<property name="password">
+			<value>${jdbc.addb011.slave00.password}</value>
+		</property>
+	</bean>
+	<bean id="addb011_slave_1" destroy-method="close" parent="addbDataSource">
+		<property name="jdbcUrl">
+			<value>${jdbc.addb011.slave01.url}</value>
+		</property>
+		<property name="user">
+			<value>${jdbc.addb011.slave01.username}</value>
+		</property>
+		<property name="password">
+			<value>${jdbc.addb011.slave01.password}</value>
+		</property>
+	</bean>
+	<bean id="addb011_slave_2" destroy-method="close" parent="addbDataSource">
+		<property name="jdbcUrl">
+			<value>${jdbc.addb011.slave02.url}</value>
+		</property>
+		<property name="user">
+			<value>${jdbc.addb011.slave02.username}</value>
+		</property>
+		<property name="password">
+			<value>${jdbc.addb011.slave02.password}</value>
+		</property>
+	</bean>
+	<bean id="addb011_slave_3" destroy-method="close" parent="addbDataSource">
+		<property name="jdbcUrl">
+			<value>${jdbc.addb011.slave03.url}</value>
+		</property>
+		<property name="user">
+			<value>${jdbc.addb011.slave03.username}</value>
+		</property>
+		<property name="password">
+			<value>${jdbc.addb011.slave03.password}</value>
+		</property>
+	</bean>
+	
+	<bean id="addb100_master" destroy-method="close" parent="addbDataSource">
+		<property name="jdbcUrl">
+			<value>${jdbc.addb100.master.url}</value>
+		</property>
+		<property name="user">
+			<value>${jdbc.addb100.master.username}</value>
+		</property>
+		<property name="password">
+			<value>${jdbc.addb100.master.password}</value>
+		</property>
+	</bean>
+	<bean id="addb100_slave_0" destroy-method="close" parent="addbDataSource">
+		<property name="jdbcUrl">
+			<value>${jdbc.addb100.slave00.url}</value>
+		</property>
+		<property name="user">
+			<value>${jdbc.addb100.slave00.username}</value>
+		</property>
+		<property name="password">
+			<value>${jdbc.addb100.slave00.password}</value>
+		</property>
+	</bean>
+	<bean id="addb100_slave_1" destroy-method="close" parent="addbDataSource">
+		<property name="jdbcUrl">
+			<value>${jdbc.addb100.slave01.url}</value>
+		</property>
+		<property name="user">
+			<value>${jdbc.addb100.slave01.username}</value>
+		</property>
+		<property name="password">
+			<value>${jdbc.addb100.slave01.password}</value>
+		</property>
+	</bean>
+	<bean id="addb100_slave_2" destroy-method="close" parent="addbDataSource">
+		<property name="jdbcUrl">
+			<value>${jdbc.addb100.slave02.url}</value>
+		</property>
+		<property name="user">
+			<value>${jdbc.addb100.slave02.username}</value>
+		</property>
+		<property name="password">
+			<value>${jdbc.addb100.slave02.password}</value>
+		</property>
+	</bean>
+	<bean id="addb100_slave_3" destroy-method="close" parent="addbDataSource">
+		<property name="jdbcUrl">
+			<value>${jdbc.addb100.slave03.url}</value>
+		</property>
+		<property name="user">
+			<value>${jdbc.addb100.slave03.username}</value>
+		</property>
+		<property name="password">
+			<value>${jdbc.addb100.slave03.password}</value>
+		</property>
+	</bean>
+	
+	<bean id="addb101_master" destroy-method="close" parent="addbDataSource">
+		<property name="jdbcUrl">
+			<value>${jdbc.addb101.master.url}</value>
+		</property>
+		<property name="user">
+			<value>${jdbc.addb101.master.username}</value>
+		</property>
+		<property name="password">
+			<value>${jdbc.addb101.master.password}</value>
+		</property>
+	</bean>
+	<bean id="addb101_slave_0" destroy-method="close" parent="addbDataSource">
+		<property name="jdbcUrl">
+			<value>${jdbc.addb101.slave00.url}</value>
+		</property>
+		<property name="user">
+			<value>${jdbc.addb101.slave00.username}</value>
+		</property>
+		<property name="password">
+			<value>${jdbc.addb101.slave00.password}</value>
+		</property>
+	</bean>
+	<bean id="addb101_slave_1" destroy-method="close" parent="addbDataSource">
+		<property name="jdbcUrl">
+			<value>${jdbc.addb101.slave01.url}</value>
+		</property>
+		<property name="user">
+			<value>${jdbc.addb101.slave01.username}</value>
+		</property>
+		<property name="password">
+			<value>${jdbc.addb101.slave01.password}</value>
+		</property>
+	</bean>
+	<bean id="addb101_slave_2" destroy-method="close" parent="addbDataSource">
+		<property name="jdbcUrl">
+			<value>${jdbc.addb101.slave02.url}</value>
+		</property>
+		<property name="user">
+			<value>${jdbc.addb101.slave02.username}</value>
+		</property>
+		<property name="password">
+			<value>${jdbc.addb101.slave02.password}</value>
+		</property>
+	</bean>
+	<bean id="addb101_slave_3" destroy-method="close" parent="addbDataSource">
+		<property name="jdbcUrl">
+			<value>${jdbc.addb101.slave03.url}</value>
+		</property>
+		<property name="user">
+			<value>${jdbc.addb101.slave03.username}</value>
+		</property>
+		<property name="password">
+			<value>${jdbc.addb101.slave03.password}</value>
+		</property>
+	</bean>
+	
+	<bean id="addb110_master" destroy-method="close" parent="addbDataSource">
+		<property name="jdbcUrl">
+			<value>${jdbc.addb110.master.url}</value>
+		</property>
+		<property name="user">
+			<value>${jdbc.addb110.master.username}</value>
+		</property>
+		<property name="password">
+			<value>${jdbc.addb110.master.password}</value>
+		</property>
+	</bean>
+	<bean id="addb110_slave_0" destroy-method="close" parent="addbDataSource">
+		<property name="jdbcUrl">
+			<value>${jdbc.addb110.slave00.url}</value>
+		</property>
+		<property name="user">
+			<value>${jdbc.addb110.slave00.username}</value>
+		</property>
+		<property name="password">
+			<value>${jdbc.addb110.slave00.password}</value>
+		</property>
+	</bean>
+	<bean id="addb110_slave_1" destroy-method="close" parent="addbDataSource">
+		<property name="jdbcUrl">
+			<value>${jdbc.addb110.slave01.url}</value>
+		</property>
+		<property name="user">
+			<value>${jdbc.addb110.slave01.username}</value>
+		</property>
+		<property name="password">
+			<value>${jdbc.addb110.slave01.password}</value>
+		</property>
+	</bean>
+	<bean id="addb110_slave_2" destroy-method="close" parent="addbDataSource">
+		<property name="jdbcUrl">
+			<value>${jdbc.addb110.slave02.url}</value>
+		</property>
+		<property name="user">
+			<value>${jdbc.addb110.slave02.username}</value>
+		</property>
+		<property name="password">
+			<value>${jdbc.addb110.slave02.password}</value>
+		</property>
+	</bean>
+	<bean id="addb110_slave_3" destroy-method="close" parent="addbDataSource">
+		<property name="jdbcUrl">
+			<value>${jdbc.addb110.slave03.url}</value>
+		</property>
+		<property name="user">
+			<value>${jdbc.addb110.slave03.username}</value>
+		</property>
+		<property name="password">
+			<value>${jdbc.addb110.slave03.password}</value>
+		</property>
+	</bean>
+	
+	<bean id="addb111_master" destroy-method="close" parent="addbDataSource">
+		<property name="jdbcUrl">
+			<value>${jdbc.addb111.master.url}</value>
+		</property>
+		<property name="user">
+			<value>${jdbc.addb111.master.username}</value>
+		</property>
+		<property name="password">
+			<value>${jdbc.addb111.master.password}</value>
+		</property>
+	</bean>
+	<bean id="addb111_slave_0" destroy-method="close" parent="addbDataSource">
+		<property name="jdbcUrl">
+			<value>${jdbc.addb111.slave00.url}</value>
+		</property>
+		<property name="user">
+			<value>${jdbc.addb111.slave00.username}</value>
+		</property>
+		<property name="password">
+			<value>${jdbc.addb111.slave00.password}</value>
+		</property>
+	</bean>
+	<bean id="addb111_slave_1" destroy-method="close" parent="addbDataSource">
+		<property name="jdbcUrl">
+			<value>${jdbc.addb111.slave01.url}</value>
+		</property>
+		<property name="user">
+			<value>${jdbc.addb111.slave01.username}</value>
+		</property>
+		<property name="password">
+			<value>${jdbc.addb111.slave01.password}</value>
+		</property>
+	</bean>
+	<bean id="addb111_slave_2" destroy-method="close" parent="addbDataSource">
+		<property name="jdbcUrl">
+			<value>${jdbc.addb111.slave02.url}</value>
+		</property>
+		<property name="user">
+			<value>${jdbc.addb111.slave02.username}</value>
+		</property>
+		<property name="password">
+			<value>${jdbc.addb111.slave02.password}</value>
+		</property>
+	</bean>
+	<bean id="addb111_slave_3" destroy-method="close" parent="addbDataSource">
+		<property name="jdbcUrl">
+			<value>${jdbc.addb111.slave03.url}</value>
+		</property>
+		<property name="user">
+			<value>${jdbc.addb111.slave03.username}</value>
+		</property>
+		<property name="password">
+			<value>${jdbc.addb111.slave03.password}</value>
+		</property>
+	</bean>
+	<!-- data source configure end -->
+	
+	<!-- vdb configure start -->
+	
+	<bean id="vdb_addb_000" class="com.baidu.beidou.multidatabase.datasource.VirtualDataSource">
+		<property name="masterPool" value="addb000_master" />
+		<property name="slavePools">
+			<list>
+				<value>addb000_slave_0</value>
+				<value>addb000_slave_1</value>
+				<value>addb000_slave_2</value>
+				<value>addb000_slave_3</value>
+			</list>
+		</property>
+	</bean>
+	<bean id="vdb_addb_001" class="com.baidu.beidou.multidatabase.datasource.VirtualDataSource">
+		<property name="masterPool" value="addb001_master" />
+		<property name="slavePools">
+			<list>
+				<value>addb001_slave_0</value>
+				<value>addb001_slave_1</value>
+				<value>addb001_slave_2</value>
+				<value>addb001_slave_3</value>
+			</list>
+		</property>
+	</bean>
+	<bean id="vdb_addb_010" class="com.baidu.beidou.multidatabase.datasource.VirtualDataSource">
+		<property name="masterPool" value="addb010_master" />
+		<property name="slavePools">
+			<list>
+				<value>addb010_slave_0</value>
+				<value>addb010_slave_1</value>
+				<value>addb010_slave_2</value>
+				<value>addb010_slave_3</value>
+			</list>
+		</property>
+	</bean>
+	<bean id="vdb_addb_011" class="com.baidu.beidou.multidatabase.datasource.VirtualDataSource">
+		<property name="masterPool" value="addb011_master" />
+		<property name="slavePools">
+			<list>
+				<value>addb011_slave_0</value>
+				<value>addb011_slave_1</value>
+				<value>addb011_slave_2</value>
+				<value>addb011_slave_3</value>
+			</list>
+		</property>
+	</bean>
+	<bean id="vdb_addb_100" class="com.baidu.beidou.multidatabase.datasource.VirtualDataSource">
+		<property name="masterPool" value="addb100_master" />
+		<property name="slavePools">
+			<list>
+				<value>addb100_slave_0</value>
+				<value>addb100_slave_1</value>
+				<value>addb100_slave_2</value>
+				<value>addb100_slave_3</value>
+			</list>
+		</property>
+	</bean>
+	<bean id="vdb_addb_101" class="com.baidu.beidou.multidatabase.datasource.VirtualDataSource">
+		<property name="masterPool" value="addb101_master" />
+		<property name="slavePools">
+			<list>
+				<value>addb101_slave_0</value>
+				<value>addb101_slave_1</value>
+				<value>addb101_slave_2</value>
+				<value>addb101_slave_3</value>
+			</list>
+		</property>
+	</bean>
+	<bean id="vdb_addb_110" class="com.baidu.beidou.multidatabase.datasource.VirtualDataSource">
+		<property name="masterPool" value="addb110_master" />
+		<property name="slavePools">
+			<list>
+				<value>addb110_slave_0</value>
+				<value>addb110_slave_1</value>
+				<value>addb110_slave_2</value>
+				<value>addb110_slave_3</value>
+			</list>
+		</property>
+	</bean>
+	<bean id="vdb_addb_111" class="com.baidu.beidou.multidatabase.datasource.VirtualDataSource">
+		<property name="masterPool" value="addb111_master" />
+		<property name="slavePools">
+			<list>
+				<value>addb111_slave_0</value>
+				<value>addb111_slave_1</value>
+				<value>addb111_slave_2</value>
+				<value>addb111_slave_3</value>
+			</list>
+		</property>
+	</bean>
+	<!-- vdb configure end -->
+	
+	
+	<bean id="addbMultiDataSource"
+		class="com.baidu.beidou.multidatabase.datasource.MultiDataSource">
+		<property name="targetDataSources">
+			<map key-type="java.lang.String">
+				<entry key="addb000_master" value-ref="addb000_master" />
+				<entry key="addb000_slave_0" value-ref="addb000_slave_0" />
+				<entry key="addb000_slave_1" value-ref="addb000_slave_1" />
+				<entry key="addb000_slave_2" value-ref="addb000_slave_2" />
+				<entry key="addb000_slave_3" value-ref="addb000_slave_3" />
+				
+				<entry key="addb001_master" value-ref="addb001_master" />
+				<entry key="addb001_slave_0" value-ref="addb001_slave_0" />
+				<entry key="addb001_slave_1" value-ref="addb001_slave_1" />
+				<entry key="addb001_slave_2" value-ref="addb001_slave_2" />
+				<entry key="addb001_slave_3" value-ref="addb001_slave_3" />
+				
+				<entry key="addb010_master" value-ref="addb010_master" />
+				<entry key="addb010_slave_0" value-ref="addb010_slave_0" />
+				<entry key="addb010_slave_1" value-ref="addb010_slave_1" />
+				<entry key="addb010_slave_2" value-ref="addb010_slave_2" />
+				<entry key="addb010_slave_3" value-ref="addb010_slave_3" />
+				
+				<entry key="addb011_master" value-ref="addb011_master" />
+				<entry key="addb011_slave_0" value-ref="addb011_slave_0" />
+				<entry key="addb011_slave_1" value-ref="addb011_slave_1" />
+				<entry key="addb011_slave_2" value-ref="addb011_slave_2" />
+				<entry key="addb011_slave_3" value-ref="addb011_slave_3" />
+				
+				<entry key="addb100_master" value-ref="addb100_master" />
+				<entry key="addb100_slave_0" value-ref="addb100_slave_0" />
+				<entry key="addb100_slave_1" value-ref="addb100_slave_1" />
+				<entry key="addb100_slave_2" value-ref="addb100_slave_2" />
+				<entry key="addb100_slave_3" value-ref="addb100_slave_3" />
+				
+				<entry key="addb101_master" value-ref="addb101_master" />
+				<entry key="addb101_slave_0" value-ref="addb101_slave_0" />
+				<entry key="addb101_slave_1" value-ref="addb101_slave_1" />
+				<entry key="addb101_slave_2" value-ref="addb101_slave_2" />
+				<entry key="addb101_slave_3" value-ref="addb101_slave_3" />
+				
+				<entry key="addb110_master" value-ref="addb110_master" />
+				<entry key="addb110_slave_0" value-ref="addb110_slave_0" />
+				<entry key="addb110_slave_1" value-ref="addb110_slave_1" />
+				<entry key="addb110_slave_2" value-ref="addb110_slave_2" />
+				<entry key="addb110_slave_3" value-ref="addb110_slave_3" />
+				
+				<entry key="addb111_master" value-ref="addb111_master" />
+				<entry key="addb111_slave_0" value-ref="addb111_slave_0" />
+				<entry key="addb111_slave_1" value-ref="addb111_slave_1" />
+				<entry key="addb111_slave_2" value-ref="addb111_slave_2" />
+				<entry key="addb111_slave_3" value-ref="addb111_slave_3" />
+			</map>
+		</property>
+		<property name="defaultTargetDataSource" ref="addb000_master" />
+		<property name="multiDataSourceKeyContext">
+			<ref local="addbMultiDSKeyContext" />
+		</property>
+	</bean>
+	
+	<bean id="addbRouter" class="com.baidu.beidou.multidatabase.router.UseridRouter">
+		<property name="prefix" value="vdb_addb"/>
+		<property name="dbShardingRule" >
+			<ref local="addbShardingRule" />
+		</property>
+	</bean>
+	<bean id="addbShardingRule" class="com.baidu.beidou.multidatabase.rule.SimpleDBShardingRuleImpl">
+		<property name="shardingNum" value="8"/>
+	</bean>
+	<bean id="addbMultiDSKeyContext" class="com.baidu.beidou.multidatabase.datasource.MultiDataSourceKeyContext">
+		<property name="router">
+			<ref local="addbRouter" />
+		</property>
+		<property name="dbName" value="adDB" />
+	</bean>
+	<!-- addb data source configure end -->
+	
+	
+	
+	<!-- capdb data source configure start -->
+	<bean id="capdbDataSource"
+		class="com.mchange.v2.c3p0.ComboPooledDataSource"
+		destroy-method="close">
+		<property name="driverClass">
+			<value>${jdbc.driverClassName}</value>
+		</property>
+		<property name="jdbcUrl">
+			<value>${jdbc.capdb.master.url}</value>
+		</property>
+		<property name="user">
+			<value>${jdbc.capdb.master.username}</value>
+		</property>
+		<property name="password">
+			<value>${jdbc.capdb.master.password}</value>
+		</property>
+		<property name="maxPoolSize">
+			<value>${jdbc.maxPoolSize}</value>
+		</property>
+		<property name="minPoolSize">
+			<value>${jdbc.minPoolSize}</value>
+		</property>
+		<property name="idleConnectionTestPeriod">
+			<value>${jdbc.idleConnectionTestPeriod}</value>
+		</property>
+		<property name="maxIdleTime">
+			<value>${jdbc.maxIdleTime}</value>
+		</property>
+	</bean>
+	
+	<bean id="capdb_master" destroy-method="close" parent="capdbDataSource">
+		<property name="jdbcUrl">
+			<value>${jdbc.capdb.master.url}</value>
+		</property>
+		<property name="user">
+			<value>${jdbc.capdb.master.username}</value>
+		</property>
+		<property name="password">
+			<value>${jdbc.capdb.master.password}</value>
+		</property>
+	</bean>
+	<!--
+	<bean id="capdb_slave_0" destroy-method="close" parent="capdbDataSource">
+		<property name="jdbcUrl">
+			<value>${jdbc.capdb.slave.db01.url}</value>
+		</property>
+	</bean>
+	-->
+	<!-- data source configure end -->
+	
+	<!-- vdb configure start -->
+	
+	<bean id="vdb_capdb" class="com.baidu.beidou.multidatabase.datasource.VirtualDataSource">
+		<property name="masterPool" value="capdb_master" />
+		<property name="slavePools">
+			<list>
+				<value>capdb_slave_0</value>
+				<value>capdb_slave_1</value>
+			</list>
+		</property>
+	</bean>
+	<!-- vdb configure end -->
+	
+	
+	<bean id="capdbMultiDataSource"
+		class="com.baidu.beidou.multidatabase.datasource.MultiDataSource">
+		<property name="targetDataSources">
+			<map key-type="java.lang.String">
+				<entry key="capdb_master" value-ref="capdb_master" />
+				<entry key="capdb_slave_0" value-ref="addb000_slave_0" />
+				<entry key="capdb_slave_1" value-ref="addb001_slave_0" />
+				<entry key="capdb_slave_2" value-ref="addb010_slave_0" />
+				<entry key="capdb_slave_3" value-ref="addb011_slave_0" />
+				<entry key="capdb_slave_4" value-ref="addb100_slave_0" />
+				<entry key="capdb_slave_5" value-ref="addb101_slave_0" />
+				<entry key="capdb_slave_6" value-ref="addb110_slave_0" />
+				<entry key="capdb_slave_7" value-ref="addb111_slave_0" />
+			</map>
+		</property>
+		<property name="defaultTargetDataSource" ref="capdb_master" />
+		<property name="multiDataSourceKeyContext">
+			<ref local="capdbMultiDSKeyContext" />
+		</property>
+	</bean>
+	
+	<bean id="capdbRouter" class="com.baidu.beidou.multidatabase.router.UseridRouter">
+		<property name="prefix" value="vdb_capdb"/>
+		<property name="dbShardingRule" >
+			<ref local="capdbShardingRule" />
+		</property>
+	</bean>
+	<bean id="capdbShardingRule" class="com.baidu.beidou.multidatabase.rule.SimpleDBShardingRuleImpl">
+		<property name="shardingNum" value="1"/>
+	</bean>
+	<bean id="capdbMultiDSKeyContext" class="com.baidu.beidou.multidatabase.datasource.MultiDataSourceKeyContext">
+		<property name="router">
+			<ref local="capdbRouter" />
+		</property>
+		<property name="dbName" value="capDB" />
+	</bean>
+	<!-- capdb data source configure end -->
+	
+	
+	<!-- xdb data source configure start -->
+	<bean id="xdbDataSource"
+		class="com.mchange.v2.c3p0.ComboPooledDataSource"
+		destroy-method="close">
+		<property name="driverClass">
+			<value>${jdbc.driverClassName}</value>
+		</property>
+		<property name="jdbcUrl">
+			<value>${jdbc.xdb.master.url}</value>
+		</property>
+		<property name="user">
+			<value>${jdbc.xdb.master.username}</value>
+		</property>
+		<property name="password">
+			<value>${jdbc.xdb.master.password}</value>
+		</property>
+		<property name="maxPoolSize">
+			<value>${jdbc.maxPoolSize}</value>
+		</property>
+		<property name="minPoolSize">
+			<value>${jdbc.minPoolSize}</value>
+		</property>
+		<property name="idleConnectionTestPeriod">
+			<value>${jdbc.idleConnectionTestPeriod}</value>
+		</property>
+		<property name="maxIdleTime">
+			<value>${jdbc.maxIdleTime}</value>
+		</property>
+	</bean>
+	
+	<bean id="xdb_master" destroy-method="close" parent="xdbDataSource">
+		<property name="jdbcUrl">
+			<value>${jdbc.xdb.master.url}</value>
+		</property>
+		<property name="user">
+			<value>${jdbc.xdb.master.username}</value>
+		</property>
+		<property name="password">
+			<value>${jdbc.xdb.master.password}</value>
+		</property>
+	</bean>
+	<bean id="xdb_slave_0" destroy-method="close" parent="xdbDataSource">
+		<property name="jdbcUrl">
+			<value>${jdbc.xdb.slave00.url}</value>
+		</property>
+		<property name="user">
+			<value>${jdbc.xdb.slave00.username}</value>
+		</property>
+		<property name="password">
+			<value>${jdbc.xdb.slave00.password}</value>
+		</property>
+	</bean>
+	<bean id="xdb_slave_1" destroy-method="close" parent="xdbDataSource">
+		<property name="jdbcUrl">
+			<value>${jdbc.xdb.slave01.url}</value>
+		</property>
+		<property name="user">
+			<value>${jdbc.xdb.slave01.username}</value>
+		</property>
+		<property name="password">
+			<value>${jdbc.xdb.slave01.password}</value>
+		</property>
+	</bean>
+	
+	<!-- data source configure end -->
+	
+	<!-- vdb configure start -->
+	
+	<bean id="vdb_xdb" class="com.baidu.beidou.multidatabase.datasource.VirtualDataSource">
+		<property name="masterPool" value="xdb_master" />
+		<property name="slavePools">
+			<list>
+				<value>xdb_slave_0</value>
+				<value>xdb_slave_1</value>
+			</list>
+		</property>
+	</bean>
+	<!-- vdb configure end -->
+	
+	<bean id="xdbMultiDataSource"
+		class="com.baidu.beidou.multidatabase.datasource.MultiDataSource">
+		<property name="targetDataSources">
+			<map key-type="java.lang.String">
+				<entry key="xdb_master" value-ref="xdb_master" />
+				<entry key="xdb_slave_0" value-ref="xdb_slave_0" />
+				<entry key="xdb_slave_1" value-ref="xdb_slave_1" />
+			</map>
+		</property>
+		<property name="defaultTargetDataSource" ref="xdb_master" />
+		<property name="multiDataSourceKeyContext">
+			<ref local="xdbMultiDSKeyContext" />
+		</property>
+	</bean>
+	
+	<bean id="xdbRouter" class="com.baidu.beidou.multidatabase.router.UseridRouter">
+		<property name="prefix" value="vdb_xdb"/>
+		<property name="dbShardingRule" >
+			<ref local="xdbShardingRule" />
+		</property>
+	</bean>
+	<bean id="xdbShardingRule" class="com.baidu.beidou.multidatabase.rule.SimpleDBShardingRuleImpl">
+		<property name="shardingNum" value="1"/>
+	</bean>
+	<bean id="xdbMultiDSKeyContext" class="com.baidu.beidou.multidatabase.datasource.MultiDataSourceKeyContext">
+		<property name="router">
+			<ref local="xdbRouter" />
+		</property>
+		<property name="dbName" value="xDB" />
+	</bean>
+	<!-- xdb data source configure end -->
+	
+		<!-- one_adx data source configure start -->
+	<bean id="oneDataSource"
+		class="com.mchange.v2.c3p0.ComboPooledDataSource"
+		destroy-method="close">
+		<property name="driverClass">
+			<value>${jdbc.driverClassName}</value>
+		</property>
+		<property name="jdbcUrl">
+			<value>${jdbc.one.master.url}</value>
+		</property>
+		<property name="user">
+			<value>${jdbc.one.master.username}</value>
+		</property>
+		<property name="password">
+			<value>${jdbc.one.master.password}</value>
+		</property>
+		<property name="maxPoolSize">
+			<value>${jdbc.maxPoolSize}</value>
+		</property>
+		<property name="minPoolSize">
+			<value>${jdbc.minPoolSize}</value>
+		</property>
+		<property name="idleConnectionTestPeriod">
+			<value>${jdbc.idleConnectionTestPeriod}</value>
+		</property>
+		<property name="maxIdleTime">
+			<value>${jdbc.maxIdleTime}</value>
+		</property>
+	</bean>
+	
+	<bean id="one_master" destroy-method="close" parent="oneDataSource">
+		<property name="jdbcUrl">
+			<value>${jdbc.one.master.url}</value>
+		</property>
+		<property name="user">
+			<value>${jdbc.one.master.username}</value>
+		</property>
+		<property name="password">
+			<value>${jdbc.one.master.password}</value>
+		</property>
+	</bean>
+	<bean id="one_slave_0" destroy-method="close" parent="oneDataSource">
+		<property name="jdbcUrl">
+			<value>${jdbc.one.slave00.url}</value>
+		</property>
+		<property name="user">
+			<value>${jdbc.one.slave00.username}</value>
+		</property>
+		<property name="password">
+			<value>${jdbc.one.slave00.password}</value>
+		</property>
+	</bean>
+	<bean id="one_slave_1" destroy-method="close" parent="oneDataSource">
+		<property name="jdbcUrl">
+			<value>${jdbc.one.slave01.url}</value>
+		</property>
+		<property name="user">
+			<value>${jdbc.one.slave01.username}</value>
+		</property>
+		<property name="password">
+			<value>${jdbc.one.slave01.password}</value>
+		</property>
+	</bean>
+	
+	<!-- data source configure end -->
+	
+	<!-- vdb configure start -->
+	
+	<bean id="vdb_one" class="com.baidu.beidou.multidatabase.datasource.VirtualDataSource">
+		<property name="masterPool" value="one_master" />
+		<property name="slavePools">
+			<list>
+				<value>one_slave_0</value>
+				<value>one_slave_1</value>
+			</list>
+		</property>
+	</bean>
+	<!-- vdb configure end -->
+	
+	<bean id="oneMultiDataSource"
+		class="com.baidu.beidou.multidatabase.datasource.MultiDataSource">
+		<property name="targetDataSources">
+			<map key-type="java.lang.String">
+				<entry key="one_master" value-ref="one_master" />
+				<entry key="one_slave_0" value-ref="one_slave_0" />
+				<entry key="one_slave_1" value-ref="one_slave_1" />
+			</map>
+		</property>
+		<property name="defaultTargetDataSource" ref="xdb_master" />
+		<property name="multiDataSourceKeyContext">
+			<ref local="oneMultiDSKeyContext" />
+		</property>
+	</bean>
+	
+	<bean id="oneRouter" class="com.baidu.beidou.multidatabase.router.UseridRouter">
+		<property name="prefix" value="vdb_one"/>
+		<property name="dbShardingRule" >
+			<ref local="xdbShardingRule" />
+		</property>
+	</bean>
+	<bean id="oneShardingRule" class="com.baidu.beidou.multidatabase.rule.SimpleDBShardingRuleImpl">
+		<property name="shardingNum" value="1"/>
+	</bean>
+	<bean id="oneMultiDSKeyContext" class="com.baidu.beidou.multidatabase.datasource.MultiDataSourceKeyContext">
+		<property name="router">
+			<ref local="oneRouter" />
+		</property>
+		<property name="dbName" value="oneDB" />
+	</bean>
+	<!-- one_adx data source configure end -->
+	
+	<!-- clkdb data source configure start -->
+	<bean id="clkdbDataSource"
+		class="com.mchange.v2.c3p0.ComboPooledDataSource"
+		destroy-method="close">
+		<property name="driverClass">
+			<value>${jdbc.driverClassName}</value>
+		</property>
+		<property name="jdbcUrl">
+			<value>${jdbc.clkdb.master.url}</value>
+		</property>
+		<property name="user">
+			<value>${jdbc.clkdb.master.username}</value>
+		</property>
+		<property name="password">
+			<value>${jdbc.clkdb.master.password}</value>
+		</property>
+		<property name="maxPoolSize">
+			<value>${jdbc.maxPoolSize}</value>
+		</property>
+		<property name="minPoolSize">
+			<value>${jdbc.minPoolSize}</value>
+		</property>
+		<property name="idleConnectionTestPeriod">
+			<value>${jdbc.idleConnectionTestPeriod}</value>
+		</property>
+		<property name="maxIdleTime">
+			<value>${jdbc.maxIdleTime}</value>
+		</property>
+	</bean>
+	
+	<bean id="clkdb_master" destroy-method="close" parent="clkdbDataSource">
+		<property name="jdbcUrl">
+			<value>${jdbc.clkdb.master.url}</value>
+		</property>
+		<property name="user">
+			<value>${jdbc.clkdb.master.username}</value>
+		</property>
+		<property name="password">
+			<value>${jdbc.clkdb.master.password}</value>
+		</property>
+	</bean>
+	<bean id="clkdb_slave_0" destroy-method="close" parent="addbDataSource">
+		<property name="jdbcUrl">
+			<value>${jdbc.clkdb.slave00.url}</value>
+		</property>
+		<property name="user">
+			<value>${jdbc.clkdb.slave00.username}</value>
+		</property>
+		<property name="password">
+			<value>${jdbc.clkdb.slave00.password}</value>
+		</property>
+	</bean>
+	<bean id="clkdb_slave_1" destroy-method="close" parent="addbDataSource">
+		<property name="jdbcUrl">
+			<value>${jdbc.clkdb.slave01.url}</value>
+		</property>
+		<property name="user">
+			<value>${jdbc.clkdb.slave01.username}</value>
+		</property>
+		<property name="password">
+			<value>${jdbc.clkdb.slave01.password}</value>
+		</property>
+	</bean>
+	
+	<!-- data source configure end -->
+	
+	<!-- vdb configure start -->
+	
+	<bean id="vdb_clkdb" class="com.baidu.beidou.multidatabase.datasource.VirtualDataSource">
+		<property name="masterPool" value="clkdb_master" />
+		<property name="slavePools">
+			<list>
+				<value>clkdb_slave_0</value>
+				<value>clkdb_slave_1</value>
+			</list>
+		</property>
+	</bean>
+	<!-- vdb configure end -->
+	
+	
+	<bean id="clkdbMultiDataSource"
+		class="com.baidu.beidou.multidatabase.datasource.MultiDataSource">
+		<property name="targetDataSources">
+			<map key-type="java.lang.String">
+				<entry key="clkdb_master" value-ref="clkdb_master" />
+				<entry key="clkdb_slave_0" value-ref="clkdb_slave_0" />
+				<entry key="clkdb_slave_1" value-ref="clkdb_slave_1" />
+			</map>
+		</property>
+		<property name="defaultTargetDataSource" ref="clkdb_master" />
+		<property name="multiDataSourceKeyContext">
+			<ref local="clkdbMultiDSKeyContext" />
+		</property>
+	</bean>
+	
+	<bean id="clkdbRouter" class="com.baidu.beidou.multidatabase.router.UseridRouter">
+		<property name="prefix" value="vdb_clkdb"/>
+		<property name="dbShardingRule" >
+			<ref local="clkdbShardingRule" />
+		</property>
+	</bean>
+	<bean id="clkdbShardingRule" class="com.baidu.beidou.multidatabase.rule.SimpleDBShardingRuleImpl">
+		<property name="shardingNum" value="1"/>
+	</bean>
+	<bean id="clkdbMultiDSKeyContext" class="com.baidu.beidou.multidatabase.datasource.MultiDataSourceKeyContext">
+		<property name="router">
+			<ref local="clkdbRouter" />
+		</property>
+		<property name="dbName" value="clkDB" />
+	</bean>
+	<!-- clkdb data source configure end -->
+	
+	
+	<!-- ========================= DATASOURCE  DEFINITIONS ========================= -->
+
+	<!-- addb start -->
+	<!-- Hibernate SessionFactory -->
+	<bean id="addbSessionFactory"
+		class="org.springframework.orm.hibernate3.LocalSessionFactoryBean">
+		<property name="dataSource">
+			<ref bean="addbMultiDataSource" />
+		</property>
+
+		<property name="mappingLocations">
+			<list>
+				<value>classpath*:/com/**/*-bd.hbm.xml</value>
+			</list>
+		</property>
+
+		<property name="entityInterceptor">
+			<bean class="com.baidu.beidou.util.log.AuditLogInterceptor"></bean>
+		</property>
+
+		<property name="hibernateProperties">
+            <bean class="org.springframework.beans.factory.config.PropertiesFactoryBean">
+                <property name="location">
+                    <value>classpath:hibernate.properties</value>
+                </property>
+            </bean>
+			<!--
+			<props>
+				<prop key="hibernate.dialect">
+					com.baidu.beidou.util.hibernate.MySQLBitDialect
+				</prop>
+				<prop key="hibernate.show_sql">false</prop>
+			</props>-->
+		</property>
+	</bean>
+	
+	<!--
+	<bean id="jdbcTemplate"
+		class="org.springframework.jdbc.core.JdbcTemplate">
+		<property name="dataSource" ref="addbMultiDataSource" />
+	</bean>
+	-->
+	<bean id="addbJdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
+		<property name="dataSource" ref="addbMultiDataSource"/>
+	</bean>
+	<bean id="addbBaseDao" abstract="true">
+		<property name="sessionFactory">
+			<ref bean="addbSessionFactory" />
+		</property>
+		<property name="jdbcTemplate">
+			<ref bean="addbJdbcTemplate" />
+		</property>
+	</bean>
+	<bean id="addbBaseDaoSupport" abstract="true">
+		<property name="jdbcTemplate">
+			<ref bean="addbJdbcTemplate" />
+		</property>
+	</bean>
+	<bean id="addbTransactionManager"
+		class="org.springframework.orm.hibernate3.HibernateTransactionManager">
+		<property name="sessionFactory">
+			<ref bean="addbSessionFactory" />
+		</property>
+		<property name="dataSource">
+			<ref bean="addbMultiDataSource" />
+		</property>
+	</bean>
+	<!-- addb end -->
+	
+	
+	<!-- capdb start -->
+	<!-- Hibernate SessionFactory -->
+	<bean id="capdbSessionFactory"
+		class="org.springframework.orm.hibernate3.LocalSessionFactoryBean">
+		<property name="dataSource">
+			<ref bean="capdbMultiDataSource" />
+		</property>
+
+		<property name="mappingLocations">
+			<list>
+				<value>classpath*:/com/**/*-bd.hbm.xml</value>
+			</list>
+		</property>
+
+		<property name="entityInterceptor">
+			<bean class="com.baidu.beidou.util.log.AuditLogInterceptor"></bean>
+		</property>
+
+		<property name="hibernateProperties">
+            <bean class="org.springframework.beans.factory.config.PropertiesFactoryBean">
+                <property name="location">
+                    <value>classpath:hibernate.properties</value>
+                </property>
+            </bean>
+			<!--
+			<props>
+				<prop key="hibernate.dialect">
+					com.baidu.beidou.util.hibernate.MySQLBitDialect
+				</prop>
+				<prop key="hibernate.show_sql">false</prop>
+			</props>-->
+		</property>
+	</bean>
+	
+	<bean id="capdbJdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
+		<property name="dataSource" ref="capdbMultiDataSource"/>
+	</bean>
+	<bean id="capdbBaseDao" abstract="true">
+		<property name="sessionFactory">
+			<ref bean="capdbSessionFactory" />
+		</property>
+		<property name="jdbcTemplate">
+			<ref bean="capdbJdbcTemplate" />
+		</property>
+	</bean>
+	<bean id="capdbBaseDaoSupport" abstract="true">
+		<property name="jdbcTemplate">
+			<ref bean="capdbJdbcTemplate" />
+		</property>
+	</bean>
+	<bean id="capdbTransactionManager"
+		class="org.springframework.orm.hibernate3.HibernateTransactionManager">
+		<property name="sessionFactory">
+			<ref bean="capdbSessionFactory" />
+		</property>
+		<property name="dataSource">
+			<ref bean="capdbMultiDataSource" />
+		</property>
+	</bean>
+	
+	<!-- capdb end -->
+	
+	<!-- xdb start -->
+	<!-- Hibernate SessionFactory -->
+	<bean id="xdbSessionFactory"
+		class="org.springframework.orm.hibernate3.LocalSessionFactoryBean">
+		<property name="dataSource">
+			<ref bean="xdbMultiDataSource" />
+		</property>
+
+		<property name="mappingLocations">
+			<list>
+				<value>classpath*:/com/**/*-bd.hbm.xml</value>
+				<value>classpath*:/com/baidu/beidou/tool/**/*-hs.hbm.xml</value>
+			</list>
+		</property>
+
+		<property name="entityInterceptor">
+			<bean class="com.baidu.beidou.util.log.AuditLogInterceptor"></bean>
+		</property>
+
+		<property name="hibernateProperties">
+            <bean class="org.springframework.beans.factory.config.PropertiesFactoryBean">
+                <property name="location">
+                    <value>classpath:hibernate.properties</value>
+                </property>
+            </bean>
+			<!--
+			<props>
+				<prop key="hibernate.dialect">
+					com.baidu.beidou.util.hibernate.MySQLBitDialect
+				</prop>
+				<prop key="hibernate.show_sql">false</prop>
+			</props>-->
+		</property>
+	</bean>
+	
+	<bean id="xdbJdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
+		<property name="dataSource" ref="xdbMultiDataSource"/>
+	</bean>
+	<bean id="xdbBaseDao" abstract="true">
+		<property name="sessionFactory">
+			<ref bean="xdbSessionFactory" />
+		</property>
+		<property name="jdbcTemplate">
+			<ref bean="xdbJdbcTemplate" />
+		</property>
+	</bean>
+	<bean id="xdbBaseDaoSupport" abstract="true">
+		<property name="jdbcTemplate">
+			<ref bean="xdbJdbcTemplate" />
+		</property>
+	</bean>
+	<bean id="xdbTransactionManager"
+		class="org.springframework.orm.hibernate3.HibernateTransactionManager">
+		<property name="sessionFactory">
+			<ref bean="xdbSessionFactory" />
+		</property>
+		<property name="dataSource">
+			<ref bean="xdbMultiDataSource" />
+		</property>
+	</bean>
+	<!-- xdb end -->
+	
+	<!-- one_adx start -->
+	<!-- Hibernate SessionFactory -->
+	<bean id="oneSessionFactory"
+		class="org.springframework.orm.hibernate3.LocalSessionFactoryBean">
+		<property name="dataSource">
+			<ref bean="oneMultiDataSource" />
+		</property>
+
+		<property name="mappingLocations">
+			<list>
+				<value>classpath*:/com/**/*-bd.hbm.xml</value>
+			</list>
+		</property>
+
+		<property name="entityInterceptor">
+			<bean class="com.baidu.beidou.util.log.AuditLogInterceptor"></bean>
+		</property>
+
+		<property name="hibernateProperties">
+            <bean class="org.springframework.beans.factory.config.PropertiesFactoryBean">
+                <property name="location">
+                    <value>classpath:hibernate.properties</value>
+                </property>
+            </bean>
+			<!--
+			<props>
+				<prop key="hibernate.dialect">
+					com.baidu.beidou.util.hibernate.MySQLBitDialect
+				</prop>
+				<prop key="hibernate.show_sql">false</prop>
+			</props>-->
+		</property>
+	</bean>
+	
+	<bean id="oneJdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
+		<property name="dataSource" ref="oneMultiDataSource"/>
+	</bean>
+	<bean id="oneBaseDao" abstract="true">
+		<property name="sessionFactory">
+			<ref bean="oneSessionFactory" />
+		</property>
+		<property name="jdbcTemplate">
+			<ref bean="oneJdbcTemplate" />
+		</property>
+	</bean>
+	<bean id="oneBaseDaoSupport" abstract="true">
+		<property name="jdbcTemplate">
+			<ref bean="oneJdbcTemplate" />
+		</property>
+	</bean>
+	<bean id="oneTransactionManager"
+		class="org.springframework.orm.hibernate3.HibernateTransactionManager">
+		<property name="sessionFactory">
+			<ref bean="oneSessionFactory" />
+		</property>
+		<property name="dataSource">
+			<ref bean="oneMultiDataSource" />
+		</property>
+	</bean>
+	<!-- one_adx end -->
+	
+	<!-- clkdb start -->
+	<!-- Hibernate SessionFactory -->
+	<bean id="clkdbSessionFactory"
+		class="org.springframework.orm.hibernate3.LocalSessionFactoryBean">
+		<property name="dataSource">
+			<ref bean="clkdbMultiDataSource" />
+		</property>
+
+		<property name="mappingLocations">
+			<list>
+				<value>classpath*:/com/**/*-bd.hbm.xml</value>
+			</list>
+		</property>
+
+		<property name="entityInterceptor">
+			<bean class="com.baidu.beidou.util.log.AuditLogInterceptor"></bean>
+		</property>
+
+		<property name="hibernateProperties">
+            <bean class="org.springframework.beans.factory.config.PropertiesFactoryBean">
+                <property name="location">
+                    <value>classpath:hibernate.properties</value>
+                </property>
+            </bean>
+			<!--
+			<props>
+				<prop key="hibernate.dialect">
+					com.baidu.beidou.util.hibernate.MySQLBitDialect
+				</prop>
+				<prop key="hibernate.show_sql">false</prop>
+			</props>-->
+		</property>
+	</bean>
+	
+	<bean id="clkdbJdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
+		<property name="dataSource" ref="clkdbMultiDataSource"/>
+	</bean>
+	<bean id="clkdbBaseDao" abstract="true">
+		<property name="sessionFactory">
+			<ref bean="clkdbSessionFactory" />
+		</property>
+		<property name="jdbcTemplate">
+			<ref bean="clkdbJdbcTemplate" />
+		</property>
+	</bean>
+	<bean id="clkdbBaseDaoSupport" abstract="true">
+		<property name="jdbcTemplate">
+			<ref bean="clkdbJdbcTemplate" />
+		</property>
+	</bean>
+	<bean id="clkdbTransactionManager"
+		class="org.springframework.orm.hibernate3.HibernateTransactionManager">
+		<property name="sessionFactory">
+			<ref bean="clkdbSessionFactory" />
+		</property>
+		<property name="dataSource">
+			<ref bean="clkdbMultiDataSource" />
+		</property>
+	</bean>
+	<!-- clkdb end -->
+	
+	<bean id="dataSourceSupport" class="com.baidu.beidou.multidatabase.datasource.MultiDataSourceSupport">
+	</bean>
+</beans>

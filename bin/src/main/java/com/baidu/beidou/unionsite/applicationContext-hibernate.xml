@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN 2.0//EN"
+			  "http://www.springframework.org/dtd/spring-beans-2.0.dtd">
+
+
+<!--
+	- Application context definition for Petclinic on Hibernate.
+-->
+<beans>
+	<bean id="unionSiteFileDao"
+		class="com.baidu.beidou.unionsite.dao.impl.UnionSiteFileDaoImpl">
+	</bean>
+	
+	<bean id="whiteUrlFileDao"
+		class="com.baidu.beidou.unionsite.dao.impl.WhiteUrlFileDaoImpl">
+	</bean>
+	
+	<bean id="urlStatFileDao"
+		class="com.baidu.beidou.unionsite.dao.impl.UrlStatFileDaoImpl">
+	</bean>
+
+
+	<bean id="adSizeDao"
+		class="com.baidu.beidou.unionsite.dao.impl.AdSizeDaoImpl"
+		parent="capdbBaseDaoSupport">
+	</bean>
+	
+	<bean id="siteStatDao"
+		class="com.baidu.beidou.unionsite.dao.impl.SiteStatFileDaoImpl"
+		parent="capdbBaseDaoSupport">
+	</bean>
+	<bean id="bdSiteStatDao"
+		class="com.baidu.beidou.unionsite.dao.impl.BDSiteStatDaoImpl" parent="xdbBaseDaoSupport">
+		<property name="prefGenerator">
+            <ref bean="clkHisStrategy"/>
+        </property>
+	</bean>
+	<bean id="bdSiteStatOnAddbDao"
+		class="com.baidu.beidou.unionsite.dao.impl.BDSiteStatOnAddbDaoImpl" parent="addbBaseDaoSupport">
+		<property name="dataSourceSupport" ref="dataSourceSupport">
+		</property>
+	</bean>
+	
+	<!-- wm123, add by liangshimu -->
+    <bean id="WM123SiteStatDao"
+        class="com.baidu.beidou.unionsite.dao.impl.WM123SiteStatDaoImpl" parent="xdbBaseDaoSupport">
+    </bean>
+    <bean id="wM123SiteStatOnCapDao"
+        class="com.baidu.beidou.unionsite.dao.impl.WM123SiteStatOnCapDaoImpl" parent="capdbBaseDaoSupport">
+    </bean>
+    <bean id="WM123SiteIndexDao"
+        class="com.baidu.beidou.unionsite.dao.impl.WM123SiteIndexDaoImpl" parent="xdbBaseDaoSupport">
+    </bean>
+    
+    <bean id="sequenceIdDaoOnXdb" class="com.baidu.beidou.util.dao.SequenceIdDaoImplOnXdb" parent="xdbBaseDaoSupport">
+	</bean>
+</beans>

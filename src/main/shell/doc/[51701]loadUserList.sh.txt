@@ -1,0 +1,33 @@
+﻿【任务名】	全用户ID加载内存
+【时间驱动】	0 * * * *	运行超时	2分钟	等待超时	 0分钟
+【运行命令】	cd /home/work/beidou-cron/bin; sh loadUserList.sh
+【日志地址】	/home/work/beidou-cron/log/loadUserList.log
+【变更库表】	无
+【任务依赖】  无
+========================================================================================
+【任务描述】
+执行远程调用：com.baidu.beidou.user.task.LoadUserListCTTask（12台服务器）
+对应Java类：beidou\src\com\baidu\beidou\user\task\LoadUserListCTTask.java
+Execute方法：
+1.	userDao.findAllUserIdContainSFState(excludeUstate, excludeShifenState);
+	该方法获取所有的用户ID（去掉excludeUstate和excludeShifenState），并按照shifenState进行分类放进map中
+	其中：excludeUstate：2（删除）
+	      excludeShifenState：7（被禁用）
+	(1)	拼接后的sql语句为：SELECT ua.userid userid, ua.ushifenstatid sfstate FROM beidou.useraccount ua WHERE 1=1 AND ua.ustate != 2 AND ua.ushifenstatid != 7
+	(2)	通过super.findBySql执行上述语句，得到List<Map<String, Object>>的list对象
+	(3)	对于list中的每个user对象，将userid放到alllist中，同时根据其sfstate放到对应的sfList中（如果list不存在，则创建并且sfMap.put(sfstate, sfList);）
+		返回结果为：sfMap: Map<Integer, List<Integer>> sfstateUserIdListMap
+2.	更新用户缓存：UserListCache.setSfstateUserIdListMap(sfstateUserIdListMap);
+3.	对于sfstateUserIdListMap，计算每一个state（Integer）对应的用户列表（List<Integer>）数量，打印到catalina日志中：
+	例如：
+	catalina.out.aimgr00:[INFO]	
+	2011-10-11 00:01:07,221	[http-8080-Processor69]	user.task.LoadUserListCTTask	(LoadUserListCTTask.java:35)	
+	-load sfstateUserIdListMap success,userid size - 2:244473, 4:384399, 6:29284, 1:591795, -1:1563162, 3:313211,
+
+
+==========================================================================================
+【报警内容】
+执行远程调用-载入用户列表失败{服务器名}
+
+【备注】
+任务51701作用是将全部的北斗的广告主信息按照shifenstat进行分类，然后存入内存； 这里43456,51701每小时执行一次，失败原因：更新8台beidou web机器上的缓存信息；由于在上线过程中，停掉了Server, 此时恰好为脚本执行期间的话，就会因为更新当前机器获取不到对应的服务而失败； 优化建议：从目前来看，由于加载的用户数据量增加，任务51701的超时时间为2分钟，目前该任务的运行耗时已经到了100s, 后续是否需要调大运行耗时，后续考虑是否增加该脚本的执行时间或者对数据量增大这种load做优化；由于loadserList.sh load进去的用户信息只是在mgr四台机器使用，而目前串行刷新12台机器；必然导致运行时间越来越长，可以将刷新其他机器的配置给去除，只刷新需要使 用到广告主的机器

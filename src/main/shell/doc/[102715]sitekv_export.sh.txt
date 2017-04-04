@@ -1,0 +1,38 @@
+﻿【任务名】	数据引擎SiteKV基准及增量数据导出
+【时间驱动】	50   *   *   *   *	运行超时	10分钟	等待超时	0分钟
+【运行命令】	cd /home/work/beidou-cron/bin&& sh sitekv_export.sh 
+【日志地址】	/home/work/beidou-cron/log/sitekv_export.log
+【变更库表】  无
+【任务依赖】  无
+========================================================================================
+【任务描述】
+
+（1）	检查配置信息和路径信息
+（2）	备份上周期增量文件，生成md5，存储到
+/home/work/beidou-cron/data/export/sitekv_bak/ sitekv_implement.data.YYYYMMDDHH(.md5)
+（3）	导出基准数据
+select sign, literal from sitekv（重试机制，3次），存储到
+/home/work/beidou-cron/data/export/sitekv/sitekv_base.data.tmp
+（4）	重命名上周期基准文件，生成md5，sitekv_base.data.YYYYMMDDHH(.md5)
+（5）	diff文件sitekv_base.data.tmp、sitekv_base.data.YYYYMMDDHH得到增量数据，存储到sitekv_implement.data，并生成md5
+（6）	移动上周期基准文件及md5到sitekv_bak目录
+（7）	重命名sitekv_base.data.tmp，得到基准文件及md5, sitekv_base.data和sitekv_base.data.md5
+（8）	清除sitekv_bak目录下的10天前历史数据
+
+
+
+==========================================================================================
+【报警内容】
+1.	Configuration Check Error（配置检查失败）
+2.	Data Path Check Error（数据路径检查失败）
+3.	Export DE Base Data Error（从DB中查询sitekv数据失败）
+4.	Diff DE Implement Data Error（diff文件得到增量数据失败）
+5.	Generate MD5 For Implement Data Error（生成增量数据md5失败）
+6.	Generate MD5 For Base Data Error（生成基准数据md5失败）
+
+
+【备注】
+该任务没有严格的任务依赖，实际上由于从beidoustat.sitekv中查询数据，因此其逻辑上的上游任务是848（sitekv数据导入）
+
+该任务生成的数据，每小时通过OP的数据推送中心Push到两台数据引擎服务器上，以便DE更新线程加载增量（每小时）和基准（每天），短时间内如果数据提供不及时，影响不大，失败时重跑即可。
+

@@ -1,0 +1,533 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:aop="http://www.springframework.org/schema/aop" xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:tx="http://www.springframework.org/schema/tx" xmlns:jdbc="http://www.springframework.org/schema/jdbc"
+	xmlns:oxm="http://www.springframework.org/schema/oxm" xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xmlns:util="http://www.springframework.org/schema/util" xmlns:task="http://www.springframework.org/schema/task"
+
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+           http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd
+           http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.0.xsd
+           http://www.springframework.org/schema/oxm http://www.springframework.org/schema/oxm/spring-oxm-3.0.xsd
+           http://www.springframework.org/schema/jdbc http://www.springframework.org/schema/jdbc/spring-jdbc-3.0.xsd
+           http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-3.0.xsd">
+
+	<bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        <property name="ignoreUnresolvablePlaceholders" value="true"/>
+        <property name="locations">
+            <list>
+                <value>classpath:com/baidu/beidou/accountmove/account_move.properties</value>
+                <value>classpath:com/baidu/beidou/accountmove/jdbc.properties</value>
+            </list>
+        </property>
+    </bean>
+	
+	<bean id="moveProcessor" class="com.baidu.beidou.accountmove.process.MoveProcessor">
+		<property name="exportor" ref="exportor" />	
+		<property name="importor" ref="importor" />	
+		<property name="keyMapper" ref="keyMapper" />
+		<property name="dataAccessService" ref="dataAccessService" />
+	</bean>
+	
+	<bean id="exportor" class="com.baidu.beidou.accountmove.exporter.impl.ExporterImpl">
+		<property name="exporterList">
+			<list>
+				<ref bean="wordPackKeywordExporter" />
+				<ref bean="wordPackExcludeExporter" />
+				<ref bean="wordExcludeExporter" />
+				<ref bean="unitIconExporter" />
+				<ref bean="userUploadIconsExporter" />
+				<ref bean="smartIdeaTemplateElementUrlExporter" />
+				<ref bean="smartIdeaTemplateElementConfExporter" />
+				<ref bean="smartIdeaProductFilterExporter" />
+				<ref bean="smartIdeaKeywordExporter" />
+				<ref bean="groupvtExporter" />
+				<ref bean="vturlExporter" />
+				<ref bean="vtpeopleExporter" />
+				<ref bean="vtcodeExporter" />
+				<ref bean="groupTradePriceExporter" />
+				<ref bean="groupSitePriceExporter" />
+				<ref bean="groupSiteFilterExporter" />
+				<ref bean="grouppackExporter" />
+				<ref bean="groupMultiChainFilterExporter" />
+				<ref bean="groupitExporter" />
+				<ref bean="groupipFilterExporter" />
+				<ref bean="groupInterestPriceExporter" />
+				<ref bean="groupAtrightInfoExporter" />
+				<ref bean="customInterestExporter" />
+				<ref bean="onlineUnitExporter" />
+				<ref bean="cprounitmaterExporter" />
+				<ref bean="cprounitstateExporter" />
+				<ref bean="cprokeywordExporter" />
+				<ref bean="groupitExcludeExporter" />
+				<ref bean="cprogroupAtrightExporter" />
+				<ref bean="cprogroupAtleftExporter" />
+				<ref bean="attachInfoExporter" />
+				<ref bean="atrightUserExporter" />
+				<ref bean="appExcludeExporter" />
+				<ref bean="wordPackExporter" />
+				<ref bean="cprogroupinfoExporter" />
+				<ref bean="cprogroupExporter" />
+				<ref bean="cproplanExporter" />
+			</list>
+		</property>	
+	</bean>
+	
+	<bean id="importor" class="com.baidu.beidou.accountmove.importer.impl.ImporterImpl">
+		<property name="importerList">
+			<list>
+				<ref bean="cproplanImporter" />
+				<ref bean="cprogroupImporter" />
+				<ref bean="cprogroupinfoImporter" />
+				<ref bean="wordPackImporter" />
+				<ref bean="appExcludeImporter" />
+				<ref bean="attachInfoImporter" />
+				<ref bean="cprogroupAtleftImporter" />
+				<ref bean="cprogroupAtrightImporter" />
+				<ref bean="customInterestImporter" />
+				<ref bean="groupitExcludeImporter" />
+				<ref bean="cprokeywordImporter" />
+				<ref bean="cprounitstateImporter" />
+				<ref bean="cprounitmaterImporter" />
+				<ref bean="onlineUnitImporter" />
+				<ref bean="groupAtrightInfoImporter" />
+				<ref bean="groupInterestPriceImporter" />
+				<ref bean="groupipFilterImporter" />
+				<ref bean="groupitImporter" />
+				<ref bean="groupMultiChainFilterImporter" />
+				<ref bean="grouppackImporter" />
+				<ref bean="groupSiteFilterImporter" />
+				<ref bean="groupSitePriceImporter" />
+				<ref bean="groupTradePriceImporter" />
+				<ref bean="vtcodeImporter" />
+				<ref bean="vtpeopleImporter" />
+				<ref bean="vturlImporter" />
+				<ref bean="groupvtImporter" />
+				<ref bean="smartIdeaKeywordImporter" />
+				<ref bean="smartIdeaProductFilterImporter" />
+				<ref bean="smartIdeaTemplateElementConfImporter" />
+				<ref bean="smartIdeaTemplateElementUrlImporter" />
+				<ref bean="userUploadIconsImporter" />
+				<ref bean="unitIconImporter" />
+				<ref bean="wordExcludeImporter" />
+				<ref bean="wordPackExcludeImporter" />
+				<ref bean="wordPackKeywordImporter" />
+				<ref bean="atrightUserImporter" />
+			</list>
+		</property>	
+	</bean>
+	
+	<bean id="keyMapper" class="com.baidu.beidou.accountmove.keymap.impl.KeyMapperImpl">
+		<property name="baseFilePath" value="${BASE_FILE_PATH}" />	
+	</bean>
+	
+	<bean id="fexporter" class="com.baidu.beidou.accountmove.util.FileExporter">
+		<property name="baseFilePath" value="${BASE_FILE_PATH}" />	
+	</bean>
+	
+	
+	<bean id="fileConfig" class="com.baidu.beidou.accountmove.ubmc.conf.FileConfig">
+		<constructor-arg value="${ubmc_properties_path}" />    
+	</bean>
+	<bean id="idService" class="com.baidu.beidou.accountmove.dao.impl.IDServiceImpl" init-method="init">
+		<property name="addbDataAccessService" ref="dataAccessService" />
+		<property name="xdbDataAccessService" ref="xdbdataAccessService" />
+		<property name="capdbDataAccessService" ref="capdbdataAccessService" />
+		<property name="addbSequenceName">
+			<set>
+				<value>cprogroupit</value> 
+				<value>cprogroupvt</value>
+				<value>cprounit</value>
+				<value>userpack</value>
+				<value>packkeyword</value>
+			</set>
+		</property>
+		<property name="capdbSequenceName">
+			<set>
+				<value>cprogroup</value> 
+				<value>cprogroupatleft</value> 
+				<value>cprokeyword</value>
+			</set>
+		</property>
+		<property name="sequenceServerName">
+			<set>
+				<value>vtcode</value> 
+				<value>dmpGroupId</value>
+			</set>
+		</property>
+		<property name="config" ref="fileConfig" />
+		<property name="sequenceIdService" ref="sequenceIdService" />
+	</bean>
+	
+	<bean id="sequenceIdService" class="com.baidu.beidou.navi.client.NaviProxyFactoryBean">
+		<property name="directCallServers">
+			<value>${SEQUENCE_DOMAIN}</value>
+		</property>
+		<property name="serviceInterface"> 
+			<value>com.baidu.beidou.action.SequenceIdService</value> 
+		</property> 
+	</bean>
+	
+	<!-- ===============================exportor start=============================== -->
+	<bean id="cproplanExporter" class="com.baidu.beidou.accountmove.table.cproplan.CproplanExporter">
+		<property name="fexporter" ref="fexporter" />
+		<property name="dataAccessService" ref="dataAccessService" />
+	</bean>
+	<bean id="cprogroupExporter" class="com.baidu.beidou.accountmove.table.cprogroup.CprogroupExporter">
+		<property name="fexporter" ref="fexporter" />
+		<property name="dataAccessService" ref="dataAccessService" />
+	</bean>
+	<bean id="cprogroupinfoExporter" class="com.baidu.beidou.accountmove.table.cprogroupinfo.CprogroupinfoExporter">
+		<property name="fexporter" ref="fexporter" />
+		<property name="dataAccessService" ref="dataAccessService" />
+	</bean>
+	<bean id="appExcludeExporter" class="com.baidu.beidou.accountmove.table.appexclude.AppExcludeExporter">
+		<property name="fexporter" ref="fexporter" />
+		<property name="dataAccessService" ref="dataAccessService" />
+	</bean>
+	<bean id="atrightUserExporter" class="com.baidu.beidou.accountmove.table.atrightuser.AtrightUserExporter">
+		<property name="fexporter" ref="fexporter" />
+		<property name="dataAccessService" ref="xdbdataAccessService" />
+	</bean>
+	<bean id="attachInfoExporter" class="com.baidu.beidou.accountmove.table.attachinfo.AttachInfoExporter">
+		<property name="fexporter" ref="fexporter" />
+		<property name="dataAccessService" ref="dataAccessService" />
+	</bean>
+	<bean id="cprogroupAtleftExporter" class="com.baidu.beidou.accountmove.table.cprogroupatleft.CprogroupAtleftExporter">
+		<property name="fexporter" ref="fexporter" />
+		<property name="dataAccessService" ref="dataAccessService" />
+	</bean>
+	<bean id="cprogroupAtrightExporter" class="com.baidu.beidou.accountmove.table.cprogroupatright.CprogroupAtrightExporter">
+		<property name="fexporter" ref="fexporter" />
+		<property name="dataAccessService" ref="dataAccessService" />
+	</bean>
+	<bean id="groupitExcludeExporter" class="com.baidu.beidou.accountmove.table.cprogroupitexclude.GroupitExcludeExporter">
+		<property name="fexporter" ref="fexporter" />
+		<property name="dataAccessService" ref="dataAccessService" />
+	</bean>
+	<bean id="cprokeywordExporter" class="com.baidu.beidou.accountmove.table.cprokeyword.CprokeywordExporter">
+		<property name="fexporter" ref="fexporter" />
+		<property name="dataAccessService" ref="dataAccessService" />
+	</bean>
+	<bean id="cprounitmaterExporter" class="com.baidu.beidou.accountmove.table.cprounitmater.CprounitmaterExporter">
+		<property name="fexporter" ref="fexporter" />
+		<property name="dataAccessService" ref="dataAccessService" />
+	</bean>
+	<bean id="cprounitstateExporter" class="com.baidu.beidou.accountmove.table.cprounitstate.CprounitstateExporter">
+		<property name="fexporter" ref="fexporter" />
+		<property name="dataAccessService" ref="dataAccessService" />
+	</bean>
+	<bean id="customInterestExporter" class="com.baidu.beidou.accountmove.table.custominterest.CustomInterestExporter">
+		<property name="fexporter" ref="fexporter" />
+		<property name="dataAccessService" ref="dataAccessService" />
+	</bean>
+	<bean id="groupAtrightInfoExporter" class="com.baidu.beidou.accountmove.table.groupatrightinfo.GroupAtrightInfoExporter">
+		<property name="fexporter" ref="fexporter" />
+		<property name="dataAccessService" ref="dataAccessService" />
+	</bean>
+	<bean id="groupInterestPriceExporter" class="com.baidu.beidou.accountmove.table.groupinterestprice.GroupInterestPriceExporter">
+		<property name="fexporter" ref="fexporter" />
+		<property name="dataAccessService" ref="dataAccessService" />
+	</bean>
+	<bean id="groupipFilterExporter" class="com.baidu.beidou.accountmove.table.groupipfilter.GroupipFilterExporter">
+		<property name="fexporter" ref="fexporter" />
+		<property name="dataAccessService" ref="dataAccessService" />
+	</bean>
+	<bean id="groupitExporter" class="com.baidu.beidou.accountmove.table.groupit.GroupitExporter">
+		<property name="fexporter" ref="fexporter" />
+		<property name="dataAccessService" ref="dataAccessService" />
+	</bean>
+	<bean id="groupMultiChainFilterExporter" class="com.baidu.beidou.accountmove.table.groupmultichainfilter.GroupMultiChainFilterExporter">
+		<property name="fexporter" ref="fexporter" />
+		<property name="dataAccessService" ref="dataAccessService" />
+	</bean>
+	<bean id="grouppackExporter" class="com.baidu.beidou.accountmove.table.grouppack.GrouppackExporter">
+		<property name="fexporter" ref="fexporter" />
+		<property name="dataAccessService" ref="dataAccessService" />
+	</bean>
+	<bean id="groupSiteFilterExporter" class="com.baidu.beidou.accountmove.table.groupsitefilter.GroupSiteFilterExporter">
+		<property name="fexporter" ref="fexporter" />
+		<property name="dataAccessService" ref="dataAccessService" />
+	</bean>
+	<bean id="groupSitePriceExporter" class="com.baidu.beidou.accountmove.table.groupsiteprice.GroupSitePriceExporter">
+		<property name="fexporter" ref="fexporter" />
+		<property name="dataAccessService" ref="dataAccessService" />
+	</bean>
+	<bean id="groupTradePriceExporter" class="com.baidu.beidou.accountmove.table.grouptradeprice.GroupTradePriceExporter">
+		<property name="fexporter" ref="fexporter" />
+		<property name="dataAccessService" ref="dataAccessService" />
+	</bean>
+	<bean id="groupvtExporter" class="com.baidu.beidou.accountmove.table.groupvt.GroupvtExporter">
+		<property name="fexporter" ref="fexporter" />
+		<property name="dataAccessService" ref="dataAccessService" />
+	</bean>
+	<bean id="smartIdeaKeywordExporter" class="com.baidu.beidou.accountmove.table.smartideakeyword.SmartIdeaKeywordExporter">
+		<property name="fexporter" ref="fexporter" />
+		<property name="dataAccessService" ref="dataAccessService" />
+	</bean>
+	<bean id="smartIdeaProductFilterExporter" class="com.baidu.beidou.accountmove.table.smartideaproductfilter.SmartIdeaProductFilterExporter">
+		<property name="fexporter" ref="fexporter" />
+		<property name="dataAccessService" ref="dataAccessService" />
+	</bean>
+	<bean id="smartIdeaTemplateElementConfExporter" class="com.baidu.beidou.accountmove.table.smartideatemplateelementconf.SmartIdeaTemplateElementConfExporter">
+		<property name="fexporter" ref="fexporter" />
+		<property name="dataAccessService" ref="dataAccessService" />
+	</bean>
+	<bean id="smartIdeaTemplateElementUrlExporter" class="com.baidu.beidou.accountmove.table.smartideatemplateelementurl.SmartIdeaTemplateElementUrlExporter">
+		<property name="fexporter" ref="fexporter" />
+		<property name="dataAccessService" ref="dataAccessService" />
+	</bean>
+	<bean id="unitIconExporter" class="com.baidu.beidou.accountmove.table.uniticon.UnitIconExporter">
+		<property name="fexporter" ref="fexporter" />
+		<property name="dataAccessService" ref="dataAccessService" />
+	</bean>
+	<bean id="userUploadIconsExporter" class="com.baidu.beidou.accountmove.table.useruploadicons.UserUploadIconsExporter">
+		<property name="fexporter" ref="fexporter" />
+		<property name="dataAccessService" ref="xdbdataAccessService" />
+	</bean>
+	<bean id="wordExcludeExporter" class="com.baidu.beidou.accountmove.table.wordexclude.WordExcludeExporter">
+		<property name="fexporter" ref="fexporter" />
+		<property name="dataAccessService" ref="dataAccessService" />
+	</bean>
+	<bean id="wordPackExporter" class="com.baidu.beidou.accountmove.table.wordpack.WordPackExporter">
+		<property name="fexporter" ref="fexporter" />
+		<property name="dataAccessService" ref="dataAccessService" />
+	</bean>
+	<bean id="wordPackExcludeExporter" class="com.baidu.beidou.accountmove.table.wordpackexclude.WordPackExcludeExporter">
+		<property name="fexporter" ref="fexporter" />
+		<property name="dataAccessService" ref="dataAccessService" />
+	</bean>
+	<bean id="wordPackKeywordExporter" class="com.baidu.beidou.accountmove.table.wordpackkeyword.WordPackKeywordExporter">
+		<property name="fexporter" ref="fexporter" />
+		<property name="dataAccessService" ref="dataAccessService" />
+	</bean>
+	<bean id="onlineUnitExporter" class="com.baidu.beidou.accountmove.table.onlineunit.OnlineUnitExporter">
+		<property name="fexporter" ref="fexporter" />
+		<property name="dataAccessService" ref="dataAccessService" />
+	</bean>
+	<bean id="vtcodeExporter" class="com.baidu.beidou.accountmove.table.vtcode.VtcodeExporter">
+		<property name="fexporter" ref="fexporter" />
+		<property name="dataAccessService" ref="dataAccessService" />
+	</bean>
+	<bean id="vtpeopleExporter" class="com.baidu.beidou.accountmove.table.vtpeople.VtpeopleExporter">
+		<property name="fexporter" ref="fexporter" />
+		<property name="dataAccessService" ref="dataAccessService" />
+	</bean>
+	<bean id="vturlExporter" class="com.baidu.beidou.accountmove.table.vturl.VturlExporter">
+		<property name="fexporter" ref="fexporter" />
+		<property name="dataAccessService" ref="dataAccessService" />
+	</bean>
+	<!-- ===============================exportor end  =============================== -->
+	
+	
+	<!-- ===============================importor start=============================== -->
+	<bean id="cproplanImporter" class="com.baidu.beidou.accountmove.table.cproplan.CproplanImporter">
+		<property name="fexporter" ref="fexporter" />
+		<property name="dataAccessService" ref="dataAccessService" />
+		<property name="keyMapper" ref="keyMapper" />
+	</bean>
+	<bean id="cprogroupImporter" class="com.baidu.beidou.accountmove.table.cprogroup.CprogroupImporter">
+		<property name="fexporter" ref="fexporter" />
+		<property name="dataAccessService" ref="dataAccessService" />
+		<property name="keyMapper" ref="keyMapper" />
+		<property name="idService" ref="idService" />
+	</bean>
+	<bean id="cprogroupinfoImporter" class="com.baidu.beidou.accountmove.table.cprogroupinfo.CprogroupinfoImporter">
+		<property name="fexporter" ref="fexporter" />
+		<property name="dataAccessService" ref="dataAccessService" />
+		<property name="keyMapper" ref="keyMapper" />
+		<property name="idService" ref="idService" />
+	</bean>
+	<bean id="appExcludeImporter" class="com.baidu.beidou.accountmove.table.appexclude.AppExcludeImporter">
+		<property name="fexporter" ref="fexporter" />
+		<property name="dataAccessService" ref="dataAccessService" />
+		<property name="keyMapper" ref="keyMapper" />
+	</bean>
+	<bean id="atrightUserImporter" class="com.baidu.beidou.accountmove.table.atrightuser.AtrightUserImporter">
+		<property name="fexporter" ref="fexporter" />
+		<property name="dataAccessService" ref="xdbdataAccessService" />
+		<property name="keyMapper" ref="keyMapper" />
+	</bean>
+	<bean id="attachInfoImporter" class="com.baidu.beidou.accountmove.table.attachinfo.AttachInfoImporter">
+		<property name="fexporter" ref="fexporter" />
+		<property name="dataAccessService" ref="dataAccessService" />
+		<property name="keyMapper" ref="keyMapper" />
+	</bean>
+	<bean id="cprogroupAtleftImporter" class="com.baidu.beidou.accountmove.table.cprogroupatleft.CprogroupAtleftImporter">
+		<property name="fexporter" ref="fexporter" />
+		<property name="dataAccessService" ref="dataAccessService" />
+		<property name="keyMapper" ref="keyMapper" />
+		<property name="idService" ref="idService" />
+	</bean>
+	<bean id="cprogroupAtrightImporter" class="com.baidu.beidou.accountmove.table.cprogroupatright.CprogroupAtrightImporter">
+		<property name="fexporter" ref="fexporter" />
+		<property name="dataAccessService" ref="dataAccessService" />
+		<property name="keyMapper" ref="keyMapper" />
+	</bean>
+	<bean id="groupitExcludeImporter" class="com.baidu.beidou.accountmove.table.cprogroupitexclude.GroupitExcludeImporter">
+		<property name="fexporter" ref="fexporter" />
+		<property name="dataAccessService" ref="dataAccessService" />
+		<property name="keyMapper" ref="keyMapper" />
+		<property name="idService" ref="idService" />
+	</bean>
+	<bean id="cprokeywordImporter" class="com.baidu.beidou.accountmove.table.cprokeyword.CprokeywordImporter">
+		<property name="fexporter" ref="fexporter" />
+		<property name="dataAccessService" ref="dataAccessService" />
+		<property name="keyMapper" ref="keyMapper" />
+		<property name="idService" ref="idService" />
+	</bean>
+	<bean id="cprounitmaterImporter" class="com.baidu.beidou.accountmove.table.cprounitmater.CprounitmaterImporter">
+		<property name="fexporter" ref="fexporter" />
+		<property name="dataAccessService" ref="dataAccessService" />
+		<property name="keyMapper" ref="keyMapper" />
+		<property name="idService" ref="idService" />
+	</bean>
+	<bean id="cprounitstateImporter" class="com.baidu.beidou.accountmove.table.cprounitstate.CprounitstateImporter">
+		<property name="fexporter" ref="fexporter" />
+		<property name="dataAccessService" ref="dataAccessService" />
+		<property name="keyMapper" ref="keyMapper" />
+		<property name="idService" ref="idService" />
+	</bean>
+	<bean id="customInterestImporter" class="com.baidu.beidou.accountmove.table.custominterest.CustomInterestImporter">
+		<property name="fexporter" ref="fexporter" />
+		<property name="dataAccessService" ref="dataAccessService" />
+		<property name="keyMapper" ref="keyMapper" />
+		<property name="idService" ref="idService" />
+	</bean>
+	<bean id="groupAtrightInfoImporter" class="com.baidu.beidou.accountmove.table.groupatrightinfo.GroupAtrightInfoImporter">
+		<property name="fexporter" ref="fexporter" />
+		<property name="dataAccessService" ref="dataAccessService" />
+		<property name="keyMapper" ref="keyMapper" />
+	</bean>
+	<bean id="groupInterestPriceImporter" class="com.baidu.beidou.accountmove.table.groupinterestprice.GroupInterestPriceImporter">
+		<property name="fexporter" ref="fexporter" />
+		<property name="dataAccessService" ref="dataAccessService" />
+		<property name="keyMapper" ref="keyMapper" />
+	</bean>
+	<bean id="groupipFilterImporter" class="com.baidu.beidou.accountmove.table.groupipfilter.GroupipFilterImporter">
+		<property name="fexporter" ref="fexporter" />
+		<property name="dataAccessService" ref="dataAccessService" />
+		<property name="keyMapper" ref="keyMapper" />
+	</bean>
+	<bean id="groupitImporter" class="com.baidu.beidou.accountmove.table.groupit.GroupitImporter">
+		<property name="fexporter" ref="fexporter" />
+		<property name="dataAccessService" ref="dataAccessService" />
+		<property name="keyMapper" ref="keyMapper" />
+		<property name="idService" ref="idService" />
+	</bean>
+	<bean id="groupMultiChainFilterImporter" class="com.baidu.beidou.accountmove.table.groupmultichainfilter.GroupMultiChainFilterImporter">
+		<property name="fexporter" ref="fexporter" />
+		<property name="dataAccessService" ref="dataAccessService" />
+		<property name="keyMapper" ref="keyMapper" />
+	</bean>
+	<bean id="grouppackImporter" class="com.baidu.beidou.accountmove.table.grouppack.GrouppackImporter">
+		<property name="fexporter" ref="fexporter" />
+		<property name="dataAccessService" ref="dataAccessService" />
+		<property name="keyMapper" ref="keyMapper" />
+	</bean>
+	<bean id="groupSiteFilterImporter" class="com.baidu.beidou.accountmove.table.groupsitefilter.GroupSiteFilterImporter">
+		<property name="fexporter" ref="fexporter" />
+		<property name="dataAccessService" ref="dataAccessService" />
+		<property name="keyMapper" ref="keyMapper" />
+	</bean>
+	<bean id="groupSitePriceImporter" class="com.baidu.beidou.accountmove.table.groupsiteprice.GroupSitePriceImporter">
+		<property name="fexporter" ref="fexporter" />
+		<property name="dataAccessService" ref="dataAccessService" />
+		<property name="keyMapper" ref="keyMapper" />
+	</bean>
+	<bean id="groupTradePriceImporter" class="com.baidu.beidou.accountmove.table.grouptradeprice.GroupTradePriceImporter">
+		<property name="fexporter" ref="fexporter" />
+		<property name="dataAccessService" ref="dataAccessService" />
+		<property name="keyMapper" ref="keyMapper" />
+	</bean>
+	<bean id="groupvtImporter" class="com.baidu.beidou.accountmove.table.groupvt.GroupvtImporter">
+		<property name="fexporter" ref="fexporter" />
+		<property name="dataAccessService" ref="dataAccessService" />
+		<property name="keyMapper" ref="keyMapper" />
+		<property name="idService" ref="idService" />
+	</bean>
+	<bean id="smartIdeaKeywordImporter" class="com.baidu.beidou.accountmove.table.smartideakeyword.SmartIdeaKeywordImporter">
+		<property name="fexporter" ref="fexporter" />
+		<property name="dataAccessService" ref="dataAccessService" />
+		<property name="keyMapper" ref="keyMapper" />
+		<property name="idService" ref="idService" />
+	</bean>
+	<bean id="smartIdeaProductFilterImporter" class="com.baidu.beidou.accountmove.table.smartideaproductfilter.SmartIdeaProductFilterImporter">
+		<property name="fexporter" ref="fexporter" />
+		<property name="dataAccessService" ref="dataAccessService" />
+		<property name="keyMapper" ref="keyMapper" />
+	</bean>
+	<bean id="smartIdeaTemplateElementConfImporter" class="com.baidu.beidou.accountmove.table.smartideatemplateelementconf.SmartIdeaTemplateElementConfImporter">
+		<property name="fexporter" ref="fexporter" />
+		<property name="dataAccessService" ref="dataAccessService" />
+		<property name="keyMapper" ref="keyMapper" />
+	</bean>
+	<bean id="smartIdeaTemplateElementUrlImporter" class="com.baidu.beidou.accountmove.table.smartideatemplateelementurl.SmartIdeaTemplateElementUrlImporter">
+		<property name="fexporter" ref="fexporter" />
+		<property name="dataAccessService" ref="dataAccessService" />
+		<property name="keyMapper" ref="keyMapper" />
+	</bean>
+	<bean id="unitIconImporter" class="com.baidu.beidou.accountmove.table.uniticon.UnitIconImporter">
+		<property name="fexporter" ref="fexporter" />
+		<property name="dataAccessService" ref="dataAccessService" />
+		<property name="keyMapper" ref="keyMapper" />
+	</bean>
+	<bean id="userUploadIconsImporter" class="com.baidu.beidou.accountmove.table.useruploadicons.UserUploadIconsImporter">
+		<property name="fexporter" ref="fexporter" />
+		<property name="dataAccessService" ref="xdbdataAccessService" />
+		<property name="keyMapper" ref="keyMapper" />
+		<property name="idService" ref="idService" />
+	</bean>
+	<bean id="wordExcludeImporter" class="com.baidu.beidou.accountmove.table.wordexclude.WordExcludeImporter">
+		<property name="fexporter" ref="fexporter" />
+		<property name="dataAccessService" ref="dataAccessService" />
+		<property name="keyMapper" ref="keyMapper" />
+	</bean>
+	<bean id="wordPackImporter" class="com.baidu.beidou.accountmove.table.wordpack.WordPackImporter">
+		<property name="fexporter" ref="fexporter" />
+		<property name="dataAccessService" ref="dataAccessService" />
+		<property name="keyMapper" ref="keyMapper" />
+		<property name="idService" ref="idService" />
+	</bean>
+	<bean id="wordPackExcludeImporter" class="com.baidu.beidou.accountmove.table.wordpackexclude.WordPackExcludeImporter">
+		<property name="fexporter" ref="fexporter" />
+		<property name="dataAccessService" ref="dataAccessService" />
+		<property name="keyMapper" ref="keyMapper" />
+	</bean>
+	<bean id="wordPackKeywordImporter" class="com.baidu.beidou.accountmove.table.wordpackkeyword.WordPackKeywordImporter">
+		<property name="fexporter" ref="fexporter" />
+		<property name="dataAccessService" ref="dataAccessService" />
+		<property name="keyMapper" ref="keyMapper" />
+		<property name="idService" ref="idService" />
+	</bean>
+	<bean id="onlineUnitImporter" class="com.baidu.beidou.accountmove.table.onlineunit.OnlineUnitImporter">
+		<property name="fexporter" ref="fexporter" />
+		<property name="dataAccessService" ref="dataAccessService" />
+		<property name="keyMapper" ref="keyMapper" />
+		<property name="idService" ref="idService" />
+	</bean>
+	
+	<bean id="vtcodeImporter" class="com.baidu.beidou.accountmove.table.vtcode.VtcodeImporter">
+		<property name="fexporter" ref="fexporter" />
+		<property name="dataAccessService" ref="dataAccessService" />
+		<property name="keyMapper" ref="keyMapper" />
+		<property name="idService" ref="idService" />
+	</bean>
+	<bean id="vtpeopleImporter" class="com.baidu.beidou.accountmove.table.vtpeople.VtpeopleImporter">
+		<property name="fexporter" ref="fexporter" />
+		<property name="dataAccessService" ref="dataAccessService" />
+		<property name="keyMapper" ref="keyMapper" />
+		<property name="idService" ref="idService" />
+	</bean>
+	<bean id="vturlImporter" class="com.baidu.beidou.accountmove.table.vturl.VturlImporter">
+		<property name="fexporter" ref="fexporter" />
+		<property name="dataAccessService" ref="dataAccessService" />
+		<property name="keyMapper" ref="keyMapper" />
+		<property name="idService" ref="idService" />
+	</bean>
+	<!-- ===============================importor end  =============================== -->
+	
+	<import	resource="classpath:/com/baidu/beidou/accountmove/datasource.xml" />
+	
+</beans>

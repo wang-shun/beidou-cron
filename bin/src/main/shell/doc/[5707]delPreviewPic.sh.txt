@@ -1,0 +1,25 @@
+﻿【任务名】	删除预览图片
+【时间驱动】	0 4 * * *	运行超时	30分钟	等待超时	 分钟
+【运行命令】	cd /home/work/beidou-cron/bin; sh delPreviewPic.sh
+【日志地址】	/home/work/beidou-cron/log/delPreviewPic.log
+【变更库表】	history.previewpic
+【任务依赖】  无
+========================================================================================
+【任务描述】
+执行远程调用：
+com.baidu.ctclient.HessianRpcClientUsingErrorCode http://${jx00}:8080/rpc/delPreviewPic ctclient1 R2Q5D7Xo5rH83h0s
+调用beidou的com.baidu.beidou.tool.task.DelPreviewPicCTTask，对应Java类为
+beidou\src\com\baidu\beidou\tool\task\DelPreviewPicCTTask.java
+该类的流程如下：
+（1）配置删除图片的频率,单位是分钟,它决定删除多少分钟之前的图片，目前为15分钟
+（2）调用PreviewPicService.removePics方法删除指定时间点之前的所有图片(先从数据库中查出再删drmc中数据最后删数据库记录)，具体为：
+	a)	previewPicDao.findByDate找出指定时间点之前的记录的drmc id数组，所执行的sql为：select drmcid from previewpic where statistime<=?
+	b)	prePicService.tmpRemove删除临时物料，并从dr-mc返回的Bean中抽取删除状态
+	c)	依据drmc删除操作的返回值判断是否成功，若成功则执行previewPicDao.delete删除库中的临时图片，所执行的sql为：
+	delete from previewpic where statistime<=
+
+==========================================================================================
+【报警内容】
+执行远程调用-删除预览图片failed（可能原因：执行远程调用失败）
+
+【备注】

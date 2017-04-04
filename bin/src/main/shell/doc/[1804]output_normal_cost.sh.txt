@@ -1,0 +1,54 @@
+﻿【任务名】	导出DW数据
+【时间驱动】	0 20 * * *	运行超时	60分钟	等待超时	0分钟
+【运行命令】	cd /home/work/beidou-cron/bin; sh output_normal_cost.sh
+【日志地址】	无
+【变更库表】	无
+【任务依赖】  上游任务：1863 导出消费数据并且导入点击日志
+========================================================================================
+【任务描述】
+(1)	创建临时目录：/home/work/beidou-cron/data/dw/tmp
+	创建输出目录：/home/work/beidou-cron/data/dw/output
+(2)	处理计费名文件cntnid.conf
+	sed '1d' ${CNT_FILE} |awk '{if(NR==1){IDS=$1}else{IDS=IDS","$1}}END{print IDS}'
+	输出：79184,80034
+(3)	如果cntnid.conf不为空，则执行sql：
+	select 0,sum(price),sum(price*rrate) from beidoufinan.cost_${STAT_DATE} a join SF_User.useracct b on a.userid=b.userid where b.ulevelid=10101 and a.userid > 30 and (a.userid < 1381000 or a.userid > 1381999)  >beidou_normal_cost
+	select 0,sum(price),sum(price*rrate) from beidoufinan.cost_${STAT_DATE} a join SF_User.useracct b on a.userid=b.userid where b.ulevelid=10104 and a.userid > 30 and (a.userid < 1381000 or a.userid > 1381999)  >beidou_heavy_cost
+	如果cntnid.conf不为空，则执行以下sql：
+	select 0,sum(price),sum(price*rrate) from beidoufinan.cost_${STAT_DATE} a join SF_User.useracct b on a.userid=b.userid where b.ulevelid=10101 and a.userid > 30 and (a.userid < 1381000 or a.userid > 1381999) and a.cntnid not in (${CNTNID}) > beidou_normal_cost
+	select 0,sum(price),sum(price*rrate) from beidoufinan.cost_${STAT_DATE} a join SF_User.useracct b on a.userid=b.userid where b.ulevelid=10104 and a.userid > 30 and (a.userid < 1381000 or a.userid > 1381999) and a.cntnid not in (${CNTNID}) > beidou_heavy_cost
+	select a.cntnid, sum(price),sum(price*rrate) from beidoufinan.cost_${STAT_DATE} a join SF_User.useracct b on a.userid=b.userid where b.ulevelid=10101 and a.userid > 30 and (a.userid < 1381000 or a.userid > 1381999) and a.cntnid in (${CNTNID}) group by a.cntnid >> beidou_normal_cost
+	select a.cntnid, sum(price),sum(price*rrate) from beidoufinan.cost_${STAT_DATE} a join SF_User.useracct b on a.userid=b.userid where b.ulevelid=10104 and a.userid > 30 and (a.userid < 1381000 or a.userid > 1381999) and a.cntnid in (${CNTNID}) group by a.cntnid >> beidou_heavy_cost
+
+(4)	对cntnid文件进行排序，生成到tmp/cntnid.sort
+	对beidou_normal_cost文件进行排序，生成到beidou_normal_cost.sort
+	对beidou_heavy_cost文件进行排序，生成到beidou_heavy_cost.sort
+(5)	对cntnid.sort和beidou_normal_cost.sort进行join
+	join -a 1 cntnid.sort beidou_normal_cost.sort | awk '{if(NF==2){print $2"\t"0"\t"0}else{printf "%s\t%.2f\t%.2f\n", $2,$3,$4}}'
+ 
+(6)	对cntnid.sort和beidou_heavy_cost.sort进行join
+	join -a 1 cntnid.sort beidou_heavy_cost.sort | awk '{if(NF==2){print $2"\t"0"\t"0}else{printf "%s\t%.2f\t%.2f\n", $2,$3,$4}}’
+ 
+(7)	对文件进行编码转换
+	iconv -fgbk -tutf8 -o${DW_FILE_PATH}/beidou_normal_cost.yymmdd beidou_normal_cost
+	iconv -fgbk -tutf8 -o${DW_FILE_PATH}/beidou_heavy_cost.yymmdd beidou_heavy_cost
+(8)	进入数据目录：/home/work/beidou-cron/data/dw/output
+	生成相应的md5文件
+
+==========================================================================================
+【报警内容】
+1.	导出DW联盟数据失败（sql执行错误）
+2.	导出DW内部流量数据失败（sql执行错误）
+3.	cntnid文件排序失败，beidou_normal_cost文件排序失败，beidou_heavy_cost文件排序失败
+4.	beidou_normal_cost.sort文件Join失败，beidou_heavy_cost.sort文件Join失败
+5.	beidou_normal_cost文件编码转换失败，beidou_heavy_cost文件编码转换失败
+6.	进入目录/home/work/beidou-cron/data/dw/output失败
+Md5 beidou_normal_cost.yyyymmdd失败，md5 beidou_heavy_cost.yyyymmdd失败
+
+【备注】
+这个任务会使用beidoufinan.cost_yyyyymmdd表的数据，曾经有过一次case，因为我们恢复数据的操作失误，导致某一个表的数据为空，因此这个任务生成的数据不正确，但不会产生报警
+这个文件，下游会在下个月初使用，目前的下游周知人为徐亚娟
+如果恢复某一天的数据，可以联系op执行
+sh output_normal_cost.sh  20110927(即：恢复那天的时间戳)
+
+

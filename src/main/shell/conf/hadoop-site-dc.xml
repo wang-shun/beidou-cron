@@ -1,0 +1,57 @@
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
+
+<configuration>
+
+<!-- NEEDED TO CHANGE -->
+
+<property>
+  <name>hadoop.job.ugi</name>
+  <value>cm_dc_offline,cmdaof6cF09</value>
+  <description>username, password used by client</description>
+</property>
+
+<property>
+  <name>fs.default.name</name>
+  <value>hdfs://yq01-wutai-hdfs.dmop.baidu.com:54310</value>
+  <description>The name of the default file system.  A URI whose
+  scheme and authority determine the FileSystem implementation.  The
+  uri's scheme determines the config property (fs.SCHEME.impl) naming
+  the FileSystem implementation class.  The uri's authority is used to
+  determine the host, port, etc. for a filesystem.</description>
+</property>
+
+<property>
+  <name>mapred.job.tracker</name>
+  <value>yq01-wutai-abaci.dmop.baidu.com:54311</value>
+  <description>The host and port that the MapReduce job tracker runs
+  at.  If "local", then jobs are run in-process as a single map
+  and reduce task.
+  </description>
+</property>
+
+<property>
+  <name>dfs.http.address</name>
+  <value>szwg-kun-hdfs.dmop.baidu.com:8070</value>
+  <description>
+    The address and the base port where the dfs namenode web ui will listen on.
+    If the port is 0 then the server will start on a free port.
+  </description>
+</property>
+
+<property>
+  <name>mapred.job.tracker.http.address</name>
+  <value>szwg-kun-job.dmop.baidu.com:8030</value>
+  <description>
+    The job tracker http server address and port the server will listen on.
+    If the port is 0 then the server will start on a free port.
+  </description>
+</property>
+
+<property>
+  <name>speed.limit.kb</name>
+  <value>15360</value>
+  <description></description>
+</property>
+
+</configuration>

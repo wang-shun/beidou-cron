@@ -1,0 +1,278 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:aop="http://www.springframework.org/schema/aop" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:mvc="http://www.springframework.org/schema/mvc" xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:task="http://www.springframework.org/schema/task"
+	xsi:schemaLocation="http://www.springframework.org/schema/aop   
+        http://www.springframework.org/schema/aop/spring-aop-3.0.xsd   
+        http://www.springframework.org/schema/beans   
+        http://www.springframework.org/schema/beans/spring-beans-3.0.xsd   
+        http://www.springframework.org/schema/context   
+        http://www.springframework.org/schema/context/spring-context-3.0.xsd   
+        http://www.springframework.org/schema/mvc   
+        http://www.springframework.org/schema/mvc/spring-mvc-3.0.xsd   
+        http://www.springframework.org/schema/tx   
+        http://www.springframework.org/schema/tx/spring-tx-3.0.xsd
+        http://www.springframework.org/schema/task     
+    	http://www.springframework.org/schema/task/spring-task-3.0.xsd">
+
+		 
+	<!-- addb configure start -->
+	<bean id="addbDataSource" abstract="true"
+		class="com.mchange.v2.c3p0.ComboPooledDataSource"
+		destroy-method="close">
+		<property name="driverClass">
+			<value>${jdbc.driverClassName}</value>
+		</property>
+		<property name="maxPoolSize">
+			<value>${jdbc.maxPoolSize}</value>
+		</property>
+		<property name="minPoolSize">
+			<value>${jdbc.minPoolSize}</value>
+		</property>
+		<property name="idleConnectionTestPeriod">
+			<value>${jdbc.idleConnectionTestPeriod}</value>
+		</property>
+		<property name="maxIdleTime">
+			<value>${jdbc.maxIdleTime}</value>
+		</property>
+	</bean>
+	
+	<bean id="addb0" parent="addbDataSource">
+		<property name="jdbcUrl">
+			<value>${jdbc.addb0.url}</value>
+		</property>
+		<property name="user">
+			<value>${dbproxy_username}</value>
+		</property>
+		<property name="password">
+			<value>${dbproxy_password}</value>
+		</property>
+	</bean>
+	<bean id="addb0JdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
+		<property name="dataSource" ref="addb0"/>
+	</bean>
+	<bean id="addb0Dao" class="com.baidu.beidou.accountmove.dao.BaseDAO">
+		<property name="jdbcTemplate">
+			<ref bean="addb0JdbcTemplate" />
+		</property>
+	</bean>
+	
+	<bean id="addb1" parent="addbDataSource">
+		<property name="jdbcUrl">
+			<value>${jdbc.addb1.url}</value>
+		</property>
+		<property name="user">
+			<value>${dbproxy_username}</value>
+		</property>
+		<property name="password">
+			<value>${dbproxy_password}</value>
+		</property>
+	</bean>
+	<bean id="addb1JdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
+		<property name="dataSource" ref="addb1"/>
+	</bean>
+	<bean id="addb1Dao" class="com.baidu.beidou.accountmove.dao.BaseDAO">
+		<property name="jdbcTemplate">
+			<ref bean="addb1JdbcTemplate" />
+		</property>
+	</bean>
+	
+	<bean id="addb2" parent="addbDataSource">
+		<property name="jdbcUrl">
+			<value>${jdbc.addb2.url}</value>
+		</property>
+		<property name="user">
+			<value>${dbproxy_username}</value>
+		</property>
+		<property name="password">
+			<value>${dbproxy_password}</value>
+		</property>
+	</bean>
+	<bean id="addb2JdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
+		<property name="dataSource" ref="addb2"/>
+	</bean>
+	<bean id="addb2Dao" class="com.baidu.beidou.accountmove.dao.BaseDAO">
+		<property name="jdbcTemplate">
+			<ref bean="addb2JdbcTemplate" />
+		</property>
+	</bean>
+	
+	<bean id="addb3" parent="addbDataSource">
+		<property name="jdbcUrl">
+			<value>${jdbc.addb3.url}</value>
+		</property>
+		<property name="user">
+			<value>${dbproxy_username}</value>
+		</property>
+		<property name="password">
+			<value>${dbproxy_password}</value>
+		</property>
+	</bean>
+	<bean id="addb3JdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
+		<property name="dataSource" ref="addb3"/>
+	</bean>
+	<bean id="addb3Dao" class="com.baidu.beidou.accountmove.dao.BaseDAO">
+		<property name="jdbcTemplate">
+			<ref bean="addb3JdbcTemplate" />
+		</property>
+	</bean>
+	
+	<bean id="addb4" parent="addbDataSource">
+		<property name="jdbcUrl">
+			<value>${jdbc.addb4.url}</value>
+		</property>
+		<property name="user">
+			<value>${dbproxy_username}</value>
+		</property>
+		<property name="password">
+			<value>${dbproxy_password}</value>
+		</property>
+	</bean>
+	<bean id="addb4JdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
+		<property name="dataSource" ref="addb4"/>
+	</bean>
+	<bean id="addb4Dao" class="com.baidu.beidou.accountmove.dao.BaseDAO">
+		<property name="jdbcTemplate">
+			<ref bean="addb4JdbcTemplate" />
+		</property>
+	</bean>
+	
+	<bean id="addb5" parent="addbDataSource">
+		<property name="jdbcUrl">
+			<value>${jdbc.addb5.url}</value>
+		</property>
+		<property name="user">
+			<value>${dbproxy_username}</value>
+		</property>
+		<property name="password">
+			<value>${dbproxy_password}</value>
+		</property>
+	</bean>
+	<bean id="addb5JdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
+		<property name="dataSource" ref="addb5"/>
+	</bean>
+	<bean id="addb5Dao" class="com.baidu.beidou.accountmove.dao.BaseDAO">
+		<property name="jdbcTemplate">
+			<ref bean="addb5JdbcTemplate" />
+		</property>
+	</bean>
+	
+	<bean id="addb6" parent="addbDataSource">
+		<property name="jdbcUrl">
+			<value>${jdbc.addb6.url}</value>
+		</property>
+		<property name="user">
+			<value>${dbproxy_username}</value>
+		</property>
+		<property name="password">
+			<value>${dbproxy_password}</value>
+		</property>
+	</bean>
+	<bean id="addb6JdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
+		<property name="dataSource" ref="addb6"/>
+	</bean>
+	<bean id="addb6Dao" class="com.baidu.beidou.accountmove.dao.BaseDAO">
+		<property name="jdbcTemplate">
+			<ref bean="addb6JdbcTemplate" />
+		</property>
+	</bean>
+	
+	<bean id="addb7" parent="addbDataSource">
+		<property name="jdbcUrl">
+			<value>${jdbc.addb7.url}</value>
+		</property>
+		<property name="user">
+			<value>${dbproxy_username}</value>
+		</property>
+		<property name="password">
+			<value>${dbproxy_password}</value>
+		</property>
+	</bean>
+	<bean id="addb7JdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
+		<property name="dataSource" ref="addb7"/>
+	</bean>
+	<bean id="addb7Dao" class="com.baidu.beidou.accountmove.dao.BaseDAO">
+		<property name="jdbcTemplate">
+			<ref bean="addb7JdbcTemplate" />
+		</property>
+	</bean>
+	<!-- addb configure end -->
+	
+	<bean id="xdb" parent="addbDataSource">
+		<property name="jdbcUrl">
+			<value>${jdbc.xdb.url}</value>
+		</property>
+		<property name="user">
+			<value>${xdb_username}</value>
+		</property>
+		<property name="password">
+			<value>${xdb_password}</value>
+		</property>
+	</bean>
+	<bean id="xdbJdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
+		<property name="dataSource" ref="xdb"/>
+	</bean>
+	<bean id="xdbDao" class="com.baidu.beidou.accountmove.dao.BaseDAO">
+		<property name="jdbcTemplate">
+			<ref bean="xdbJdbcTemplate" />
+		</property>
+	</bean>
+	
+	<bean id="capdb" parent="addbDataSource">
+		<property name="jdbcUrl">
+			<value>${jdbc.capdb.url}</value>
+		</property>
+		<property name="user">
+			<value>${capdb_username}</value>
+		</property>
+		<property name="password">
+			<value>${capdb_password}</value>
+		</property>
+	</bean>
+	<bean id="capdbJdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
+		<property name="dataSource" ref="capdb"/>
+	</bean>
+	<bean id="capdbDao" class="com.baidu.beidou.accountmove.dao.BaseDAO">
+		<property name="jdbcTemplate">
+			<ref bean="capdbJdbcTemplate" />
+		</property>
+	</bean>
+	
+	
+	
+	<bean id="dataAccessService" class="com.baidu.beidou.accountmove.dao.impl.DataAccessServiceImpl">
+		<property name="baseDAOList">
+			<list>
+				<ref bean="addb0Dao" />
+				<ref bean="addb1Dao" />
+				<ref bean="addb2Dao" />
+				<ref bean="addb3Dao" />
+				<ref bean="addb4Dao" />
+				<ref bean="addb5Dao" />
+				<ref bean="addb6Dao" />
+				<ref bean="addb7Dao" />
+			</list>
+		</property>	
+		<property name="dbName" value="beidou" />
+	</bean>
+	<bean id="xdbdataAccessService" class="com.baidu.beidou.accountmove.dao.impl.DataAccessServiceImpl">
+		<property name="baseDAOList">
+			<list>
+				<ref bean="xdbDao" />
+			</list>
+		</property>	
+		<property name="shardingNum" value="1" />
+		<property name="dbName" value="history" />	
+	</bean>
+	<bean id="capdbdataAccessService" class="com.baidu.beidou.accountmove.dao.impl.DataAccessServiceImpl">
+		<property name="baseDAOList">
+			<list>
+				<ref bean="capdbDao" />
+			</list>
+		</property>	
+		<property name="shardingNum" value="1" />
+		<property name="dbName" value="beidoucap" />
+	</bean>
+	
+</beans>

@@ -1,0 +1,21 @@
+﻿【任务名】	每日预算重新上线
+【时间驱动】	25 0 * * * 运行超时	50分钟	等待超时	5分钟
+【运行命令】	cd /home/work/beidou-cron/bin ; sh cproplan-budgetover.sh
+【日志地址】	/home/work/beidou-cron/log/cproplan_budgetover.log.wf
+【变更库表】	beidou.cproplan
+【任务依赖】  上游任务：1761:推广计划循环搁置;
+========================================================================================
+【任务描述】
+1.	执行查询SELECT COUNT(planid) FROM cproplan t
+2.	将记录数分为10片，分1,2,3,4,5-10共五批更新，因此有三种类型的update
+（1）	UPDATE cproplan t set t.budgetover = 0 WHERE planid <=**
+（2）	UPDATE cproplan t set t.budgetover = 0 WHERE planid > ${BEIGIN_INDEX} AND planid <= ${END_INDEX}
+（3）	UPDATE cproplan t set t.budgetover = 0 WHERE planid > **
+
+==========================================================================================
+【报警内容】
+cproplan_budgetover : UPDATE sub number ** fail.
+
+【备注】
+
+

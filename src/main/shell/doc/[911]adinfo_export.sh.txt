@@ -1,0 +1,31 @@
+﻿【任务名】	导出非增量配置项
+【时间驱动】	2,17,32,47 * * * *	运行超时	10分钟	等待超时	0分钟
+【运行命令】	cd /home/work/beidou-cron; sh adinfo_export.sh
+【日志地址】	/home/work/beidou-cron/log/adinfo_export.log
+【变更库表】	无
+【任务依赖】  无
+========================================================================================
+【任务描述】
+1.检查数据目录及配置项的合法性：/home/work/data/export/adinfo
+2.备份如下文件并生成md5，备份后的文件名在原有名字基础上加时间戳
+（1）	adfilterip.map（推广组ip过滤信息）
+（2）	adfiltersite.map（推广组网站过滤信息）
+（3）	ad_bid_per_trade.map（推广组分行业出价信息）
+（4）	ad_bid_per_site.map（推广组分站点出价信息）
+（5）	ad_target_url_per_site.map（网站点击链接）
+3.查询上述文件数据（从tc01库），结果去重后，生成相应map文件及md5，重试3次
+（1）	select groupid, ip from groupipfilter
+（2）	select groupid, site from groupsitefilter
+（3）	select groupid, tradeid, price from grouptradeprice order by groupid,tradeid
+（4）	select groupid, siteid, price from groupsiteprice where price is not null
+（5）	select groupid, siteid, targeturl from groupsiteprice where targeturl is not null
+
+==========================================================================================
+【报警内容】
+1.	adinfo: **** Export Error
+可能原因：执行某次查询失败
+2.	adinfo: Fail to generate md5 for ****
+可能原因：生成md5文件失败
+
+【备注】
+该任务的DB配置写在自己的配置文件里，目前是tc01的ip，需要注意

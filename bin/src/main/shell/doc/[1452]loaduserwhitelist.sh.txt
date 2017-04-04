@@ -1,0 +1,19 @@
+﻿【任务名】	用户白名单加载内存(远ALL)
+【时间驱动】	32 22 * * *	运行超时 1分钟	等待超时	 30分钟
+【运行命令】 	cd /home/work/beidou-cron/bin; sh loaduserwhitelist.sh
+【日志地址】	/home/work/beidou-cron/log/loaduserwhitelist.log
+【变更库表】	beidou.whitelist 
+【任务依赖】  上游任务：1451: 用户白名单入库
+
+========================================================================================
+【任务描述】
+执行rpc调用，url：http://$1:8080/rpc/loadUserWhiteList（全部Web服务器）
+调用：com.baidu.beidou.cprogroup.task.LoadUserWhiteListCTTask
+Execute方法：unionSiteMgr.loadWhiteUserList();
+//加载可投放百度自主流量的用户
+List<Integer> userList = whiteListDao.getUseBaiduUsersWhiteList();
+WhiteListCache.useBaiduUsers.setList(userList);
+
+==========================================================================================
+【报警内容】
+执行远程调用-载入自有流量用户白名单失败{服务器名}

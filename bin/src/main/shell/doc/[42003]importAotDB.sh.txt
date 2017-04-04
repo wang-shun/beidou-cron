@@ -1,0 +1,37 @@
+﻿【任务名】	将一些昨日数据库数据及时保存起来
+【时间驱动】	1 0 * * *	运行超时	180分钟	等待超时	0分钟
+【运行命令】	cd /home/work/beidou-cron/bin/; sh importAotDB.sh
+【日志地址】	/home/work/beidou-cron/aot/log/importAotDB.log
+【变更库表】	aot. cproplanstat_tmp，aot.cprogroupstat_tmp
+【任务依赖】  下游任务：42004-获取doris相关数据，并导入数据库
+========================================================================================
+【任务描述】
+1.	AOT主库执行查询：
+(1)	drop table if exists cproplanstat_tmp
+(2)	drop table if exists cprogroupstat_tmp
+(3)	create table cproplanstat_tmp like cproplanstat
+(4)	create table cprogroupstat_tmp like cprogroupstat
+2.	执行Cron调用：
+java -Xms512m -Xmx2048m -classpath ${CUR_CLASSPATH} com.baidu.beidou.aot.ImportAotDB
+执行aotMgr.importDBInfo();方法
+(1)	打印日志：开始加载推广计划信息
+执行loadPlanInfo();// 获取Plan的凌晨基准信息，由于Plan个数较少，信息也较小，因此不分页
+(2)	打印日志：开始加载推广组信息
+执行loadGroupPriceInfo();//获取Group的凌晨基准信息（仅包含price信息），这里也不分页
+(3)	打印日志：开始加载站点信息
+执行loadSiteInfo();//加载全部站点信息，并按照规则得到相应的数据结构，由于site数目较小，也没有分页
+(4)	打印日志：开始加载Code信息
+执行loadCodeInfo();//加载全部Code信息，并按照规则得到相应的数据结构，没有分页
+(5)	打印日志：开始计算推广计划信息
+执行executePlanStat();将计算好的plan统计信息批量存储入数据库 aot.cproplanstat_tmp
+(6)	打印日志：开始计算推广组信息
+执行executeGroupStat();将计算好的plan统计信息批量存储入数据库aot.cprogroupstat_tmp
+(7)	打印日志：importAotDB结束
+
+==========================================================================================
+【报警内容】
+1.	drop planstat的临时表失败
+2.	drop groupstat的临时表失败
+3.	建立planstat的临时表失败
+4.	建立groupstat的临时表失败
+5.	账户优化导入数据库数据失败

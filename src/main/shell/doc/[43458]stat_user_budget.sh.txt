@@ -1,0 +1,37 @@
+﻿【任务名】	准备用户预算数据
+【时间驱动】	30 1 * * *		运行超时	30分钟	等待超时	0分钟
+【运行命令】	cd /home/work/beidou-cron/bin; sh stat_user_budget.sh;
+【日志地址】	无
+【变更库表】	无
+【任务依赖】  下游任务：43460:生成网盟预算统计数据;
+========================================================================================
+【任务描述】
+1.	执行查询：
+	select  distinct s{0-7}.pid,s{0-7}.uid,g.userid from cprogroup g, cprounitstate{0-7} s{0-7} where s{0-7}.gid=g.groupid and s{0-7}.state=0 and g.groupstate=0;（从8张表中选择pid、uid、userid，推广单元有效，推广组有效）
+	导出数据到： beidou-cron/data/bd_budget_stat/tmp/pid_tmp.${TODAY}.txt
+2.	执行查询：
+	select t.budget, t.userid, t.planid from cproplan t where t.planstate=0;(有效计划)
+	导出数据到： beidou-cron/data/bd_budget_stat/tmp/plan_id_temp.${TODAY}.txt
+3.	执行查询：
+	select u.userid from useraccount u where u.ustate=0 and u.userid > 30 and (u.userid < 1381000 or u.userid > 1381999) and u.ushifenstatid in (2,3,6); 有效用户
+	导出数据到 : beidou-cron/data/bd_budget_stat/tmp/user_list_temp.${TODAY}.txt
+4.	根据以上三个list筛选出userid、planid、budget（userid在3的文件中，planid在1的文件中），数据导出到：
+	on/data/bd_budget_stat/tmp/budget.yyyymmdd.txt
+5.	从ftp://jx-dr-fnct00.jx.baidu.com:
+	/home/work/var/dr-finance/toshifen/bduserfund.txt抓取财务端余额数据文件
+	（userid，余额），排序后存于balance.yyyymmdd.txt文件
+6.	处理4、5中的文件：对于budget.yyyymmdd.txt，对同一用户的所有budget求和；
+	并与balance.yyyymmdd.txt中的budget比较，选取较小的而一个
+	上述处理结果存于:
+	beidou-cron/data/bd_budget_stat/input/user_budget.yyyymmdd.txt中
+	文件内容有两列：(userid,budget)
+
+==========================================================================================
+【报警内容】
+1.	***列表生成失败（可能原因：步骤1-3中的查询出错）
+2.	计算用户预算数据失败,请RD排查（可能原因：步骤4文件生成失败）
+3.	删除本地余额文件错误（可能原因：删除旧的余额文件错误）
+4.	远程获取财务端余额数据文件失败（可能原因：抓取财务端文件错误）
+5.	文件完整性验证失败（可能原因：校验MD5失败）
+6.	获取用户余额数据失败,请RD排查（可能原因：步骤5失败）
+

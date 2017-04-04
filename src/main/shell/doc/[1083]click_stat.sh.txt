@@ -1,0 +1,67 @@
+﻿【任务名】	点击日志解析处理
+【时间驱动】	30 * * * *	运行超时	30分钟	等待超时	0分钟
+【运行命令】	cd /home/work/beidou-stat/bin; sh click_stat.sh
+【日志地址】	/home/work/beidou-stat/log/click_stat.log.yyyymmdd中
+【变更库表】	无
+【任务依赖】  上游任务： 1224: 全网投放广告ID导出脚本
+========================================================================================
+【任务描述】
+1.	如无目录则创建
+	/home/work/beidou-stat/data/click_log/20110801
+	/home/work/beidou-stat/data/fullad/
+	/home/work/beidou-stat/data/click_stat/normal/20110801/
+	/home/work/beidou-stat/click_stat/recovery
+	/home/work/beidou-stat/tmp
+2.	下载文件列表
+	wget -q --tries=5 --limit-rate=10000k --waitretry=2 -O /home/work/beidou-stat//tmp/dcharge.bd.log.list ftp://ftp:ftp@tc-sf-drd08.tc.baidu.com//home/work/var/beidou_log/20110731/dcharge.bd.log.list（昨天日期）
+	下载文件列表MD5，进入临时目录验证md5
+	
+	下载全流量创意ID列表,限速10M，重试等待时间问2m
+	wget -q --tries=5 --limit-rate=10000k --waitretry=2 -O /home/work/beidou-stat//data/fullad//fullad.2011080100 ftp://ftp:ftp@tc-beidou-cron00.tc.baidu.com//home/work/beidou-cron/adfile/fullad.2011080100（今天日期）
+	下载MD5，验证md5
+3.	进入工作目录，遍历dcharge.bd.log.list文件中的每一个文件名，如果当前目录不存在文件，则：
+	（1）	下载日志文件及md5
+	wget -q --tries=5 --limit-rate=10000k --waitretry=2 -O /home/work/beidou-stat//data/click_log/20110731/dcharge.bd.20110731-2315.log ftp://ftp:ftp@tc-sf-drd08.tc.baidu.com//home/work/var/beidou_log/20110731/dcharge.bd.20110731-2315.log 
+	（2）	验证md5
+	以上命令打印到日志文件中
+4.	将临时目录下的dcharge.bd.log.list移动到
+	/home/work/beidou-stat/data/click_log/{YYYYMMDD}（今天）目录下
+5.	判断此前1小时的4个文件是否都存在，如果存在则调用file_format函数，分别传递00,15,30,45参数，对下载的文件进行处理（如一行有20列，直接输出，否则为前19列+第23列），存储到/home/work/beidou-stat/data/click_log/20110801下，并生成md5
+6.	进入bin目录
+	执行命令：
+	/home/work/beidou-stat//bin/beidou_click_stat_hour(二进制文件) -D20110731 -H23 -A2011080100 -p../conf -fbeidou_click_stat_hour.conf
+
+7.	进入结果文件目录/home/work/beidou-stat/data/click_stat/normal/20110801/
+	生成beidoustat.2011080118.normal.0.0文件的md5
+	生成beidouqtstat.2011080120.normal.0.0.文件的md5
+8.	清空文件filelist.2011080120.normal.0.0
+	打印”beidoustat.2011080118.normal.0.0”到该文件中，并生成md5
+
+
+==========================================================================================
+【报警内容】
+1.	创建目录****失败
+2.	下载文件列表（MD5）失败
+3.	进入临时目录失败
+4.	点击日志文件列表MD5校验失败
+5.	进入目录/home/work/beidou-stat/data/fullad/失败
+6.	下载全流量创意ID列表（MD5）失败
+7.	点击全流量创意ID列表MD5校验失败
+8.	进入工作目录**失败
+9.	下载日志文件**失败
+10.	进入点击日志目录**失败
+11.	点击日志**MD5校验失败
+12.	awk文件**失败
+13.	进入结果文件目录**失败
+14.	生成MD5文件**.md5失败
+15.	生成结果文件**到文件列表**失败
+16.	缺少文件**.log文件
+
+==========================================================================================
+【备注】
+由于1083要在每小时30分去抓取1224生成的数据，因此1224运行时间超过30分钟则直接导致1083的失败。需要让OP重跑1083任务恢复。需要注意的是，直接运行1083的任务在当前小时内恢复，跨小时恢复需修改脚本。
+
+过去，1083任务执行失败时，需要同时查看两个md5，具体为：
+（1）	进入tc-cron机器，/home/work/beidou-stat/data/fullad，检查最近一个任务周期的fullad.YYYYMMDDHH这个文件的MD5是否生成了（1224任务的结果）
+（2）	再到/home/work/beidou-cron/adfile目录下，看最近一个任务周期的fullad.YYYYMMDDHH这个文件的MD5是否生成，如果没有等待任务执行完毕后再检查确认一下
+

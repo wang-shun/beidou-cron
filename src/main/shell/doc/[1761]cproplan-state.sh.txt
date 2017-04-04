@@ -1,0 +1,22 @@
+﻿【任务名】	余额不足提醒任务
+【时间驱动】	20 0 * * *	运行超时	5分钟	等待超时	分钟
+【运行命令】	cd /home/work/beidou-cron/bin ; sh cproplan-state.sh
+【日志地址】	无
+【变更库表】	beidou.cproplan
+【任务依赖】  下游任务：1762:每日预算重新上线;
+========================================================================================
+【任务描述】
+运行sql文件modcproplanstate.sql
+文件内容：
+update cproplan t set t.planstate = 0 where t.planstate = 3 and t.startdate = DATE_FORMAT(now(),'%Y%m%d');（对于未开始状态的推广计划，如今天是其开始日期，则设置为有效状态）
+
+update cproplan t set t.planstate = 4 where t.planstate = 0 and t.hasenddate = 1 and t.enddate <= DATE_FORMAT(DATE_SUB(now(),INTERVAL 1 DAY),'%Y%m%d');（对于有效并且设置结束日期的推广计划，如果已在昨天或之前结束，则设置其状态为已下线）
+
+
+==========================================================================================
+【报警内容】
+modcproplanstate.sql运行失败
+
+【备注】
+
+

@@ -1,0 +1,38 @@
+﻿【任务名】	生成网盟预算统计数据
+【时间驱动】	30 4 * * *		运行超时	30分钟	等待超时	0分钟
+【运行命令】	cd /home/work/beidou-cron/bin; sh stat_user_cost_offline.sh
+【日志地址】	无
+【变更库表】	无
+【任务依赖】  上游任务：43458: 准备用户预算数据
+========================================================================================
+【任务描述】
+1.	获取上游生成的用户预算数据
+beidou-cron/data/bd_budget_stat/input/user_budget.yyyymmdd.txt
+文件内容有两列：(userid,budget)
+2.	从beidoufinan表中获取用户的消费总额
+select p.userid,p.cost from (select userid, sum(price) as cost from beidoufinan.cost_${YESTERDAY} group by userid) p where p.cost>0 order by p.userid
+存储到beidou-cron/data/bd_budget_stat/input/cost.txt
+文件内容有两列：（userid,cost）
+3.	从计费抓取用户推广计划下线日志
+wget ftp://tc-sf-drd21.tc.baidu.com:/home/work/var/bdcharge/other_log/${YESTERDAY}/balance.${YESTERDAY}-*.log -P ${TMP_PATH} --limit-rate=5000K
+文件有两列：(planid, offline_time)
+4.	对下线日志进行汇总，筛选出有过下线的userid列表，存储到user_offline.txt
+5.	从DB中查询昨天到今天下线的推广计划，如
+select distinct planid from cproplan_offline where offtime>='****' and offtime<='****' order by planid;，结果存储到plan_offline.txt（planid一列）
+6.	
+(1)将budget.${yyyymmdd}.txt中的第一列userid打印到user.txt
+(2)对比plan_offline.txt和budget.${yyyymmdd}.txt，得到未下线的userid（在budget.${yyyymmdd}.txt中存在但没有在plan_offline.txt中），存储到not_offline.txt
+(4)对比not_offline.txt和user.txt，将user.txt中存在但是not_offline.txt中没有的userid筛选到文件user_all_plan_offline.txt
+(5) cat user_all_plan_offline.txt user_offline.txt | sort -u > offline.txt
+7.	将cost.txt、offline.txt、user.txt合并汇总到all_user.txt
+8.	对于所有all_user.txt中的用户（过滤 (userid> 30) && (userid < 1381000 || userid > 1381999) && !(cost==0 && offline==0 && budget==0))，输出消费及预算信息到
+/home/work/beidou-cron/data/bd_budget_stat/output/user_info.${yyyymmdd}.txt
+
+
+==========================================================================================
+【报警内容】
+1.	获取用户预算数据失败-user_budget.yyyymmdd.txt not created（可能原因：上游任务数据文件未生成）
+2.	获取用户消费数据失败-cost.txt not created（可能原因，DB查询瞬断）
+3.	获取用户下线数据失败-user_offline.txt not created（merge下线日志出差）
+4.	获取计划下线数据失败-plan_offline.txt not created（从DB中查询推广计划下线时间失败）
+

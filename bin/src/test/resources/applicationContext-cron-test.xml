@@ -1,0 +1,217 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN 2.0//EN"
+			  "http://www.springframework.org/dtd/spring-beans-2.0.dtd">
+
+
+<!--
+	- Application context definition for Petclinic on Hibernate.
+-->
+<beans>
+	<import resource="classpath:applicationContext-hibernate.xml" />
+	<import resource="classpath:applicationContext-transaction-config.xml" />
+	<import resource="classpath:applicationContext-cache.xml" />
+	
+	<bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        <property name="ignoreUnresolvablePlaceholders" value="true"/>
+        <property name="locations">
+            <list>
+                <value>classpath*:dbslice_conf.properties</value>
+            </list>
+        </property>
+    </bean>
+
+	<!--  =============================== basic  config  ================================ -->
+	<bean class="com.baidu.beidou.util.BeidouConfig">
+		<!-- 如果需要使用AKA服务，ATOM服务等，需要配置对应搜属性 -->
+		<property name="akaServier">
+			<value>${AKA_SERVER}</value>
+		</property>
+		<property name="AKA_LITERAL_CLIENT">
+			<value>${AKA_LITERAL_CLIENT}</value>
+		</property>
+		<property name="AKA_PICTURE_CLIENT">
+			<value>${AKA_PICTURE_CLIENT}</value>
+		</property>
+		<property name="AKA_KW_CLIENT">
+			<value>${AKA_KW_CLIENT}</value>
+		</property>
+		<property name="AKA_LIST_TYPE">
+			<value>${AKA_LIST_TYPE}</value>
+		</property>
+		
+		<property name="MASTER_CACHE_SERVER">
+			<value>${MASTER_CACHE_SERVER}</value>
+		</property>
+		<property name="SLAVE_CACHE_SERVER">
+			<value>${SLAVE_CACHE_SERVER}</value>
+		</property>
+		<!-- cache读写超时,单位为秒 -->
+		<property name="CACHE_OPERATION_TIMEOUT">
+			<value>1</value>
+		</property>
+		<!-- cache数据缓冲的大小,单位为字节 -->
+		<property name="CACHE_READ_BUFFER_SIZE">
+			<value>16384</value>
+		</property>
+		<!-- cache队列长度 -->
+		<property name="CACHE_OP_QUEUE_LEN">
+			<value>16384</value>
+		</property>
+		<property name="UC_POST_APPID">
+			<value>${UC_POST_APPID}</value>
+		</property>
+		<property name="UC_BEIDOU_GROUPTYPE">
+			<value>${UC_BEIDOU_GROUPTYPE}</value>
+		</property>
+		<property name="UC_SHIFEN_GROUPTYPE">
+			<value>${UC_SHIFEN_GROUPTYPE}</value>
+		</property>
+		<property name="UC_SHIFEN_GETLEADER_GROUPTYPE">
+			<value>${UC_SHIFEN_GETLEADER_GROUPTYPE}</value>
+		</property>
+	</bean>
+	
+	<bean id="mailSender" class="org.springframework.mail.javamail.JavaMailSenderImpl">
+    	<property name="host"><value>${mail.smtp.host}</value></property>
+		<property name="javaMailProperties"> 
+          <props>   
+            <prop key="mail.smtp.timeout">${mail.readtimeout}</prop> 
+            <prop key="mail.smtp.connectiontimeout">${mail.connectiontimeout}</prop> 
+          </props> 
+		</property>
+    </bean>
+    
+    <bean id="globalConstantMgr" class="com.baidu.beidou.util.service.impl.GlobalConstantMgrImpl">
+	</bean>
+	
+	<bean id="statTableService" class="com.baidu.beidou.stat.service.impl.StatTableServiceImpl">
+		<property name="cproGroupDao">
+  			<ref bean="cproGroupDao"/>
+  		</property>
+   		<property name="unitDao">
+  			<ref bean="unitDao"/>
+  		</property>
+	</bean>
+			
+	<!--  =============================== transaction  config ================================ -->
+	<bean id="beidou_addbMultiDataSourceInterceptor" parent="addbMultiDataSourceInterceptor"
+		class="com.baidu.beidou.multidatabase.datasource.MultiDataSourceInterceptor">
+		<property name="multiDataSourceKeyContext">
+			<ref bean="addbMultiDSKeyContext" />
+		</property>
+	</bean>
+	<bean id="beidou_addbTransactionInterceptor" parent="addbTransactionInterceptor"
+		class="org.springframework.transaction.interceptor.TransactionInterceptor">
+		<property name="transactionAttributes">
+			<props merge="true">
+				<prop key="bdSiteStore">PROPAGATION_REQUIRED, -Exception</prop>
+				<prop key="bdSiteCalculate">PROPAGATION_REQUIRED, -Exception</prop>
+			</props>
+		</property>
+	</bean>
+	<bean id="beidou_addbMultiDataSourceProxy" parent="addbMultiDataSourceProxy"
+		class="org.springframework.aop.framework.autoproxy.BeanNameAutoProxyCreator">
+		<property name="beanNames">
+			<list>
+				<!--  <value>mailManager</value> -->
+				<value>statTableService</value>
+				<value>unitWriteMgr</value>
+				<value>simpleTransProxy</value>
+			</list>
+		</property>
+		<property name="interceptorNames">
+			<list>
+				<value>beidou_addbMultiDataSourceInterceptor</value>
+				<value>beidou_addbTransactionInterceptor</value>
+			</list>
+		</property>
+	</bean>
+
+	
+	<bean id="beidou_xdbMultiDataSourceInterceptor" parent="xdbMultiDataSourceInterceptor"
+		class="com.baidu.beidou.multidatabase.datasource.MultiDataSourceInterceptor">
+		<property name="multiDataSourceKeyContext">
+			<ref bean="xdbMultiDSKeyContext" />
+		</property>
+		<property name="attributes">
+			<props  merge="true">
+			</props>
+		</property>
+	</bean>
+	<bean id="beidou_xdbTransactionInterceptor" parent="xdbTransactionInterceptor"
+		class="org.springframework.transaction.interceptor.TransactionInterceptor">
+		<property name="transactionAttributes">
+			<props merge="true">
+				<prop key="bdSiteStore">PROPAGATION_REQUIRED, -Exception</prop>
+				<prop key="bdSiteCalculate">PROPAGATION_REQUIRED, -Exception</prop>
+				<prop key="saveResult*">PROPAGATION_REQUIRED, -Exception</prop>
+				<prop key="sendFailedMails*">PROPAGATION_REQUIRED, -Exception</prop>
+				<prop key="dealSnapShot*">PROPAGATION_REQUIRED, -Exception</prop>
+			</props>
+		</property>
+	</bean>
+	<bean id="beidou_xdbMultiDataSourceProxy" parent="xdbMultiDataSourceProxy"
+		class="org.springframework.aop.framework.autoproxy.BeanNameAutoProxyCreator">
+		<property name="beanNames">
+			<list>
+				<value>iconRepositoryService</value>
+				<value>bdSiteStatService</value>
+				<value>userFundService</value>
+				<value>snapShotMgr</value>
+				<value>aotMgr</value>
+			</list>
+		</property>
+		<property name="interceptorNames">
+			<list>
+				<value>beidou_xdbMultiDataSourceInterceptor</value>
+				<value>beidou_xdbTransactionInterceptor</value>
+			</list>
+		</property>
+	</bean>
+	
+	<bean id="beidou_clkdbMultiDataSourceInterceptor" parent="clkdbMultiDataSourceInterceptor"
+		class="com.baidu.beidou.multidatabase.datasource.MultiDataSourceInterceptor">
+		<property name="multiDataSourceKeyContext">
+			<ref bean="clkdbMultiDSKeyContext" />
+		</property>
+	</bean>
+	<bean id="beidou_clkdbTransactionInterceptor" parent="clkdbTransactionInterceptor"
+		class="org.springframework.transaction.interceptor.TransactionInterceptor">
+	</bean>
+	<bean id="beidou_clkdbMultiDataSourceProxy" parent="clkdbMultiDataSourceProxy"
+		class="org.springframework.aop.framework.autoproxy.BeanNameAutoProxyCreator">
+		<property name="beanNames">
+			<list>
+				<value>userFundService</value>
+			</list>
+		</property>
+		<property name="interceptorNames">
+			<list>
+				<value>beidou_clkdbMultiDataSourceInterceptor</value>
+				<value>beidou_clkdbTransactionInterceptor</value>
+			</list>
+		</property>
+	</bean>
+	
+	<!--  ========================= import user applicationContext =========================== -->
+	
+	<import
+		resource="classpath:/com/baidu/beidou/account/applicationContext.xml" />
+	<import
+		resource="classpath:/com/baidu/beidou/user/applicationContext.xml" />
+	<import
+		resource="classpath:/com/baidu/beidou/cprounit/applicationContext.xml" />
+	<import
+		resource="classpath:/com/baidu/beidou/cprogroup/applicationContext.xml" />
+	<import
+		resource="classpath:/com/baidu/beidou/cproplan/applicationContext.xml" />
+	<import
+		resource="classpath:/com/baidu/beidou/unionsite/applicationContext.xml" />
+	<import
+		resource="classpath:/com/baidu/beidou/tool/applicationContext.xml" />
+	<import
+		resource="classpath:/com/baidu/beidou/aot/applicationContext.xml" />
+	<import
+		resource="classpath:/com/baidu/beidou/auditmanager/applicationContext.xml" />
+
+</beans>

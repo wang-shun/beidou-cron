@@ -1,0 +1,44 @@
+﻿【任务名】	每日预算重新上线
+【时间驱动】	10 1 * * * 运行超时	5分钟	等待超时	0分钟
+【运行命令】	cd /home/work/beidou-cron/bin; sh ireginfo.sh
+【日志地址】	/home/work/datainf/log/ireginfo.log
+【变更库表】	beidou.reginfo
+【任务依赖】  下游任务：1063:生成地域网站行业js文件（远tc00）;
+========================================================================================
+【任务描述】
+1.	计算当前日期，如2011-07-13 01:10:01，并写入日志文件
+2.	进入目录：/home/work/datainf/data/import/reginfo，将rgn.map备份为rgn.map.bak
+	如文件不存在，则touch rgn.map.bak
+3.	将rgn.map.md5备份为rgn.map.md5.bak，如文件不存在，同样touch rgn.map.md5
+4.	抓取文件
+	wget -c -T 20 -t 5 
+	ftp://ftp:ftp@tc-beidou-cron00.tc//home/work/beidou-cron/data/rgn.map -O rgn.map
+	wget -c -T 20 -t 5 
+	ftp://ftp:ftp@tc-beidou-cron00.tc//home/work/beidou-cron/data/rgn.map.md5 -O rgn.map.md5
+	校验md5
+	其中rgn.map的格式范例如下：（”省市关系，网吧/电信等”, 一级地域id，二级地域id，名称），二级地域id为0，表示该reg为父级地域
+	1	30	531	眉山市	
+	1	30	 0	四川省	
+5.	与昨天下载并文件的md5比较，如果比较结果一致，则不再导入库，并且写入日志：
+	/home/work/datainf/log/datainf_wget.log文件中，否则继续步骤6
+6.	判断rgn.map中是否存在重复的行，存在则输出：一级地域ID、二级地域ID值存在重复
+7.	将一级地域ID去重排序得到变量FIRST_CLASS_USING，将标记为父级地域的一级地域ID去重排序，得到变量FIRST_CLASS，如果FIRST_CLASS_USING!= FIRST_CLASS，则输出“某个一级地域ID值不存在”
+8.	执行sql： DELETE from reginfo（通过调用home/work/datainf/runproc.sh）
+	如执行失败则调用home/work/datainf/run.sh ireginfo（执行地域信息数据导入命令）
+9.	执行查询：select count(*) from reginfo，如果数量小于1，则输出：“地域信息数据导入检查失败”，否则输出：“地域信息数据数导入成功”到日志文件datainf_wget.log中
+
+==========================================================================================
+【报警内容】
+1.	从tc-beidou-cron00.tc download rgn.map,执行wget命令有问题（可能原因：文件不存在或者wget命令错误）
+2.	从tc-beidou-cron00.tc download rgn.map.md5,执行wget命令有问题（可能原因：文件不存在或者wget命令错误）
+3.	从tc-beidou-cron00.tc 下载的 rgn.map、rgn.map.md5，md5值不一致（可能原因：md5文件校验错误）
+4.	rgn.map，一级地域ID、二级地域ID值存在重复（可能原因：文件中存在重复行）
+5.	rgn.map，某个一级地域ID值不存在（可能原因：存在某个一级地域，其父级地域标记位不是0）
+6.	执行DELETE from reginfo命令有问题（可能原因：执行sql错误，或数据库连接错误）
+7.	执行 地域信息数据导入 命令失败（可能原因，调用com.baidu.union.integrate.DataIO错误）
+8.	地域信息数据导入检查失败（可能原因：数据未导入到reginfo表）
+
+
+【备注】
+
+

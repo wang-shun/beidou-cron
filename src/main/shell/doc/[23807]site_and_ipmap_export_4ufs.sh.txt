@@ -1,0 +1,26 @@
+﻿【任务名】	生成ipmap和网站信息给ufs
+【时间驱动】	30 20 * * 2	运行超时	 5分钟	等待超时	0分钟
+【运行命令】	cd /home/work/beidou-cron/bin; sh site_and_ipmap_export_4ufs.sh
+【日志地址】	/home/work/beidou-cron/log/site_export_4ufs.log
+【变更库表】	无
+【任务依赖】  无
+========================================================================================
+【任务描述】
+1.	打印当前日期时间戳到日志
+2.	执行sql查询
+	select siteid,siteurl,isdomain from beidou.unionsite where valid=1
+	 结果存储到：/home/work/beidou-cron/data/unionsite/output下的union.dat
+3.	对/home/work/beidou-cron/data/下的beidou_ip.map进行处理，该文件内容如下所示
+ 	http://bave.baidu.com/api/images/cb9d85ac-b951-484c-a516-88c79f00ed9b
+ 	
+	只对第一列为1，并且第四列内容介于1-34之间的行进行处理
+	（1）	如果第5列大于0，则打印2,3,5列
+	（2）	否则打印2,3,4列
+	结果存储到/home/work/beidou-cron/data/unionsite/output/ip.map中，内容如下所示：
+ 	http://bave.baidu.com/api/images/0a25d0b5-064a-4262-88c0-8c3db5ab54e1
+ 	
+4.	生成2,3两个文件的md5
+
+==========================================================================================
+【报警内容】
+site_ufs_export_daily.sh：error to export siteinfo for ufs from db

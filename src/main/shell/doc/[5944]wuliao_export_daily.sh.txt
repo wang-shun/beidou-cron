@@ -1,0 +1,23 @@
+﻿【任务名】	多媒体物料统计信息4Admaker
+【时间驱动】	无（事件驱动）	运行超时	120分钟	等待超时	 0分钟
+【运行命令】	cd /home/work/beidou-cron/bin; sh wuliao_export_daily.sh
+【日志地址】	/home/work/beidou-cron/log/wuliao_export_daily.log
+【变更库表】	无
+【任务依赖】  上游任务：40083:天粒度数据汇总2;
+========================================================================================
+【任务描述】
+执行sql查询（执行8次类似的联表查询）
+select s0.adid, c0.filesrc, s0.srchs, s0.clks from 
+beidoustat.stat_ad_${TIME_YYYYMM} as s0, 
+beidou.cprounitmater0 as c0
+//其中${TIME_YYYYMM}为昨天对应的月表，date -d 'yesterday' +%Y%m
+结果输出到/home/work/beidou-cron/data/admaker/output目录下
+文件名为beidou_material_${TIME_YYYYMMDD}
+其中${TIME_YYYYMMDD}为昨天的日期
+
+
+==========================================================================================
+【报警内容】
+error to query materials from db
+
+【备注】

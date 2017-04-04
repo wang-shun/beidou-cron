@@ -1,0 +1,594 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN 2.0//EN" "http://www.springframework.org/dtd/spring-beans-2.0.dtd">
+
+<!--
+	- Application context definition for "springapp" DispatcherServlet.
+-->
+
+<beans>
+
+	<bean id="unitMgr" class="com.baidu.beidou.cprounit.service.impl.CproUnitMgrImpl">
+		<property name="unitDao">
+			<ref bean="unitDao" />
+		</property>
+	</bean>
+	
+	<bean id="unitWriteMgr" class="com.baidu.beidou.cprounit.service.impl.CproUnitWriteMgrImpl">
+		<property name="unitWriteDao">
+			<ref bean="unitWriteDao" />
+		</property>
+	</bean>
+
+	<bean id="unitConfig" class="com.baidu.beidou.cprounit.constant.CproUnitConfig">
+		<property name="DRMC_MATPREFIX">
+			<value>${DRMC_MATPREFIX}</value>
+		</property>
+		<property name="DRMC_BATCH_NUM">
+			<value>${DRMC_BATCH_NUM}</value>
+		</property>
+		<property name="MAX_UNIT_NUMBER" value="${MAX_UNIT_NUMBER}"></property>
+	</bean>
+	
+	<bean id="amDriverProxy" class="com.baidu.beidou.util.McpackProxyFactoryBean">
+    	<property name="serviceInterface">
+			<value>com.baidu.beidou.cprounit.mcdriver.AmDriverProxy</value>	
+		</property>
+		<property name="serviceUrl" value="${AM_SERVICEURL}" />	
+		<property name="servers" value="${AM_SERVER}" />	
+		<property name="encoding" value="UTF-8" />
+		<property name="connectionTimeout" value="${AM.connectionTimeout}" />
+		<property name="readTimeout" value="${AM.readTimeout}" />
+		<property name="hasHeaders" value="true" />
+	</bean>
+	
+	<bean id="amService" class="com.baidu.beidou.cprounit.service.impl.AmServiceImpl">
+		<constructor-arg index="0" value="${AM_TYPE}"/>
+		<constructor-arg index="1" value="${UBMC_PRODID}"/>
+		<constructor-arg index="2" value="${AM_SYSCODE}"/>
+		<constructor-arg index="3" value="${AM_PRODID}"/>
+		<property name="amDriverProxy" ref="amDriverProxy" />
+	</bean>
+	
+	<bean id="amDataDriverProxy" class="com.baidu.beidou.util.McpackProxyFactoryBean">
+    	<property name="serviceInterface">
+			<value>com.baidu.beidou.cprounit.mcdriver.AmDataRevisionDriverProxy</value>	
+		</property>
+		<property name="serviceUrl" value="${AM_FIX_SERVICEURL}" />	
+		<property name="servers" value="${AM_FIX_SERVER}" />	
+		<property name="encoding" value="UTF-8" />
+		<property name="connectionTimeout" value="${AM_FIX_CONNECTION_TIMEOUT}" />
+		<property name="readTimeout" value="${AM_FIX_READ_TIMEOUT}" />
+		<property name="hasHeaders" value="true" />
+	</bean>
+	
+	<bean id="amDataService" class="com.baidu.beidou.cprounit.service.impl.AmDataServiceImpl">
+		<constructor-arg index="0" value="${AM_FIX_SYSCODE}"/>
+		<constructor-arg index="1" value="${AM_FIX_PRODID}"/>
+		<property name="amDataDriverProxy" ref="amDataDriverProxy" />
+	</bean>
+	
+	<bean id="recompileCreativeProxy" class="com.baidu.beidou.util.McpackProxyFactoryBean">
+    	<property name="serviceInterface">
+			<value>com.baidu.beidou.cprounit.mcdriver.RecompileCreativeApiProxy</value>	
+		</property>
+		<property name="serviceUrl" value="${AM_RECOMPILE_SERVICEURL}" />	
+		<property name="servers" value="${AM_RECOMPILE_SERVER}" />	
+		<property name="encoding" value="UTF-8" />
+		<property name="connectionTimeout" value="${AM_RECOMPILE_CONNECTION_TIMEOUT}" />
+		<property name="readTimeout" value="${AM_RECOMPILE_READ_TIMEOUT}" />
+		<property name="hasHeaders" value="true" />
+	</bean>
+	
+	<bean id="recompileCreativeService" class="com.baidu.beidou.cprounit.service.impl.RecompileCreativeServiceImpl">
+		<constructor-arg index="0" value="${UBMC_PRODID}"/>
+		<constructor-arg index="1" value="${AM_RECOMPILE_SYSCODE}"/>
+		<constructor-arg index="2" value="${AM_RECOMPILE_PRODID}"/>
+		<property name="recompileCreativeProxy" ref="recompileCreativeProxy" />
+	</bean>
+	
+	
+	<bean id="rawMcDriverProxy" class="com.baidu.beidou.util.McpackProxyFactoryBean">
+    	<property name="serviceInterface">
+			<value>com.baidu.beidou.cprounit.mcdriver.RawMcDriverProxy</value>	
+		</property>
+		<property name="serviceUrl" value="${DRMC_SERVICEURL}" />	
+		<property name="servers" value="${DRMC_SERVER}" />	
+		<property name="encoding" value="UTF-8" />
+		<property name="retryTimes" value="3" />
+		<property name="connectionTimeout" value="${DRMC.connectionTimeout}" />
+		<property name="readTimeout" value="${DRMC.readTimeout}" />
+		<property name="hasHeaders" value="true" />
+	</bean>
+	
+	<bean id="drmcService" class="com.baidu.beidou.cprounit.service.impl.DrmcServiceImpl">
+		<constructor-arg index="0" value="${DRMC_SYSCODE}"/>
+		<constructor-arg index="1" value="${DRMC_PRODID}"/>
+		<property name="rawMcDriverProxy" ref="rawMcDriverProxy" />
+	</bean>
+
+	<!-- 用于操作用户上传的图标、系统图标库图标 -->
+	<bean id="iconService" class="com.baidu.beidou.cprounit.service.impl.IconServiceImpl">
+		<constructor-arg index="0" value="${DRMC_SYSCODE}"/>
+		<constructor-arg index="1" value="${DRMC_PRODID}"/>
+		<property name="rawMcDriverProxy" ref="rawMcDriverProxy" />
+	</bean>
+	
+	<bean id="iconRepositoryService" class="com.baidu.beidou.cprounit.icon.service.impl.IconRepositoryServiceImpl">
+		<property name="purposeDao">
+			<ref bean="purposeDao" />
+		</property>
+		<property name="systemIconDao">
+			<ref bean="systemIconDao" />
+		</property>
+		<property name="iconPurposeDao">
+			<ref bean="iconPurposeDao"/>
+		</property>
+		<property name="adConfigDao">
+			<ref bean="adConfigDao"/>
+		</property>
+	</bean>
+	
+	<!-- ubmc related -->
+	<bean id="ubmcDriverProxy" class="com.baidu.beidou.util.McpackProxyFactoryBean">
+    	<property name="serviceInterface">
+			<value>com.baidu.beidou.cprounit.ubmcdriver.UbmcDriverProxy</value>	
+		</property>
+		
+		<property name="serviceUrl" value="${UBMC_SERVICEURL}" />	
+		<property name="servers" value="${UBMC_SERVER}" />	
+		<property name="encoding" value="UTF-8" />
+		<property name="retryTimes" value="3" />
+		<property name="connectionTimeout" value="${UBMC.connectionTimeout}" />
+		<property name="readTimeout" value="${UBMC.readTimeout}" />
+		<property name="hasHeaders" value="true" />
+	</bean>
+	
+	<bean id="ubmcService" class="com.baidu.beidou.cprounit.service.impl.UbmcServiceImpl">
+		<constructor-arg index="0" value="${UBMC_SYSCODE}"/>
+		<constructor-arg index="1" value="${UBMC_PRODID}"/>
+		<property name="ubmcDriverProxy" ref="ubmcDriverProxy" />
+	</bean>
+	
+	<bean id="syncAuditHistoryMgr" class="com.baidu.beidou.cprounit.service.syncubmc.SyncAuditHistoryMgr">
+		<property name="ubmcService">
+			<ref bean="ubmcService" />
+		</property>
+		<property name="auditHistoryDao">
+			<ref bean="historyDao"/>
+		</property>
+	</bean>
+	
+	<bean id="syncPreMaterMgr" class="com.baidu.beidou.cprounit.service.syncubmc.SyncPreMaterMgr">
+		<property name="ubmcService">
+			<ref bean="ubmcService" />
+		</property>
+		<property name="preMaterDao">
+			<ref bean="preMaterDao"/>
+		</property>
+	</bean>
+	
+	<bean id="syncUnitMgr" class="com.baidu.beidou.cprounit.service.syncubmc.SyncUnitMgr">
+		<property name="ubmcService">
+			<ref bean="ubmcService" />
+		</property>
+		<property name="unitDao">
+			<ref bean="unitDao"/>
+		</property>
+	</bean>
+	
+	<bean id="syncTmpUnitMgr" class="com.baidu.beidou.cprounit.service.syncubmc.SyncTmpUnitMgr">
+		<property name="ubmcService">
+			<ref bean="ubmcService" />
+		</property>
+		<property name="tmpUnitDao">
+			<ref bean="tmpUnitDao"/>
+		</property>
+	</bean>
+	
+	<bean id="syncSystemIconMgr" class="com.baidu.beidou.cprounit.service.syncubmc.SyncSystemIconMgr">
+		<property name="ubmcService">
+			<ref bean="ubmcService" />
+		</property>
+		<property name="systemIconDao">
+			<ref bean="systemIconDao"/>
+		</property>
+	</bean>
+	
+	<bean id="syncUserUploadIconMgr" class="com.baidu.beidou.cprounit.service.syncubmc.SyncUserUploadIconMgr">
+		<property name="ubmcService">
+			<ref bean="ubmcService" />
+		</property>
+		<property name="userUploadIconDao">
+			<ref bean="userUploadIconDao"/>
+		</property>
+	</bean>
+	
+	<bean id="syncUbmcMaterTask" class="com.baidu.beidou.cprounit.task.impl.SyncUbmcMaterTaskImpl">
+		<property name="syncAuditHistoryMgr">
+			<ref bean="syncAuditHistoryMgr" />
+		</property>
+		<property name="syncPreMaterMgr">
+			<ref bean="syncPreMaterMgr" />
+		</property>
+		<property name="syncUnitMgr">
+			<ref bean="syncUnitMgr"/>
+		</property>
+		<property name="syncTmpUnitMgr">
+			<ref bean="syncTmpUnitMgr"/>
+		</property>
+		<property name="syncSystemIconMgr">
+			<ref bean="syncSystemIconMgr"/>
+		</property>
+		<property name="syncUserUploadIconMgr">
+			<ref bean="syncUserUploadIconMgr"/>
+		</property>
+	</bean>
+	
+	<bean id="checkUnitTextMgr" class="com.baidu.beidou.cprounit.service.syncubmc.CheckUnitTextMgr">
+		<property name="ubmcService">
+			<ref bean="ubmcService" />
+		</property>
+		<property name="unitDao">
+			<ref bean="unitDao"/>
+		</property>
+	</bean>
+	
+	<bean id="checkUnitImageMgr" class="com.baidu.beidou.cprounit.service.syncubmc.CheckUnitImageMgr">
+		<property name="ubmcService">
+			<ref bean="ubmcService" />
+		</property>
+		<property name="unitDao">
+			<ref bean="unitDao"/>
+		</property>
+	</bean>
+	
+	<bean id="checkImageUpdateMgr" class="com.baidu.beidou.cprounit.service.syncubmc.CheckImageUpdateMgr">
+		<property name="ubmcService">
+			<ref bean="ubmcService" />
+		</property>
+		<property name="unitDao">
+			<ref bean="unitDao"/>
+		</property>
+	</bean>
+	
+	<bean id="checkUnitAllMgr" class="com.baidu.beidou.cprounit.service.syncubmc.CheckUnitAllMgr">
+		<property name="ubmcService">
+			<ref bean="ubmcService" />
+		</property>
+	</bean>
+	
+	<bean id="checkAdmakerUpdateMgr" class="com.baidu.beidou.cprounit.service.syncubmc.CheckAdmakerUpdateMgr">
+		<property name="errorAdmakerUrl" value="${AM_FIX_ERROR_AMMAKER_URL}" />
+		<property name="errorUbmcTmpUrl" value="${AM_FIX_ERROR_UBMC_TMP_URL}" />
+		
+		<property name="ubmcService">
+			<ref bean="ubmcService" />
+		</property>
+		<property name="drmcService">
+			<ref bean="drmcService" />
+		</property>
+		<property name="amDataService">
+			<ref bean="amDataService" />
+		</property>
+		<property name="unitWriteMgr">
+			<ref bean="unitWriteMgr" />
+		</property>
+	</bean>
+	
+	<bean id="checkMaterMd5Mgr" class="com.baidu.beidou.cprounit.service.syncubmc.CheckMaterMd5Mgr">
+		<property name="ubmcService">
+			<ref bean="ubmcService" />
+		</property>
+		<property name="unitDao">
+			<ref bean="unitDao"/>
+		</property>
+	</bean>
+	
+	<bean id="checkAdmakerFixUpdateMgr" class="com.baidu.beidou.cprounit.service.syncubmc.CheckAdmakerFixUpdateMgr">
+		<property name="ubmcService">
+			<ref bean="ubmcService" />
+		</property>
+		<property name="amService">
+			<ref bean="amService"/>
+		</property>
+		<property name="unitDao">
+			<ref bean="unitDao"/>
+		</property>
+	</bean>
+	
+	<bean id="recompileAdmakerFlashMaterMgr" class="com.baidu.beidou.cprounit.service.syncubmc.RecompileAdmakerFlashMaterMgr">
+		<property name="ubmcService">
+			<ref bean="ubmcService" />
+		</property>
+		<property name="recompileCreativeService">
+			<ref bean="recompileCreativeService"/>
+		</property>
+		<property name="unitDao">
+			<ref bean="unitDao"/>
+		</property>
+	</bean>
+	
+	<bean id="checkAdmakerFlashVersionMaterMgr" class="com.baidu.beidou.cprounit.service.syncubmc.CheckAdmakerFlashVersionMaterMgr">
+		<property name="ubmcService">
+			<ref bean="ubmcService" />
+		</property>
+	</bean>
+	
+	<bean id="checkMaterFilterMgr" class="com.baidu.beidou.cprounit.service.syncubmc.CheckMaterFilterMgr">
+		<property name="ubmcService">
+			<ref bean="ubmcService" />
+		</property>
+		<property name="unitDao">
+			<ref bean="unitDao"/>
+		</property>
+	</bean>
+	
+	<bean id="fixMaterUrlMgr" class="com.baidu.beidou.cprounit.service.syncubmc.FixMaterUrlMgr">
+		<property name="ubmcService">
+			<ref bean="ubmcService" />
+		</property>
+	</bean>
+	
+	<bean id="checkAndFixMaterMgr" class="com.baidu.beidou.cprounit.service.syncubmc.CheckAndFixMaterMgr">
+		<property name="ubmcService">
+			<ref bean="ubmcService" />
+		</property>
+		<property name="unitDao">
+			<ref bean="unitDao"/>
+		</property>
+	</bean>
+	
+	<bean id="recompileTargetMaterMgr" class="com.baidu.beidou.cprounit.service.syncubmc.RecompileTargetMaterMgr">
+		<property name="ubmcService">
+			<ref bean="ubmcService" />
+		</property>
+		<property name="recompileCreativeService">
+			<ref bean="recompileCreativeService"/>
+		</property>
+		<property name="unitDao">
+			<ref bean="unitDao"/>
+		</property>
+	</bean>
+	
+	<bean id="checkAndFixAdmakerMaterMgr" class="com.baidu.beidou.cprounit.service.syncubmc.CheckAndFixAdmakerMaterMgr">
+		<property name="ubmcService">
+			<ref bean="ubmcService" />
+		</property>
+	</bean>
+	
+	<bean id="syncDrmcUnitMgr" class="com.baidu.beidou.cprounit.service.syncubmc.SyncDrmcUnitMgr">
+		<property name="ubmcService">
+			<ref bean="ubmcService" />
+		</property>
+		<property name="drmcService">
+			<ref bean="drmcService" />
+		</property>
+		<property name="iconService">
+			<ref bean="iconService" />
+		</property>
+		<property name="amService">
+			<ref bean="amService" />
+		</property>
+		<property name="unitWriteMgr">
+			<ref bean="unitWriteMgr" />
+		</property>
+	</bean>
+	
+	<bean id="checkUbmcMaterTask" class="com.baidu.beidou.cprounit.task.impl.CheckUbmcMaterTaskImpl">
+		<property name="checkUnitTextMgr">
+			<ref bean="checkUnitTextMgr" />
+		</property>
+		<property name="checkUnitImageMgr">
+			<ref bean="checkUnitImageMgr" />
+		</property>
+		<property name="checkImageUpdateMgr">
+			<ref bean="checkImageUpdateMgr" />
+		</property>
+		<property name="checkUnitAllMgr">
+			<ref bean="checkUnitAllMgr" />
+		</property>
+		<property name="checkAdmakerUpdateMgr">
+			<ref bean="checkAdmakerUpdateMgr" />
+		</property>
+		<property name="checkMaterMd5Mgr">
+			<ref bean="checkMaterMd5Mgr" />
+		</property>
+		<property name="checkAdmakerFixUpdateMgr">
+			<ref bean="checkAdmakerFixUpdateMgr" />
+		</property>
+		<property name="checkMaterFilterMgr">
+			<ref bean="checkMaterFilterMgr" />
+		</property>
+		<property name="recompileAdmakerFlashMaterMgr">
+			<ref bean="recompileAdmakerFlashMaterMgr" />
+		</property>
+		<property name="checkAdmakerFlashVersionMaterMgr">
+			<ref bean="checkAdmakerFlashVersionMaterMgr" />
+		</property>
+		<property name="fixMaterUrlMgr">
+			<ref bean="fixMaterUrlMgr" />
+		</property>
+		<property name="checkAndFixMaterMgr">
+			<ref bean="checkAndFixMaterMgr" />
+		</property>
+		<property name="recompileTargetMaterMgr">
+			<ref bean="recompileTargetMaterMgr" />
+		</property>
+		<property name="checkAndFixAdmakerMaterMgr">
+			<ref bean="checkAndFixAdmakerMaterMgr" />
+		</property>
+	</bean>
+
+	<bean id="flashDecodeTask" class="com.baidu.beidou.cprounit.task.impl.FlashDecodeTaskImpl">
+		<property name="FLASH_INFO_INPUT_FILE" value="${FLASH_INFO_INPUT_FILE}"/>
+		<property name="FLASH_INFO_OUTPUT_FILE" value="${FLASH_INFO_OUTPUT_FILE}"/>
+		<property name="ubmcService" ref="ubmcService" />
+		<property name="DRMC_MATPREFIX" value="${DRMC_MATPREFIX}"/>
+		<property name="flashDecoder">
+			<bean class="com.baidu.chuangyi.flash.decode.FlashDecoder"></bean>
+		</property>
+	</bean>
+	
+	<bean id="syncDrmcMaterTask" class="com.baidu.beidou.cprounit.task.impl.SyncDrmcMaterTaskImpl">
+		<property name="syncDrmcUnitMgr">
+			<ref bean="syncDrmcUnitMgr" />
+		</property>
+	</bean>
+	
+	<bean id="unitAdxMgr" class="com.baidu.beidou.cprounit.service.impl.UnitAdxMgrImpl">
+		<property name="unitAdxDao">
+			<ref bean="unitAdxDao" />
+		</property>
+	</bean>
+	
+	<bean id="unitAdxMgrOnRead" class="com.baidu.beidou.cprounit.service.impl.UnitAdxMgrOnReadImpl">
+		<property name="unitAdxDao">
+			<ref bean="unitAdxDao" />
+		</property>
+	</bean>
+	
+	<bean id="googleAdxSnapshotMgr" class="com.baidu.beidou.cprounit.service.google.impl.GoogleAdxSnapshotMgrImpl">
+		<property name="unitAdxMgrOnRead">
+			<ref bean="unitAdxMgrOnRead"/>
+		</property>
+		<property name="userBatchNumber">
+			<value>${GOOGLE_SNAPSHOT_USER_BATCH_NUM}</value>
+		</property>
+		<property name="userBatchSleepTime">
+			<value>${GOOGLE_SNAPSHOT_USER_BATCH_SLEEP_TIME}</value>
+		</property>
+	</bean>
+	
+	<bean id="googleAdxSnapshotExecutor" class="com.baidu.beidou.cprounit.service.google.executor.GoogleAdxSnapshotExecutor">
+		<property name="SNAPSHOT_TASK_NUM">
+			<value>${GOOGLE_SNAPSHOT_TASK_NUM}</value>
+		</property>
+	</bean>
+	
+	<bean id="googleAdxSnapshotTask" class="com.baidu.beidou.cprounit.service.google.executor.GoogleAdxSnapshotTask" scope="prototype">
+		<property name="ubmcService">
+			<ref bean="ubmcService"/>
+		</property>
+		<property name="unitAdxMgr">
+			<ref bean="unitAdxMgr"/>
+		</property>
+		<property name="snapshotRetryTime">
+			<value>${GOOGLE_SNAPSHOT_RETRY_TIME}</value>
+		</property>
+		<property name="snapshotServiceUrls">
+			<value>${GOOGLE_SNAPSHOT_SERVICE_URL}</value>
+		</property>
+		<property name="materialMaxSize">
+			<value>${GOOGLE_MATERIAL_MAXSIZE}</value>
+		</property>
+		<property name="upadteMaxNum">
+			<value>${GOOGLE_UPADTE_MAX_NUM}</value>
+		</property>
+		<property name="flashLoadTime">
+			<value>${GOOGLE_SNAPSHOT_FLASH_LOAD_TIME}</value>
+		</property>
+		<property name="snapshotFailedThreshold">
+			<value>${GOOGLE_SNAPSHOT_FAILED_THRESHOLD}</value>
+		</property>
+		<property name="snapshotCallInterval">
+			<value>${GOOGLE_SNAPSHOT_CALL_INTERVAL}</value>
+		</property>
+		<property name="updateDBSleepTime">
+			<value>${GOOGLE_UPDATE_SLEEP_TIME}</value>
+		</property>
+		<property name="pictureCompressQuality">
+			<value>${GOOGLE_SNAPSHOT_COMPRESS_QUALITY}</value>
+		</property>
+		<property name="offsetX">
+			<value>${GOOGLE_SNAPSHOT_OFFSET_X}</value>
+		</property>
+		<property name="offsetY">
+			<value>${GOOGLE_SNAPSHOT_OFFSET_Y}</value>
+		</property>
+		<property name="snapshotPath">
+			<value>${GOOGLE_SNAPSHOT_PATH}</value>
+		</property>
+		<property name="snapshotKeepFile">
+			<value>${GOOGLE_SNAPSHOT_KEEP_FILE}</value>
+		</property>
+	</bean>
+	
+	<bean id="googleAdxAuditApiMgr" class="com.baidu.beidou.cprounit.service.google.impl.GoogleAdxAuditApiMgrImpl">
+		<property name="unitAdxMgrOnRead">
+			<ref bean="unitAdxMgrOnRead"/>
+		</property>
+		<property name="auditBatchNumber">
+			<value>${GOOGLE_AUDIT_BATCH_NUM}</value>
+		</property>
+		<property name="auditBatchSleepTime">
+			<value>${GOOGLE_AUDIT_BATCH_SLEEP_TIME}</value>
+		</property>
+	</bean>
+	
+	<bean id="googleAdxAuditApiExecutor" class="com.baidu.beidou.cprounit.service.google.executor.GoogleAdxAuditApiExecutor">
+		<property name="AUDIT_TASK_NUM">
+			<value>${GOOGLE_AUDIT_API_TASK_NUM}</value>
+		</property>
+	</bean>
+	
+	<bean id="googleAdxAuditApiTask" class="com.baidu.beidou.cprounit.service.google.executor.GoogleAdxAuditApiTask" scope="prototype">
+		<property name="unitAdxMgr">
+			<ref bean="unitAdxMgr"/>
+		</property>
+		<property name="apiCallRetryTime">
+			<value>${GOOGLE_AUDIT_API_RETRY_TIME}</value>
+		</property>
+		<property name="upadteMaxNum">
+			<value>${GOOGLE_AUDIT_UPADTE_MAX_NUM}</value>
+		</property>
+		<property name="auditUpdateSleepTime">
+			<value>${GOOGLE_AUDIT_UPADTE_SLEEP_TIME}</value>
+		</property>
+		<property name="auditCallInterval">
+			<value>${GOOGLE_AUDIT_CALL_INTERVAL}</value>
+		</property>
+		<property name="googleAdxAccountId">
+			<value>${GOOGLE_ADX_ACCOUNT_ID}</value>
+		</property>
+	</bean>
+	
+	<bean id="googleAdxPoolingAuditApiMgr" class="com.baidu.beidou.cprounit.service.google.impl.GoogleAdxPoolingAuditApiMgrImpl">
+		<property name="unitAdxMgr">
+			<ref bean="unitAdxMgr"/>
+		</property>
+		<property name="unitAdxMgrOnRead">
+			<ref bean="unitAdxMgrOnRead"/>
+		</property>
+		<property name="maxResultsPerPage">
+			<value>${GOOGLE_POOLING_AUDIT_API_MAX_RESULTS_PER_PAGE}</value>
+		</property>
+		<property name="callInterval">
+			<value>${GOOGLE_POOLING_AUDIT_API_CALL_INTERVAL}</value>
+		</property>
+		<property name="apiCallRetryTime">
+			<value>${GOOGLE_POOLING_AUDIT_API_RETRY_TIME}</value>
+		</property>
+		<property name="upadteMaxNum">
+			<value>${GOOGLE_POOLING_AUDIT_UPADTE_MAX_NUM}</value>
+		</property>
+		<property name="updateSleepTime">
+			<value>${GOOGLE_POOLING_UPDATE_SLEEP_TIME}</value>
+		</property>
+	</bean>
+	
+	<bean id="googleApiHelper" class="com.baidu.beidou.cprounit.service.google.api.GoogleApiHelper">
+		<property name="CLIENT_ID">
+			<value>${GOOGLE_CLIENT_ID}</value>
+		</property>
+		<property name="CLIENT_SECRET">
+			<value>${GOOGLE_CLIENT_SECRET}</value>
+		</property>
+		<property name="REFRESH_TOKEN">
+			<value>${GOOGLE_REFRESH_TOKEN}</value>
+		</property>
+		<property name="APPLICATION_NAME">
+			<value>${GOOGLE_APPLICATION_NAME}</value>
+		</property>
+	</bean>
+	
+</beans>

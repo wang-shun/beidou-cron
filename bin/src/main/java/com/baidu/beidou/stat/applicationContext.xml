@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN 2.0//EN" "http://www.springframework.org/dtd/spring-beans-2.0.dtd">
+
+<!--
+	- Application context definition for "springapp" DispatcherServlet.
+-->
+
+<beans>
+	<bean id="propertyConfigurer2"
+		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="ignoreUnresolvablePlaceholders" value="true"/>
+		<property name="locations">
+			<list>
+				<value>classpath:socketpool.properties</value>				
+			</list>
+		</property>
+	</bean>
+	<bean id="socketPool" class="com.baidu.beidou.util.socket.socketpool.SocketPool">
+		<property name="server"><value>${socketpool.server}</value></property>
+		<property name="init"><value>${socketpool.init}</value></property>
+		<property name="maxActive"><value>${socketpool.maxActive}</value></property>
+		<property name="maxIdle"><value>${socketpool.maxIdle}</value></property>
+		<property name="maxWait"><value>${socketpool.maxWait}</value></property>
+		<property name="minEvictableIdleTimeMillis"><value>${socketpool.minEvictableIdleTimeMillis}</value></property>
+		<property name="numTestsPerEvictionRun"><value>${socketpool.numTestsPerEvictionRun}</value></property><!--not used for now -->
+		<property name="timeBetweenEvictionRunsMillis"><value>${socketpool.timeBetweenEvictionRunsMillis}</value></property><!--not used for now -->
+	</bean>
+	<bean id="storageDriver" class="com.baidu.beidou.stat.driver.impl.StorageDriverImpl">
+		<property name="pool">
+			<ref bean="socketPool" />
+		</property>
+	</bean>
+	
+	<bean id="userStatService" class="com.baidu.beidou.olap.service.impl.UserStatServiceImpl"/>
+</beans>

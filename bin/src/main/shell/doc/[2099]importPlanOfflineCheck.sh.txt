@@ -1,0 +1,45 @@
+﻿【任务名】	导入推广计划下线时间
+【时间驱动】	10,25,40,55 * * * *	运行超时	5分钟	等待超时	0分钟
+【运行命令】	cd /home/work/beidou-cron/bin;sh ./importPlanOfflineCheck.sh
+【日志地址】	beidou-cron/log/importPlanOffline.log
+【变更库表】	beidou.cproplan_offline
+【任务依赖】  无
+========================================================================================
+【任务描述】
+主要功能：该任务每15分钟运行一次，每次运行时，探测截止其运行时间之前，上游每15分钟所生成的用户下线日志是否已抓取，如果不成功则重新抓取并入库，正常情况下，每次会抓取最近的一个时间点（25min前的）的日志，例如10min抓取上个小时45min的文件，文件内容是上个小时30-45min的推广计划下线时间数据。
+流程描述：
+1.	检测前一天23点以后的4份文件是否正常
+2.	检测当天从0时到当前时刻之前25分钟之间，所有的日志是否抓取并入库；如缺少则执行importPlanOffline.sh脚本，这里是缺少某个周期就去下载某个周期的策略。
+importPlanOffline.sh脚本
+1.	抓取文件（ftp://10.23.242.141/home/work/var/beidou_log）到本地，如：
+/home/work/beidou-cron/data/planoffline/input/2011070下的
+bdbudget.20110704-1545.log文件
+该文件内容如下：（计划id，消费，预算，下线时间）
+372810  1200    1000    2011-07-04 15:45:01
+2.	删除当前时刻3个月前的数据
+3.	从主库内读取全部cproplan表中planid->userid的关系，存于cproplan.log
+4.	通过1、3得到的文件，筛选出合法的下线计划列表，存于bdbudget.log
+5.	将bdbudget.log文件中的数据加载到表beidou.cproplan_offline
+
+[辅助图片]http://bave.baidu.com/api/images/02c28c49-6caa-4b6f-bbc8-857a83ef67b1
+
+
+==========================================================================================
+【报警内容】
+1.	进入数据目录失败（可能原因：创建目录错误，或路径错误导致无法执行cd任务）
+2.	获取${PLAN_OFFLINE_URL}/${filename}失败
+3.	删除3个月前旧数据错误
+4.	查询cproplan表中planid->userid的关系错误
+5.	awk生成bdbudget.log文件错误
+6.	加载bdbudget.log文件内容到cproplan_offline表错误
+7.	${PLAN_OFFLINE_DATA_PATH}/$date/${filename}长时间没有抓取成功（可能原因：某个上游的日志文件超过1小时都没有抓取到）
+
+
+
+【备注】
+这个任务经常出现的问题是importPlanOffline.sh执行失败。一般来说，是因为某个查询planId->userId关系或者数据文件load进数据库失败，这时候
+查看/home/work/beidou-cron/data/planoffline/input/{今天}/的目录下最近的几个文件，看是否有某个文件没有load到beidou.cproplan_offline库(目前的规模大概是600多行/文件)，如果存在的话，联系OP将这个文件备份删除或者mv到其他路径即可，下个周期任务执行时会自动补上这个文件并重新入库。
+现在以上工作脚本已经可以自动完成，当检测到失败时，脚本会自动删除本周期文件并且发短信提醒，下个周期会自动回溯。
+
+
+

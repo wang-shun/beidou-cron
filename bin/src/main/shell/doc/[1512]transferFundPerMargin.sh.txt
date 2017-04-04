@@ -1,0 +1,67 @@
+﻿【任务名】	每小时条件转账
+【时间驱动】	10 * * * * 运行超时 30分钟	等待超时	 分钟
+【运行命令】	cd /home/work/beidou-cron/bin; sh transferFundPerMargin.sh
+【日志地址】	/home/work/beidou-cron/log/transferFundPerMargin.yyyymmdd.log
+【变更库表】	beidou. userfundperday
+【任务依赖】  上游任务：1451: 用户白名单入库
+
+========================================================================================
+【任务描述】
+调用Cron代码com.baidu.beidou.account.TransferFundPerMargin
+执行userFundService.autoTransferFundPerMargin();//根据账户余额进行自动转账
+方法流程：
+1.	List<UserFundPerDay> configList = userFundPerDayDAO.findAll(2);
+	//批量获取转账申请的客户，自动转账：当余额不足margin元时转fund元
+2.	List<UserFundPerDay> filteredConfigList = this.filteByState(configList);
+	// filteByStateByPage分批（100）过滤出状态合法的用户，
+	判断条件：
+	if(!(user.getUstate() == 0&& (user.getUshifenstatid() in 2,3,6))){
+	非法用户
+	}
+3.	Map<Integer, Double> cachePayMap = this.getBeidouVipCache();	//获取大客户缓存信息（待加入beidou账面的缓存金额）
+4.	合并账户信息以及大客户缓存
+5.	批量转账，对一个用户进行转账，不再区分大客户和小客户
+	（1）	判断余额满足边界条件：currentBalance < Margin，是则继续
+	（2）	mfcService.autoProductTransfer(config.getUserId(), AccountConfig.MFC_FENGCHAO_PRODUCTID, AccountConfig.MFC_BEIDOU_PRODUCTID, fund);
+	其中： MFC_BEIDOU_PRODUCTID=5，MFC_FENGCHAO_PRODUCTID=4
+	是财务中心给beidou和凤巢分配的产品ID
+	（3）	writeFundTransferResult(BufferedWriter bw, Integer userId, Double fund, int result)
+	将结果信息写入文件
+	/home/work/beidou-cron/data/mfc/autofundtransfer/autotransfer_when.log.yyyymmdd，分别有时间戳、userid、转账金额（元）、0（固定）、转账结果（result）
+	例如：
+	Fri Aug 05 13:10:51 CST 2011    285846  20.0    0       1
+	Fri Aug 05 13:10:51 CST 2011    282538  150.0   0       0
+	（4）	判断result等于0（转账OK），更新通知状态标志位，后续可继续通知
+	userFundPerDayDAO.updateNotifyFlag(config.getUserId(), AccountConstant.AUTO_TRANSFER_WHEN, BeidouConstant.BOOLEAN_FALSE);
+	（5）	如果result等于14（资金不足）
+	如果尚未提醒过用户，置提醒标示位，避免反复提醒影响用户体验
+	userFundPerDayDAO.updateNotifyFlag(config.getUserId(), AccountConstant.AUTO_TRANSFER_WHEN, BeidouConstant.BOOLEAN_TRUE);
+	（6）	批量发送邮件this.sendTransferResultMailAndSms(tranferLogFile);
+	/**
+		 * 读取结果文件，发送通知邮件和短信
+		 * 文件格式为时间\tuserid\tfund\t方向\t结果
+		 * 方向=0表示向beidou转钱；方向=1表示向外转钱
+		 * 结果=0表示成功，=1表示失败**/
+	将结果文件内容封装为vo对象
+	remindService.sendSuccessMessage(userRemind, vo);//成功消息
+	remindService.sendFailMessage(userRemind, vo);//失败消息
+	需要验证的规则：验证邮件合法则发送邮件，验证手机合法且在（9:00-22:00）则发送短信
+
+[辅助图片]http://bave.baidu.com/api/images/483865ec-eb7a-4405-ae07-d80082a1015d
+
+==========================================================================================
+【报警内容】
+beidou-cron/transferFundPerMargin error
+
+【备注】
+1.	这个任务为什么每小时10分才开始跑
+2.	这个任务需要调用MFC的转账接口，有IP限制：
+	"beidouIp" => array(
+	            "10.23.239.65"（tc-beidou-cron00.tc.baidu.com）,
+	            "10.65.15.229",
+	            "10.23.249.163",
+	        ), 这个转账接口的ip有限制
+	北斗访问的其他接口没有ip限制
+3.	关于大客户缓存：大客户的资金通过订单行的方式按合同号一笔一笔来，主要是因为每笔订单的R值是不同的。
+
+

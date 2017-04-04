@@ -1,0 +1,25 @@
+﻿【任务名】	天粒度数据汇总3
+【时间驱动】	无（事件驱动）	运行超时	240分钟	  等待超时	0分钟
+【运行命令】	cd /home/work/beidou-stat/bin; sh beidou_stat_merge.sh 3
+【日志地址】/home/work/beidou-stat/log/beidou_stat_merge${TODAY_DATE}.log
+【变更库表】	
+Beidoustat.stat_ad_${date}
+Beidoustat.stat_user_${date}
+Beidoustat.stat_mainsite_${date}
+
+【任务依赖】  无
+========================================================================================
+【任务描述】
+传递的参数为3，执行第3个if分支（对比天粒度数据汇总1,2）
+使用IP：${BEIDOU_STAT_DB_IP3}
+STAT_DAY=`date -d "1 day ago" +%Y%m%d`（昨天日期）
+执行函数stat_day ${STAT_DAY} 
+其余流程同天粒度数据汇总1
+
+
+==========================================================================================
+【报警内容】
+1.	execute sql create table stat_ad_YYYYMM failed
+2.	execute sql create table stat_mainsite_YYYY and stat_user_YYYY failed
+3.	execute sql stat user data into table stat_user_YYYY failed
+4.	execute sql stat mainsite data into table stat_mainsite_YYYY failed

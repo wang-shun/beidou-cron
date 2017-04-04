@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN 2.0//EN"
+			  "http://www.springframework.org/dtd/spring-beans-2.0.dtd">
+
+
+<!--
+	- Application context definition for Petclinic on Hibernate.
+-->
+<beans>
+	<bean id="cproGroupDao"
+		class="com.baidu.beidou.cprogroup.dao.impl.CproGroupDaoImpl"
+		parent="addbBaseDaoSupport">
+	</bean>
+	<bean id="cproGroupDaoOnMultiDataSource"
+		class="com.baidu.beidou.cprogroup.dao.impl.CproGroupDaoOnMultiDataSourceImpl"
+		parent="addbBaseDaoSupport">
+		<property name="dataSourceSupport" ref="dataSourceSupport">
+		</property>
+	</bean>
+	<bean id="cproGroupOnCapDao"
+		class="com.baidu.beidou.cprogroup.dao.impl.CproGroupOnCapDaoImpl"
+		parent="capdbBaseDaoSupport">
+	</bean>
+	<bean id="cproGroupOnXdbDao"
+		class="com.baidu.beidou.cprogroup.dao.impl.CproGroupOnXdbDaoImpl"
+		parent="xdbBaseDaoSupport">
+	</bean>
+	<bean id="cproKeywordDao"
+		class="com.baidu.beidou.cprogroup.dao.impl.CproKeywordDaoImpl"
+		parent="addbBaseDaoSupport">
+		<property name="dataSourceSupport" ref="dataSourceSupport">
+		</property>
+	</bean>
+	<bean id="groupIpFilterDao"
+		class="com.baidu.beidou.cprogroup.dao.impl.GroupIpFilterDaoImpl"
+		parent="addbBaseDaoSupport">
+		<property name="dataSourceSupport" ref="dataSourceSupport">
+		</property>
+	</bean>
+	<bean id="groupSiteFilterDao"
+		class="com.baidu.beidou.cprogroup.dao.impl.GroupSiteFilterDaoImpl"
+		parent="addbBaseDaoSupport">
+		<property name="dataSourceSupport" ref="dataSourceSupport">
+		</property>
+	</bean>
+	<bean id="groupSitePriceDao"
+		class="com.baidu.beidou.cprogroup.dao.impl.GroupSitePriceDaoImpl"
+		parent="addbBaseDaoSupport">
+		<property name="dataSourceSupport" ref="dataSourceSupport">
+		</property>
+	</bean>
+	<bean id="whiteListDao"
+		class="com.baidu.beidou.cprogroup.dao.impl.WhiteListDaoImpl"
+		parent="capdbBaseDaoSupport">
+	</bean>
+	<bean id="qtBlackListDao"
+		class="com.baidu.beidou.cprogroup.dao.impl.QTBlacklistDaoImpl"
+		parent="xdbBaseDaoSupport">
+	</bean>
+	<!--kr回收站  add by qianlei -->
+	<bean id="krRecycleDao"
+		class="com.baidu.beidou.cprogroup.dao.impl.KrRecycleDaoImpl"
+		parent="xdbBaseDaoSupport">
+	</bean>
+	<bean id="similarPeopleDao"
+		class="com.baidu.beidou.cprogroup.dao.impl.SimilarPeopleDaoImpl"
+		parent="addbBaseDaoSupport">
+	</bean>
+</beans>

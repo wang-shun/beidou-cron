@@ -1,0 +1,35 @@
+﻿【任务名】	余额不足提醒任务
+【时间驱动】	30 0 * * *	运行超时	30分钟	等待超时	0分钟
+【运行命令】	cd /home/work/beidou-cron/bin; sh mfc_import.sh
+【日志地址】	/home/work/beidou-cron/log/mfc_import.log
+【变更库表】	beidou.userbalance
+【任务依赖】  下游任务：2109:导入销售管理员综述信息;
+========================================================================================
+【任务描述】
+（1）检查路径合法性
+（2）从以下路径抓取文件，并存储到/home/work/beidou-cron/data/mfc/tmp下，重试3次
+	ftp:// ftp: ftp@jx-dr-fnct00.jx.baidu.com
+	//home/work/var/dr-finance/stat/balance/userblns.txt
+	ftp:// ftp: ftp@jx-dr-fnct00.jx.baidu.com
+	//home/work/var/dr-finance/stat/balance/userblns.txt.md5
+	校验MD5
+（3）打印userblns.txt中的1、11、10列到userblns.txt.filter文件中
+（4）建临时表create table userbalance_tmp like userbalance（userid,balance,invest）
+	将userblns.txt.filter中数据导入该表
+（5）drop table userbalance; rename table userbalance_tmp to userbalance;
+（6）备份userblns.txt.filter到mfc/bak/目录下，命名为userblns.txt.yyyymmddhhmm
+	并生成md5文件
+（7）备份userblns.txt到data/balance/目录下，命名为userblns.dat.yyyymmdd
+	并生成md5文件
+
+[辅助图片]http://bave.baidu.com/api/images/edac2dff-200d-467d-9153-6cfbd7d66ccc
+
+==========================================================================================
+【报警内容】
+（1）	mfc: Fail to download userblns.txt.（可能原因：文件抓取失败、md5校验失败）
+（2）	mfc: Import Error（可能原因：导入数据到表错误）
+
+
+【备注】
+
+

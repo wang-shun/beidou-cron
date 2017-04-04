@@ -1,0 +1,52 @@
+﻿【任务名】	余额不足提醒任务
+【时间驱动】	1 0 * * *	运行超时	120分钟	等待超时	分钟
+【运行命令】	cd /home/work/beidou-cron/bin; sh transferFundPerDay.sh
+【日志地址】	/home/work/beidou-cron/log/transferFundPerDay.yyyymmdd.log
+【变更库表】	无
+【任务依赖】  无
+========================================================================================
+【任务描述】
+Cron调用：com.baidu.beidou.account.TransferFundPerDay
+对应/beidou-cron/src/com/baidu/beidou/account/TransferFundPerDay.java
+执行service.moveFundPerDay();//每日定时转账
+1.	List<UserFundPerDay> ufpList = userFundPerDayDAO.findAll(1);//自动转账：每日定量转fund元	
+2.	过滤出状态合法的用户
+	List<UserFundPerDay> filteredConfigList = this.filteByState(configList);
+	// filteByStateByPage分批（100）过滤出状态合法的用户，
+	判断条件：
+	if(!(user.getUstate() == 0&& (user.getUshifenstatid() in 2,3,6))){
+	非法用户
+	}
+3.	调用MFC API进行转账
+	int flag = mfcService.autoProductTransfer(ufp.getUserId(), 
+	AccountConfig.MFC_FENGCHAO_PRODUCTID, AccountConfig.MFC_BEIDOU_PRODUCTID, 
+				  fund);
+	其中： MFC_BEIDOU_PRODUCTID=5，MFC_FENGCHAO_PRODUCTID=4
+	是财务中心给beidou和凤巢分配的产品ID
+	更底层的接口调用为：
+	mfcOperationDriverProxy.autoProductTransfer(TokenUtil.getTokenId(64), userId, appIdOut, appIdIn, amount, getHeaders());
+	/**autoProductTransfer：自动转账接口
+		*@param userId: 用户ID。
+		*@param appIdOut: 转出产品线ID。如果此参数为0，则转出产品线为转入产品线的上层账号。
+		*@param appIdIn: 转入产品线ID。如果此参数为0，则转入产品线为转出产品线的上层账号。
+		*@param amount: 金额。以元为单位。字段类型为浮点数，精度为2位小数。
+		*@param params Rpc调用时需要传递的参数列表，通常是消息头。
+		**/
+4.	判断flag是否等于0（转账OK），并将结果写入转账日志
+	/home/work/beidou-cron/data/mfc/autofundtransfer/autotransfer_always.log.yyyyMMddHH
+	Fri Aug 05 00:01:13 CST 2011    250049  20.0    0       1
+	Fri Aug 05 00:01:13 CST 2011    165174  10.0    0       0
+	文件格式为时间\tuserid\tfund\t方向\t结果
+	* 方向=0表示向beidou转钱；方向=1表示向外转钱
+5.	批量发送邮件，this.sendTransferResultMailAndSms(tranferLogFile);
+
+[辅助图片]http://bave.baidu.com/api/images/03629466-1ff8-4e8c-b875-592ec0693f1b
+
+==========================================================================================
+【报警内容】
+每日定时转账任务失败，请追查
+
+【备注】
+这个任务目前只能在tc_cron00上跑，有IP限制
+
+

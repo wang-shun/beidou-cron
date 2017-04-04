@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN 2.0//EN" "http://www.springframework.org/dtd/spring-beans-2.0.dtd">
+
+<!--
+	- Application context definition for "springapp" DispatcherServlet.
+-->
+
+<beans>
+	<bean id="client" class="com.baidu.beidou.bigpipe.client.SimpleNoneBlockingPubClient" init-method="init" destroy-method="shutDown">
+		<property name="conf">
+    		<bean class="com.baidu.beidou.bigpipe.transport.BigPipeConf">
+    			<property name="selecttimeout">
+    				<value>${SELECT_TIMEOUT}</value>
+    			</property>
+    			<property name="pipe">
+    				<value>${PIPE}</value>
+    			</property>
+    			<property name="pipeletId">
+    				<value>${PIPELET_ID}</value>
+    			</property>
+    			<property name="cluster">
+    				<value>${CLUSTER}</value>
+    			</property>
+    			<property name="userName">
+    				<value>${USERNAME}</value>
+    			</property>
+    			<property name="pwd">
+    				<value>${PWD}</value>
+    			</property>
+    			<property name="maxCachedTask">
+    				<value>${MAX_CACHEDTASK}</value>
+    			</property>
+    			<property name="metaString">
+    				<value>${METASTRING}</value>
+    			</property>
+    			<property name="reConnectMaxTimes">
+    				<value>${RECONNECTMAXTIMES}</value>
+    			</property>
+    		</bean>
+    	</property>
+	</bean>
+    <bean id="messageSendService" class="com.baidu.beidou.message.service.MessageSend">
+        <property name="client">
+            <ref bean="client" />
+        </property>
+    </bean> 
+</beans>

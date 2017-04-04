@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN 2.0//EN" "http://www.springframework.org/dtd/spring-beans-2.0.dtd">
+
+<!--
+	- Application context definition for "springapp" DispatcherServlet.
+-->
+
+<beans>
+	
+	<bean id="cproPlanMgr" class="com.baidu.beidou.cproplan.service.impl.CproPlanMgrImpl">
+		<property name="cproPlanDao">
+			<ref bean="cproPlanDao"/>
+		</property>
+	</bean>
+	
+</beans>

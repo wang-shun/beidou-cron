@@ -1,0 +1,39 @@
+﻿【任务名】	北斗禁止投放黑名单用户列表更新
+【时间驱动】	10 * * * *	运行超时	10分钟	等待超时	0分钟
+【运行命令】	cd /home/work/beidou-cron/bin&& sh beidou_blacklist.sh
+【日志地址】	/home/work/beidou-cron/log/beidou_blacklist.log
+【变更库表】	beidou.useraccount
+【任务依赖】  无
+========================================================================================
+【任务描述】
+
+1.	校验目录配置及路径（数据文件地址：
+/home/work/beidou-cron/data/beidou_blacklist/）
+2.	备份上个周期生成的文件
+3.	从总控中心抓取用户黑名单列表及MD5，并进行校验
+ftp://tc-sf-ct00.tc.baidu.com:// /home/work/var/sf-ct/filesvr/data/760/ wm_user_blacklist_data.txt
+4.	校验文件合法性（删除空行，不能非数字，不能多列）
+5.	选取数据库中ustate=1的黑名单用户，存于文件blacklist_db.data
+6.	将wm_user_blacklist_data.txt和blacklist_db.data进行diff，得到需要恢复正常的用户集合A，需要加黑名单的用户集合B（两个文件都有的userid不更新），分别存储于update_to_0.tmp和update_to_1.tmp
+7.	执行sql
+对于update_to_0.tmp
+update beidou.useraccount set ustate=0 where userid in(-1，A) and ustate=1
+对于update_to_1.tmp
+update beidou.useraccount set ustate=1 where userid in(-1，B) and ustate=0
+8.	删除10天前的历史文件
+
+
+==========================================================================================
+【报警内容】
+1.	wget文件wm_user_blacklist_data.txt失败（总控中心不可访问）
+2.	Check Black User List Failed（MD5校验失败）
+3.   Error File Format（文件校验失败）
+4.	UPDATE USTATE TO 0 Error（执行步骤7失败）
+5.	UPDATE USTATE TO 1 Error（执行步骤7失败）
+
+【备注】
+该任务通过ustate位来禁止QT/CT黑名单用户投放广告，如果任务执行失败，需要重跑
+脚本中对于DB操作具备重试机制，如果上游总控中心的文件出现问题
+可以尝试使用备份抓取地址，在conf/beidou_blacklist.conf中，用：
+REMOTE_SERVER_NAME_BAK=tc-sf-ct01.tc 替换
+REMOTE_SERVER_NAME=tc-sf-ct00.tc

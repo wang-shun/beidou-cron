@@ -1,0 +1,26 @@
+﻿【任务名】	记录昨日剩余未审核物料数
+【时间驱动】	1 0 * * *	运行超时	5分钟	等待超时	0分钟
+【运行命令】	cd /home/work/beidou-cron/bin; sh auditmon.sh
+【日志地址】	/home/work/beidou-cron/log/auditmon.conf
+【变更库表】	无
+【任务依赖】  无
+========================================================================================
+【任务描述】
+1.	检查配置文件及内容，检查文件存放路径: /home/work/beidou-cron/data/auditmon
+2.	执行查询，失败重试3次
+	select (
+		(select count(*) from cprounitstate0 where state=3) + 
+		(select count(*) from cprounitstate1 where state=3) + 
+		(select count(*) from cprounitstate2 where state=3) + 
+		(select count(*) from cprounitstate3 where state=3) + 
+		(select count(*) from cprounitstate4 where state=3) + 
+		(select count(*) from cprounitstate5 where state=3) + 
+		(select count(*) from cprounitstate6 where state=3) + 
+		(select count(*) from cprounitstate7 where state=3)
+	) count
+	(state状态值含义：0-有效、1-暂停、2-删除、3-审核中、4-审核拒绝)
+	输出结果到/home/work/beidou-cron/data/auditmon/count**中，如count31
+
+==========================================================================================
+【报警内容】
+auditmon_count Error.(可能原因：查询总数错误)

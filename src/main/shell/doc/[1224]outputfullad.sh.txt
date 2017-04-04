@@ -1,0 +1,18 @@
+﻿【任务名】	全网投放广告ID导出脚本
+【时间驱动】	0 * * * *	运行超时	30分钟	等待超时	0分钟
+【运行命令】	cd /home/work/beidou-cron; sh outputfullad.sh
+【日志地址】	/home/work/beidou-cron/log/YYYYmmdd（昨天）.log
+【变更库表】	无
+【任务依赖】  下游任务：1083: 点击日志解析处理
+========================================================================================
+【任务描述】
+(1)	查询有效推广组列表到文件/home/work/beidou-cron/data/tmp/groupIdEffect.txt
+(2)	查询全网投放推广组列表到文件:
+/home/work/beidou-cron/data/tmp/groupIdAllSiteList.txt
+(3)	查询全库创意列表到文件/home/work/beidou-cron/data/tmp/unitIdAllList.txt
+(4)	Awk（1），（2），（3）生成的文件，得到全网投放创意id列表到文件/home/work/beidou-cron/adfile/fullad.${当前时刻}，并生成md5
+(5)	如果当前小时是整点，拷贝一份当前文件到同目录下，名称为fullad.txt，并生成md5
+
+==========================================================================================
+【报警内容】
+Export Error fullad.YYYYmmddHH

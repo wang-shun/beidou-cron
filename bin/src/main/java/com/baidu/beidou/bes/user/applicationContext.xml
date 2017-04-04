@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN 2.0//EN" "http://www.springframework.org/dtd/spring-beans-2.0.dtd">
+
+<!--
+	- Application context definition for "springapp" DispatcherServlet.
+-->
+
+<beans>
+	<!-- 导入用户启动入口 -->
+	<bean id="importUserMgr" class="com.baidu.beidou.bes.user.service.ImportUserMgr">
+  		<property name="adxList">
+  			<list>
+  				<ref bean="tencentAdx"/>
+  			</list>
+  		</property>
+	</bean>
+	<!-- end -->
+	
+	<!-- 推送用户审核入口 -->
+	<bean id="auditUserMgr" class="com.baidu.beidou.bes.user.service.PushUserAuditMgr">
+  		<property name="adxList">
+  			<list>
+  				<ref bean="tencentAdxAudit"/>
+  			</list>
+  		</property>
+	</bean>
+	<!-- end -->
+	
+	<bean id="auditUserServiceMgr" class="com.baidu.beidou.bes.user.service.impl.AuditUserServiceMgrImpl" scope="prototype">
+		<property name="auditUserDao">
+			<ref bean="auditUserDao"/>
+		</property>
+	</bean>
+	
+	<bean id="commonMap" class="java.util.HashMap">
+		<constructor-arg>
+			<map key-type="java.lang.String" value-type="java.lang.Integer">
+            	<entry key="tencent" value="8" />
+           		<entry key="sohu" value="4" />
+        	</map>
+		</constructor-arg>
+	</bean>
+	
+	<!-- 过滤器部分 test -->
+	<bean id="userLevelFilter" class="com.baidu.beidou.bes.user.filter.impl.UserLevelFilter">
+	</bean>
+	
+	<!-- 导入公共的信息 -->
+	<bean id="abstractMessage" class="com.baidu.beidou.bes.user.template.AbstractImportMessage">
+		<property name="adxUserAddFile">
+			<value>adx_user_to_add</value>
+  		</property>
+  		<property name="adxUserUpdateFile">
+  			<value>adx_user_to_update</value>
+  		</property>
+  		<property name="companyMapping">
+  			<ref local="commonMap"/>
+  		</property>
+  		<property name="userServiceMgr">
+  			<ref bean="auditUserServiceMgr"/>
+  		</property>
+  	</bean>
+	<!-- end abstact -->
+	
+	<!-- tencent 数据入库 -->
+	<bean id="tencentAdx" class="com.baidu.beidou.bes.user.template.ImportUserExcutor" parent="abstractMessage" scope="prototype">
+		<property name="company">
+			<value>tencent</value>
+		</property>	
+		<!-- 	
+  		<property name="filterList">
+  			<list>
+  				<ref bean="userLevelFilter"/>
+  			</list>
+  		</property>	
+  		 -->	
+	</bean>
+	<!-- end tencent 数据入库 -->
+	
+	<!-- sohu 数据入库 -->
+	<bean id="sohuAdx" class="com.baidu.beidou.bes.user.template.ImportUserExcutor"  parent="abstractMessage" scope="prototype">
+		<property name="company">
+			<value>sohu</value>
+		</property>				
+	</bean>
+	<!-- end sohu 数据入库 -->
+	
+	<!-- httpclient线程池 -->
+	<bean id="connectionManagerParams" class="org.apache.commons.httpclient.params.HttpConnectionManagerParams">
+		<property name="connectionTimeout" value="${connect_timeout}"/>
+		<property name="soTimeout" value="${read_timeout}"/>
+		<property name="maxTotalConnections" value="64"/>
+		<property name="defaultMaxConnectionsPerHost" value="64"/>
+	</bean> 
+	
+	<bean id="connectionManager" class="org.apache.commons.httpclient.MultiThreadedHttpConnectionManager">
+		<property name="params" ref="connectionManagerParams"/>
+	</bean>
+	
+	<bean id="httpClient" class="org.apache.commons.httpclient.HttpClient">
+		<constructor-arg>
+			<ref bean="connectionManager"/>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="httpClientUtil" class="com.baidu.beidou.bes.user.util.HttpClientUtil">
+		<property name="httpClient" ref="httpClient"/>
+	</bean>
+	<!-- end 线程池 -->
+	
+	<bean id="tencentAdxAudit" class="com.baidu.beidou.bes.user.template.CallAdxApi" scope="prototype">
+		<property name="company">
+			<value>8</value>
+		</property>
+		<property name="auditUserMgr">
+  			<ref bean="auditUserServiceMgr"/>
+  		</property>
+	</bean>
+	
+	<!-- tencent push user task -->
+	<bean id="tencentPushUserTask" class="com.baidu.beidou.bes.user.template.tencent.TencentPushUserTask" scope="prototype">
+		<property name="authMap">
+			<map>
+				<entry key="dsp_id" value="${tencent_dsp_id}"/>
+				<entry key="token" value="${tencent_token}"/>
+			</map>
+		</property>
+		
+		<property name="httpClientUtil">
+			<ref bean="httpClientUtil"/>
+		</property>
+		<property name="syncUrl">
+			<value>${tencent_sync_api}</value>
+		</property>
+		
+		<property name="auditUserMgr">
+  			<ref bean="auditUserServiceMgr"/>
+  		</property>
+	</bean>
+	<!-- end -->
+	
+	<!-- tencent audit result task -->
+	<bean id="tencentAuditResultTask" class="com.baidu.beidou.bes.user.template.tencent.TencentGetResultTask" scope="prototype">
+		<property name="authMap">
+			<map>
+				<entry key="dsp_id" value="${tencent_dsp_id}"/>
+				<entry key="token" value="${tencent_token}"/>
+			</map>
+		</property>
+		
+		<property name="httpClientUtil">
+			<ref bean="httpClientUtil"/>
+		</property>
+		<property name="syncUrl">
+			<value>${tencent_sync_info}</value>
+		</property>
+		
+		<property name="auditUserMgr">
+  			<ref bean="auditUserServiceMgr"/>
+  		</property>
+	</bean>
+	<!-- end -->
+	<bean id="dbOperateTask" class="com.baidu.beidou.bes.user.template.DBOperateTask" scope="prototype">
+		<property name="userServiceMgr">
+  			<ref bean="auditUserServiceMgr"/>
+  		</property>
+	</bean>
+</beans>

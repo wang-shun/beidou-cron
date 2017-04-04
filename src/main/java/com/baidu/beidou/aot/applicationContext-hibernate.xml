@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN 2.0//EN"
+			  "http://www.springframework.org/dtd/spring-beans-2.0.dtd">
+
+
+<!-- - Application context definition for Petclinic on Hibernate. -->
+<beans>
+	<bean id="cproPlanStatDao" class="com.baidu.beidou.aot.dao.impl.CproPlanStatDaoImpl"
+		parent="addbBaseDaoSupport">
+		<property name="dataSourceSupport" ref="dataSourceSupport">
+		</property>
+	</bean>
+	<bean id="cproPlanOfflineStatDao" class="com.baidu.beidou.aot.dao.impl.CproPlanOfflineStatDaoImpl"
+		parent="capdbBaseDaoSupport">
+		<property name="dataSourceSupport" ref="dataSourceSupport">
+		</property>
+	</bean>
+	<bean id="cproPlanStatOnXdbDao" class="com.baidu.beidou.aot.dao.impl.CproPlanStatOnXdbDaoImpl"
+		parent="xdbBaseDaoSupport">
+	</bean>
+	<bean id="cproGroupStatDao" class="com.baidu.beidou.aot.dao.impl.CproGroupStatDaoImpl"
+		parent="addbBaseDaoSupport">
+		<property name="dataSourceSupport" ref="dataSourceSupport">
+		</property>
+	</bean>
+	<bean id="cproGroupStatOnXdbDao" class="com.baidu.beidou.aot.dao.impl.CproGroupStatOnXdbDaoImpl"
+		parent="xdbBaseDaoSupport">
+	</bean>
+	<bean id="codeStatDao" class="com.baidu.beidou.aot.dao.impl.CodeStatDaoImpl"
+		parent="capdbBaseDaoSupport">
+	</bean>
+	<bean id="unionsiteStatDao" class="com.baidu.beidou.aot.dao.impl.UnionSiteStatDaoImpl"
+		parent="xdbBaseDaoSupport">
+	</bean>
+	<bean id="qtkrSpecialTradeDao" class="com.baidu.beidou.aot.dao.impl.QtkrSpecialTradeDaoImpl"
+		parent="xdbBaseDaoSupport">
+	</bean>
+</beans>

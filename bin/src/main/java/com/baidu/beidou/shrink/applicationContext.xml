@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN 2.0//EN" "http://www.springframework.org/dtd/spring-beans-2.0.dtd">
+
+<!--
+	- Application context definition for "springapp" DispatcherServlet.
+-->
+
+<beans>
+
+    <bean id="appExcludeApplyService" class="com.baidu.beidou.shrink.service.impl.DefaultShrinkApplyServiceImpl">
+        <property name="tableName">
+            <value>app_exclude</value>
+        </property>
+        <property name="simpleSQLDataSourceDao">
+            <ref bean="simpleSQLDataSourceDao" />
+        </property>
+    </bean>
+    <bean id="cproGroupInfoApplyService" class="com.baidu.beidou.shrink.service.impl.GroupInfoShrinkApplyServiceImpl">
+        <property name="simpleSQLDataSourceDao" ref="simpleSQLDataSourceDao" />
+    </bean>
+    <bean id="cproGroupITExcludeApplyService" class="com.baidu.beidou.shrink.service.impl.DefaultShrinkApplyServiceImpl">
+        <property name="tableName">
+            <value>cprogroupit_exclude</value>
+        </property>
+        <property name="simpleSQLDataSourceDao">
+            <ref bean="simpleSQLDataSourceDao" />
+        </property>
+    </bean>
+    <bean id="cproGroupITApplyService" class="com.baidu.beidou.shrink.service.impl.DefaultShrinkApplyServiceImpl">
+        <property name="tableName">
+            <value>cprogroupit</value>
+        </property>
+        <property name="simpleSQLDataSourceDao">
+            <ref bean="simpleSQLDataSourceDao" />
+        </property>
+    </bean>
+    <bean id="cproGroupVTApplyService" class="com.baidu.beidou.shrink.service.impl.DefaultShrinkApplyServiceImpl">
+        <property name="tableName">
+            <value>cprogroupvt</value>
+        </property>
+        <property name="simpleSQLDataSourceDao">
+            <ref bean="simpleSQLDataSourceDao" />
+        </property>
+    </bean>
+	<bean id="cprokeyWordApplyService" class="com.baidu.beidou.shrink.service.impl.DefaultShrinkApplyServiceImpl">
+		<property name="tableName">
+			<value>cprokeyword</value>
+		</property>
+		<property name="slice">
+			<value>${table.keyword.slice}</value>
+		</property>
+		<property name="simpleSQLDataSourceDao">
+            <ref bean="simpleSQLDataSourceDao" />
+        </property>
+	</bean>
+	<bean id="groupPackApplyService" class="com.baidu.beidou.shrink.service.impl.DefaultShrinkApplyServiceImpl">
+        <property name="tableName">
+            <value>group_pack</value>
+        </property>
+        <property name="simpleSQLDataSourceDao" ref="simpleSQLDataSourceDao" />
+    </bean>
+	<bean id="groupIpFilterApplyService" class="com.baidu.beidou.shrink.service.impl.DefaultShrinkApplyServiceImpl">
+        <property name="tableName">
+            <value>groupipfilter</value>
+        </property>
+        <property name="simpleSQLDataSourceDao">
+            <ref bean="simpleSQLDataSourceDao" />
+        </property>
+    </bean>
+	<bean id="groupSiteFilterApplyService" class="com.baidu.beidou.shrink.service.impl.DefaultShrinkApplyServiceImpl">
+        <property name="tableName">
+            <value>groupsitefilter</value>
+        </property>
+        <property name="simpleSQLDataSourceDao">
+            <ref bean="simpleSQLDataSourceDao" />
+        </property>
+    </bean>
+    <bean id="wordExcludeApplyService" class="com.baidu.beidou.shrink.service.impl.DefaultShrinkApplyServiceImpl">
+        <property name="tableName">
+            <value>word_exclude</value>
+        </property>
+        <property name="simpleSQLDataSourceDao">
+            <ref bean="simpleSQLDataSourceDao" />
+        </property>
+    </bean>
+    <bean id="wordPackExcludeApplyService" class="com.baidu.beidou.shrink.service.impl.DefaultShrinkApplyServiceImpl">
+        <property name="tableName">
+            <value>word_pack_exclude</value>
+        </property>
+        <property name="simpleSQLDataSourceDao">
+            <ref bean="simpleSQLDataSourceDao" />
+        </property>
+    </bean>
+    
+    <bean id="monitor" class="com.baidu.beidou.shrink.service.impl.ShrinkMonitorImpl">
+    </bean>
+    <bean id="simpleTransProxy" class="com.baidu.beidou.shrink.service.impl.SimpleTransProxyImpl" />
+</beans>

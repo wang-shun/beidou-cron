@@ -1,0 +1,21 @@
+﻿【任务名】	定期为NOVA导出北斗用户
+【时间驱动】	30 23 * * *		运行超时	5分钟	等待超时	0分钟
+【运行命令】	cd /home/work/beidou-cron/bin/; sh export_beidou_user.sh;
+【日志地址】	/home/work/beidou-cron/log/export_beidou_user.log
+【变更库表】	无
+【任务依赖】	 无
+========================================================================================
+【任务描述】
+1.	校验目录/home/work/beidou-cron/data/beidou_user是否存在以及可写
+2.	执行sql语句：select distinct userid from cproplan，输出到文件
+		/home/work/beidou-cron/data/beidou_user/beidou_user.yyyymmdd,及md5
+
+
+==========================================================================================
+【报警内容】
+1.	export beidou user for nova error（可能原因：执行sql语句导出数据错误）
+2.	md5sum beidou user for nova error
+可能原因：生成beidou_user.yyyymmdd.md5文件失败
+3.	export_beidou_user run failed! （可能原因：文件路径错误，或者出现上述错误）
+
+

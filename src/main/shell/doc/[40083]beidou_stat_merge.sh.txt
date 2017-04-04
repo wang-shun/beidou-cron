@@ -1,0 +1,102 @@
+﻿【任务名】	天粒度数据汇总1
+【时间驱动】	无（事件驱动）	运行超时	240分钟	  等待超时	0分钟
+【运行命令】	cd /home/work/beidou-stat/bin; sh beidou_stat_merge.sh 1
+【日志地址】/home/work/beidou-stat/log/beidou_stat_merge${TODAY_DATE}.log
+【变更库表】	
+Beidoustat.stat_ad_${date}
+Beidoustat.stat_user_${date}
+Beidoustat.stat_mainsite_${date}
+
+【任务依赖】  无
+========================================================================================
+【任务描述】
+传递的参数为1，执行第1个if分支（对比天粒度数据汇总2,3）
+使用IP：${BEIDOU_STAT_DB_IP1}
+STAT_DAY=`date -d "1 day ago" +%Y%m%d`（昨天日期）
+执行函数stat_day ${STAT_DAY}
+stat_day流程：
+1.	创建表
+create table if not exists stat_ad_${1:0:6}
+(
+adid bigint(20) NOT NULL,
+srchs bigint(20) NOT NULL,
+clks int(11) NOT NULL,
+cost int(11) NOT NULL,
+userid int(10) NOT NULL,
+planid int(10) NOT NULL,
+groupid int(10) NOT NULL,
+wuliaotype tinyint(3) NOT NULL,
+mainsitecount int(11) NOT NULL,
+date date NOT NULL,
+KEY adid (adid)) ENGINE=MYISAM"
+
+2.	创建表
+create table if not exists stat_user_${1:0:4}
+(
+userid int(10) NOT NULL,
+srchs bigint(20) NOT NULL,
+clks int(11) NOT NULL,
+cost int(11) NOT NULL,
+mainsitecount int(11) NOT NULL,
+date date NOT NULL,
+KEY userid (userid)) 
+ENGINE=MYISAM; 
+
+3.	创建表
+create table if not exists stat_mainsite_${1:0:4}
+(
+mainsiteid bigint(20) unsigned NOT NULL,
+srchs bigint(20) NOT NULL,
+clks int(11) NOT NULL,
+cost int(11) NOT NULL,
+usercount int(11) NOT NULL,
+plancount int(11) NOT NULL,
+groupcount int(11) NOT NULL,
+adcount int(11) NOT NULL,
+date date NOT NULL,
+KEY mainsiteid (mainsiteid)) ENGINE=MYISAM"
+
+4.	Load数据到stat_ad_YYMM表（数据是63898任务生成的文件）
+/home/work/beidou-stat/data/output/stat_ad_final_${DATE}
+alter table stat_ad_${1:0:6} disable keys;
+load data local infile '数据文件' into table stat_ad_${1:0:6};
+alter table stat_ad_${1:0:6} enable keys;
+打印日志：
+2011-12-20 06:51:16,stat 20111219,spend time:120s  info: load data into stat_ad_201112
+5.	更新数据到stat_user_yyyy表
+insert into stat_user_${1:0:4} 
+select userid,sum(srchs),sum(clks),sum(cost),count(distinct mainsiteid),$1 from detail$1 group by userid"
+打印日志：
+2011-12-20 07:06:22,stat 20111219,spend time:906s  info:insert into stat_user_2011
+
+6.	更新数据到stat_mainsite_YYYY表
+insert into stat_mainsite_${1:0:4} 
+select mainsiteid,sum(srchs),sum(clks),sum(cost),count(distinct userid), count(distinct planid), count(distinct groupid), count(distinct adid),$1 from detail$1 group by mainsiteid" 
+   打印日志：
+2011-12-20 07:44:15,stat 20111219,spend time:2273s  info:insert into stat_mainsite_2011
+
+7.	打印日志：end beidou_stat_merge at 2011-12-20 08:07:31s,total time:4695s
+
+
+==========================================================================================
+【报警内容】
+1.	execute sql create table stat_ad_YYYYMM failed
+2.	execute sql create table stat_mainsite_YYYY and stat_user_YYYY failed
+3.	execute sql stat user data into table stat_user_YYYY failed
+4.	execute sql stat mainsite data into table stat_mainsite_YYYY failed
+
+【备注】
+这个脚本还可以进行数据恢复操作，方式是传递第二个，第三个参数
+1.	如果传递三个参数（并且第三个参数应该是”-d”）
+表示删除第二个参数指定日期的数据
+会执行以下sql
+delete from stat_ad_${2:0:6} where date='$2'
+delete from stat_user_${2:0:4} where date='$2'
+delete from stat_mainsite_${2:0:4} where date='$2'
+    如果删除失败则报警：failed to delete from stat_mainsite_${2:0:4} where date='$2'
+2.	如果传递两个参数
+则表示重新入库数据，那么首先会删除旧数据，然后重新入库，也就是执行
+beidou_stat_merge.sh $1 ${STAT_DAY} –d
+stat_day ${STAT_DAY}
+脚本对于第二个参数日期有合法性校验
+

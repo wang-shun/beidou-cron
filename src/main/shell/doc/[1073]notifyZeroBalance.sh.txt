@@ -1,0 +1,29 @@
+﻿【任务名】	余额为0邮件提醒
+【时间驱动】	0 1 * * *	运行超时	240分钟	等待超时	0分钟
+【运行命令】	cd /home/work/beidou-cron/bin; sh notifyZeroBalance.sh
+【日志地址】	/home/work/beidou-cron/log/
+【变更库表】	无
+【任务依赖】  无
+========================================================================================
+【任务描述】
+执行Cron调用：com.baidu.beidou.account.SendZeroBalanceRemind
+beidou-cron/src/com/baidu/beidou/account/SendZeroBalanceRemind.java
+执行execute方法
+1.	userDao.getZeroBalanceUserIdCountWithoutFundPerDay();
+	//获取账户余额为0，且没有设置自动转账的用户个数（过滤删除和关闭状态的用户）
+2.	分页int totalPage = totalCount/10000
+3.	遍历每一页：
+	（1） //获取当前余额为0，且没有设置自动转账的用户
+		List<Integer> userIds = 
+	userDao.getZeroBalanceUserIdsWithoutFundPerDay(currentPage, pageSize);
+	（1）	executePage(userIds);//批量发送提醒
+	(a)	accountService.getTotalExpenseByUserDate(userid, yesterday);//获取该用户前一天的累积消费，访问SF_Click（select sum(bid) expense from clk****），如果clk表不存在，说明计费端没有当日的任何消费记录，可以直接返回
+	(b)	如果累积消费 >0，则需要发送邮件提醒，执行sendNotifyEmail(userid);方法，对于删除和关闭状态的用户不发送提醒，同时增加发送给销售管理员，邮件标题为百度“网盟推广帐户****服务失效通知“
+
+
+[辅助图片]http://bave.baidu.com/api/images/6f22ae43-a748-4b9d-b60e-da50abfa9d32
+
+==========================================================================================
+【报警内容】
+notify zeroBalance fail
+

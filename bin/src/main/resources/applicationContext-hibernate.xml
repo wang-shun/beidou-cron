@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN 2.0//EN"
+			  "http://www.springframework.org/dtd/spring-beans-2.0.dtd">
+
+
+<!-- - Application context definition for Petclinic on Hibernate. -->
+<beans>
+
+	<!-- ========================= GENERAL DEFINITIONS ========================= -->
+
+	<!-- Configurer that replaces ${...} placeholders with values from a properties 
+		file -->
+	<!-- (in this case, JDBC-related settings for the dataSource definition 
+		below) -->
+	<bean id="propertyConfigurer"
+		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="ignoreUnresolvablePlaceholders" value="true" />
+		<property name="order" value="0" />
+		<property name="locations">
+			<list>
+				<value>classpath:jdbc-mysql.properties</value>
+				<value>classpath:passwd.properties</value>
+				<value>classpath:file-path.properties</value>
+				<value>classpath:siteimporter.properties</value>
+				<value>classpath:platform-related.properties</value>
+				<value>classpath:adx.properties</value>
+			</list>
+		</property>
+	</bean>
+
+	<import
+		resource="classpath*:applicationContext-core-multidb.xml" />
+	<import
+		resource="classpath:/com/baidu/beidou/user/applicationContext-hibernate.xml" />
+	<import
+		resource="classpath:/com/baidu/beidou/account/applicationContext-hibernate.xml" />
+	<import
+		resource="classpath:/com/baidu/beidou/cprounit/applicationContext-hibernate.xml" />
+	<import
+		resource="classpath:/com/baidu/beidou/cprogroup/applicationContext-hibernate.xml" />
+	<import
+		resource="classpath:/com/baidu/beidou/cproplan/applicationContext-hibernate.xml" />
+	<import
+		resource="classpath:/com/baidu/beidou/unionsite/applicationContext-hibernate.xml" />
+	<import
+		resource="classpath:/com/baidu/beidou/tool/applicationContext-hibernate.xml" />
+	<import
+		resource="classpath:/com/baidu/beidou/aot/applicationContext-hibernate.xml" />
+    <import 
+    	resource="classpath:/com/baidu/beidou/shrink/applicationContext-hibernate.xml" />
+    <import 
+    	resource="classpath:/com/baidu/beidou/atleft/applicationContext-hibernate.xml" />
+	<import
+		resource="classpath:/com/baidu/beidou/bes/user/applicationContext-hibernate.xml" />
+</beans>

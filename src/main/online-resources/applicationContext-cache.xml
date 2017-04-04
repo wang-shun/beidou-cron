@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN 2.0//EN"
+			  "http://www.springframework.org/dtd/spring-beans-2.0.dtd">
+
+
+<!--
+	- Application context definition for Petclinic on Hibernate.
+-->
+<beans>
+
+	<bean id="propertyConfigurerUtil"
+		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="ignoreUnresolvablePlaceholders" value="true" />
+		<property name="order" value="100" />
+		<property name="locations">
+			<list>
+				<value>classpath*:redis-config.properties</value>
+			</list>
+		</property>
+	</bean>
+	
+	<!-- redis configuration -->
+	<bean id="auditredisCacheMgr"
+		class="com.baidu.beidou.util.redis.RedisCacheManager">
+		<property name="retryTimes">
+			<value>${redis.group1.retry.times}</value>
+		</property>
+		<property name="clientList">
+			<list>
+				<ref bean="redisClient1" />
+				<ref bean="redisClient2" />
+			</list>
+		</property>
+	</bean>
+	
+	<bean id="redisClient1"
+		class="com.baidu.beidou.util.redis.RedisClient">
+		<property name="cacheName">
+			<value>${redis.audit.client1.name}</value>
+		</property>
+		<property name="redisServerHost">
+			<value>${redis.audit.client1.host}</value>
+		</property>
+		<property name="redisServerPort">
+			<value>${redis.audit.client1.port}</value>
+		</property>
+		<property name="timeout">
+			<value>${redis.audit.client1.timeout}</value>
+		</property>
+		<property name="redisAuthKey">
+			<value>${redis.audit.client1.password}</value>
+		</property>
+	</bean>
+	
+	<bean id="redisClient2"
+		class="com.baidu.beidou.util.redis.RedisClient">
+		<property name="cacheName">
+			<value>${redis.audit.client2.name}</value>
+		</property>
+		<property name="redisServerHost">
+			<value>${redis.audit.client2.host}</value>
+		</property>
+		<property name="redisServerPort">
+			<value>${redis.audit.client2.port}</value>
+		</property>
+		<property name="timeout">
+			<value>${redis.audit.client2.timeout}</value>
+		</property>
+		<property name="redisAuthKey">
+			<value>${redis.audit.client2.password}</value>
+		</property>
+	</bean>
+</beans>

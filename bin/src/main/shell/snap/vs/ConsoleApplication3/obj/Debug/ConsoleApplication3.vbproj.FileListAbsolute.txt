@@ -1,0 +1,9 @@
+E:\vs\ConsoleApplication3\ConsoleApplication3\bin\Debug\ConsoleApplication3.exe
+E:\vs\ConsoleApplication3\ConsoleApplication3\bin\Debug\ConsoleApplication3.pdb
+E:\vs\ConsoleApplication3\ConsoleApplication3\bin\Debug\ConsoleApplication3.xml
+E:\vs\ConsoleApplication3\ConsoleApplication3\obj\Debug\ResolveAssemblyReference.cache
+E:\vs\ConsoleApplication3\ConsoleApplication3\obj\Debug\ConsoleApplication3.Resources.resources
+E:\vs\ConsoleApplication3\ConsoleApplication3\obj\Debug\ConsoleApplication3.vbproj.GenerateResource.Cache
+E:\vs\ConsoleApplication3\ConsoleApplication3\obj\Debug\ConsoleApplication3.exe
+E:\vs\ConsoleApplication3\ConsoleApplication3\obj\Debug\ConsoleApplication3.xml
+E:\vs\ConsoleApplication3\ConsoleApplication3\obj\Debug\ConsoleApplication3.pdb

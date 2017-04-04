@@ -1,0 +1,44 @@
+<?xml version="1.0"?>
+<project default="dist" name="helloworld">	
+	<property name="srcDir" location="src"/>
+	<property name="buildDir" location="build"/>
+	<property name="distDir" location="output/beidou-hadoop"/>
+	<property name="lib.dir" value="lib" />
+
+    <path id="project.classpath">
+        <pathelement path="${lib.dir}"/>
+			<fileset dir="${lib.dir}"><include name="**/*.jar"/></fileset>    		
+        <pathelement location="classes"/>
+    </path>
+        	
+	<target name="init">
+		<tstamp/>
+		<mkdir dir="${buildDir}"/>
+		<mkdir dir="${distDir}"/>
+	</target>
+
+	<target name="compile" depends="init">
+		<javac srcdir="${srcDir}" destdir="${buildDir}">
+			<classpath refid="project.classpath"/>
+		</javac>
+    	<copy todir="${distDir}/tools">
+    		<fileset dir="${srcDir}/tools"/>
+    	</copy>
+		<fixcrlf srcdir="${distDir}/tools" includes="**/*.sh" eol="lf" eof="remove"  encoding="GBK"/>
+	</target>
+
+	<target name="dist" depends="compile">
+		<jar destfile="${distDir}/beidou-hadoop.jar" basedir="${buildDir}">
+			<manifest>
+				<attribute name="Build-By" value="${user.name}"/>	
+				<attribute name="Main-class" value="com.baidu.beidou.hadoop.util.MyProgramDriver"/>	
+			</manifest>
+		</jar>
+	</target> 
+
+	<target name="clean">
+		<delete dir="${buildDir}"/>
+		<delete dir="${distDir}"/>
+	</target>
+
+</project>

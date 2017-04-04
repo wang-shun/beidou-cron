@@ -1,0 +1,435 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN 2.0//EN"
+			  "http://www.springframework.org/dtd/spring-beans-2.0.dtd">
+
+
+<!--
+	- Application context definition for Petclinic on Hibernate.
+-->
+<beans>
+	<!-- addb interceptor config start-->
+	<!-- 多数据源拦截器，此处是abstract，后面系统中会继承它 -->
+	<bean id="addbMultiDataSourceInterceptor"
+		class="com.baidu.beidou.multidatabase.datasource.MultiDataSourceInterceptor">
+		<property name="attributes">
+			<props>
+				<prop key="query*">read</prop>
+				<prop key="count*">read</prop>
+				<prop key="find*">read</prop>
+                <prop key="get*">read</prop>
+                <prop key="list*">read</prop>
+				<prop key="load*">read</prop>
+				<prop key="*">write</prop>
+			</props>
+		</property>
+		<property name="multiDataSourceKeyContext">
+			<ref bean="addbMultiDSKeyContext" />
+		</property>
+	</bean>
+	<bean id="addbTransactionInterceptor"
+		class="org.springframework.transaction.interceptor.TransactionInterceptor">
+		<property name="transactionManager" ref="addbTransactionManager" />
+		<property name="transactionAttributes">
+			<props>
+				<prop key="reg*">PROPAGATION_REQUIRED, -Exception</prop>
+				<prop key="mod*">PROPAGATION_REQUIRED, -Exception</prop>
+				<prop key="update*">
+					PROPAGATION_REQUIRED, -Exception
+				</prop>
+				<prop key="add*">PROPAGATION_REQUIRED, -Exception</prop>
+				<prop key="del*">PROPAGATION_REQUIRED, -Exception</prop>
+				<prop key="set*">PROPAGATION_REQUIRED, -Exception</prop>
+				<prop key="save*">
+					PROPAGATION_REQUIRED, -Exception
+				</prop>
+				<prop key="commit*">
+					PROPAGATION_REQUIRED, -Exception
+				</prop>
+				<prop key="pause*">
+					PROPAGATION_REQUIRED, -Exception
+				</prop>
+				<prop key="resume*">
+					PROPAGATION_REQUIRED, -Exception
+				</prop>
+				<prop key="syn*">PROPAGATION_REQUIRED, -Exception</prop>
+				<prop key="commit*">
+					PROPAGATION_REQUIRED, -Exception
+				</prop>
+				<prop key="clone*">
+					PROPAGATION_REQUIRED, -Exception
+				</prop>
+				<prop key="audit*">
+					PROPAGATION_REQUIRED, -Exception
+				</prop>
+				<prop key="reaudit*">
+					PROPAGATION_REQUIRED, -Exception
+				</prop>
+				<prop key="insert*">
+					PROPAGATION_REQUIRED, -Exception
+				</prop>
+				<prop key="replace*">
+					PROPAGATION_REQUIRED, -Exception
+				</prop>
+				<prop key="clear*">
+					PROPAGATION_REQUIRED, -Exception
+				</prop>
+				<prop key="copy*">
+					PROPAGATION_REQUIRED, -Exception
+				</prop>
+				<prop key="optimize*">
+					PROPAGATION_REQUIRED, -Exception
+				</prop>
+                <prop key="create*">
+                    PROPAGATION_REQUIRED, -Exception
+                </prop>
+                <prop key="import*">
+                    PROPAGATION_REQUIRED, -Exception
+                </prop>
+                <prop key="*">readOnly</prop>
+			</props>
+		</property>
+	</bean>
+	<bean id="addbMultiDataSourceProxy"
+		abstract="true" >
+		<property name="beanNames">
+			<list>
+				<!-- 需要使用读写分类的bean名称，如果不在multiDataSourceInterceptor中指定的通配符中，还需要配置方法名。-->
+				<!--  <value>accountService</value> -->
+				<!-- <value>loadAuditConf</value> -->
+				<value>cproGroupMgr</value>
+				<value>unionSiteMgr</value>
+				<value>groupSiteConfigMgr</value>
+				<value>cproGroupConstantMgr</value>
+				<value>cproKeywordMgr</value>
+				<value>cproPlanMgr</value>
+				<value>unitWriteMgr</value>
+				<value>userMgr</value>
+				<value>cproGroupRTMgr</value>
+				<value>cproGroupITMgr</value>
+				<value>cproGroupVTMgr</value>
+				<value>customITMgr</value>
+				<value>statDAO2</value>
+				<value>groupPackMgr</value>
+				<value>packMgr</value>
+                <value>wordPackKeywordMgr</value>
+                <value>wordPackMgr</value>
+                <value>wordPackExcludeMgr</value>
+			</list>
+		</property>
+		<property name="interceptorNames">
+			<list>
+				<!-- 指定获取数据源的Interceptor -->
+				<value>addbMultiDataSourceInterceptor</value>
+				<!-- 事务管理的Interceptor -->
+				<value>addbTransactionInterceptor</value>
+			</list>
+		</property>
+	</bean>
+	<!-- addb interceptor config end-->
+	
+	
+	<!-- capdb interceptor config start-->
+	<!-- 多数据源拦截器，此处是abstract，后面系统中会继承它 -->
+	<bean id="capdbMultiDataSourceInterceptor"
+		class="com.baidu.beidou.multidatabase.datasource.MultiDataSourceInterceptor">
+		<property name="attributes">
+			<props>
+				<prop key="query*">read</prop>
+				<prop key="count*">read</prop>
+				<prop key="find*">read</prop>
+                <prop key="get*">read</prop>
+                <prop key="list*">read</prop>
+				<prop key="load*">read</prop>
+				<prop key="*">write</prop>
+			</props>
+		</property>
+		<property name="multiDataSourceKeyContext">
+			<ref bean="capdbMultiDSKeyContext" />
+		</property>
+	</bean>
+	<bean id="capdbTransactionInterceptor"
+		class="org.springframework.transaction.interceptor.TransactionInterceptor">
+		<property name="transactionManager" ref="capdbTransactionManager" />
+		<property name="transactionAttributes">
+			<props>
+				<prop key="reg*">PROPAGATION_REQUIRED, -Exception</prop>
+				<prop key="mod*">PROPAGATION_REQUIRED, -Exception</prop>
+				<prop key="update*">
+					PROPAGATION_REQUIRED, -Exception
+				</prop>
+				<prop key="add*">PROPAGATION_REQUIRED, -Exception</prop>
+				<prop key="del*">PROPAGATION_REQUIRED, -Exception</prop>
+				<prop key="set*">PROPAGATION_REQUIRED, -Exception</prop>
+				<prop key="save*">
+					PROPAGATION_REQUIRED, -Exception
+				</prop>
+				<prop key="commit*">
+					PROPAGATION_REQUIRED, -Exception
+				</prop>
+				<prop key="pause*">
+					PROPAGATION_REQUIRED, -Exception
+				</prop>
+				<prop key="resume*">
+					PROPAGATION_REQUIRED, -Exception
+				</prop>
+				<prop key="syn*">PROPAGATION_REQUIRED, -Exception</prop>
+				<prop key="commit*">
+					PROPAGATION_REQUIRED, -Exception
+				</prop>
+				<prop key="clone*">
+					PROPAGATION_REQUIRED, -Exception
+				</prop>
+				<prop key="audit*">
+					PROPAGATION_REQUIRED, -Exception
+				</prop>
+				<prop key="reaudit*">
+					PROPAGATION_REQUIRED, -Exception
+				</prop>
+				<prop key="insert*">
+					PROPAGATION_REQUIRED, -Exception
+				</prop>
+				<prop key="replace*">
+					PROPAGATION_REQUIRED, -Exception
+				</prop>
+				<prop key="clear*">
+					PROPAGATION_REQUIRED, -Exception
+				</prop>
+				<prop key="copy*">
+					PROPAGATION_REQUIRED, -Exception
+				</prop>
+				<prop key="optimize*">
+					PROPAGATION_REQUIRED, -Exception
+				</prop>
+                <prop key="create*">
+                    PROPAGATION_REQUIRED, -Exception
+                </prop>
+                <prop key="import*">
+                    PROPAGATION_REQUIRED, -Exception
+                </prop>
+                <prop key="*">readOnly</prop>
+			</props>
+		</property>
+	</bean>
+	<bean id="capdbMultiDataSourceProxy" abstract="true">
+		<property name="beanNames">
+			<list>
+				<value>loadAuditConf</value>
+			</list>
+		</property>
+		<property name="interceptorNames">
+			<list>
+				<value>capdbMultiDataSourceInterceptor</value>
+				<value>capdbTransactionInterceptor</value>
+			</list>
+		</property>
+	</bean>
+	<!-- capdb interceptor config end-->
+	
+	<!-- xdb interceptor config start-->
+	<!-- 多数据源拦截器，此处是abstract，后面系统中会继承它 -->
+	<bean id="xdbMultiDataSourceInterceptor"
+		class="com.baidu.beidou.multidatabase.datasource.MultiDataSourceInterceptor">
+		<property name="attributes">
+			<props>
+				<prop key="query*">read</prop>
+				<prop key="count*">read</prop>
+				<prop key="find*">read</prop>
+                <prop key="get*">read</prop>
+                <prop key="list*">read</prop>
+				<prop key="load*">read</prop>
+				<prop key="*">write</prop>
+			</props>
+		</property>
+		<property name="multiDataSourceKeyContext">
+			<ref bean="xdbMultiDSKeyContext" />
+		</property>
+	</bean>
+	<bean id="xdbTransactionInterceptor"
+		class="org.springframework.transaction.interceptor.TransactionInterceptor">
+		<property name="transactionManager" ref="xdbTransactionManager" />
+		<property name="transactionAttributes">
+			<props>
+				<prop key="reg*">PROPAGATION_REQUIRED, -Exception</prop>
+				<prop key="mod*">PROPAGATION_REQUIRED, -Exception</prop>
+				<prop key="update*">
+					PROPAGATION_REQUIRED, -Exception
+				</prop>
+				<prop key="add*">PROPAGATION_REQUIRED, -Exception</prop>
+				<prop key="del*">PROPAGATION_REQUIRED, -Exception</prop>
+				<prop key="set*">PROPAGATION_REQUIRED, -Exception</prop>
+				<prop key="save*">
+					PROPAGATION_REQUIRED, -Exception
+				</prop>
+				<prop key="commit*">
+					PROPAGATION_REQUIRED, -Exception
+				</prop>
+				<prop key="pause*">
+					PROPAGATION_REQUIRED, -Exception
+				</prop>
+				<prop key="resume*">
+					PROPAGATION_REQUIRED, -Exception
+				</prop>
+				<prop key="syn*">PROPAGATION_REQUIRED, -Exception</prop>
+				<prop key="commit*">
+					PROPAGATION_REQUIRED, -Exception
+				</prop>
+				<prop key="clone*">
+					PROPAGATION_REQUIRED, -Exception
+				</prop>
+				<prop key="audit*">
+					PROPAGATION_REQUIRED, -Exception
+				</prop>
+				<prop key="reaudit*">
+					PROPAGATION_REQUIRED, -Exception
+				</prop>
+				<prop key="insert*">
+					PROPAGATION_REQUIRED, -Exception
+				</prop>
+				<prop key="replace*">
+					PROPAGATION_REQUIRED, -Exception
+				</prop>
+				<prop key="clear*">
+					PROPAGATION_REQUIRED, -Exception
+				</prop>
+				<prop key="copy*">
+					PROPAGATION_REQUIRED, -Exception
+				</prop>
+				<prop key="optimize*">
+					PROPAGATION_REQUIRED, -Exception
+				</prop>
+                <prop key="create*">
+                    PROPAGATION_REQUIRED, -Exception
+                </prop>
+                <prop key="import*">
+                    PROPAGATION_REQUIRED, -Exception
+                </prop>
+                <prop key="downloadUserReportFileByUserIdToken"> PROPAGATION_REQUIRED, -Exception</prop>
+				<prop key="subscribe*">PROPAGATION_REQUIRED, -Exception</prop>
+				<prop key="unsubscribe*">PROPAGATION_REQUIRED, -Exception</prop>
+				<prop key="retryMoveFundPerDay">PROPAGATION_REQUIRED, -Exception</prop>
+				<prop key="autoTransferFundPerMargin">PROPAGATION_REQUIRED, -Exception</prop>
+				<prop key="*">readOnly</prop>
+			</props>
+		</property>
+	</bean>
+	<bean id="xdbMultiDataSourceProxy" abstract="true">
+		<property name="beanNames">
+			<list>
+				<value>optHistoryMgr</value>
+				<value>reportService</value>
+				<value>aotMgr</value>
+			</list>
+		</property>
+		<property name="interceptorNames">
+			<list>
+				<value>xdbMultiDataSourceInterceptor</value>
+				<value>xdbTransactionInterceptor</value>
+			</list>
+		</property>
+	</bean>
+	<!-- xdb interceptor config end-->
+	
+	
+	<!-- clkdb interceptor config start-->
+	<!-- 多数据源拦截器，此处是abstract，后面系统中会继承它 -->
+	<bean id="clkdbMultiDataSourceInterceptor"
+		class="com.baidu.beidou.multidatabase.datasource.MultiDataSourceInterceptor">
+		<property name="attributes">
+			<props>
+				<prop key="query*">read</prop>
+				<prop key="count*">read</prop>
+				<prop key="find*">read</prop>
+                <prop key="get*">read</prop>
+                <prop key="list*">read</prop>
+				<prop key="load*">read</prop>
+				<prop key="*">write</prop>
+			</props>
+		</property>
+		<property name="multiDataSourceKeyContext">
+			<ref bean="clkdbMultiDSKeyContext" />
+		</property>
+	</bean>
+	<bean id="clkdbTransactionInterceptor"
+		class="org.springframework.transaction.interceptor.TransactionInterceptor">
+		<property name="transactionManager" ref="clkdbTransactionManager" />
+		<property name="transactionAttributes">
+			<props>
+				<prop key="reg*">PROPAGATION_REQUIRED, -Exception</prop>
+				<prop key="mod*">PROPAGATION_REQUIRED, -Exception</prop>
+				<prop key="update*">
+					PROPAGATION_REQUIRED, -Exception
+				</prop>
+				<prop key="add*">PROPAGATION_REQUIRED, -Exception</prop>
+				<prop key="del*">PROPAGATION_REQUIRED, -Exception</prop>
+				<prop key="set*">PROPAGATION_REQUIRED, -Exception</prop>
+				<prop key="save*">
+					PROPAGATION_REQUIRED, -Exception
+				</prop>
+				<prop key="commit*">
+					PROPAGATION_REQUIRED, -Exception
+				</prop>
+				<prop key="pause*">
+					PROPAGATION_REQUIRED, -Exception
+				</prop>
+				<prop key="resume*">
+					PROPAGATION_REQUIRED, -Exception
+				</prop>
+				<prop key="syn*">PROPAGATION_REQUIRED, -Exception</prop>
+				<prop key="commit*">
+					PROPAGATION_REQUIRED, -Exception
+				</prop>
+				<prop key="clone*">
+					PROPAGATION_REQUIRED, -Exception
+				</prop>
+				<prop key="audit*">
+					PROPAGATION_REQUIRED, -Exception
+				</prop>
+				<prop key="reaudit*">
+					PROPAGATION_REQUIRED, -Exception
+				</prop>
+				<prop key="insert*">
+					PROPAGATION_REQUIRED, -Exception
+				</prop>
+				<prop key="replace*">
+					PROPAGATION_REQUIRED, -Exception
+				</prop>
+				<prop key="clear*">
+					PROPAGATION_REQUIRED, -Exception
+				</prop>
+				<prop key="copy*">
+					PROPAGATION_REQUIRED, -Exception
+				</prop>
+				<prop key="optimize*">
+					PROPAGATION_REQUIRED, -Exception
+				</prop>
+                <prop key="create*">
+                    PROPAGATION_REQUIRED, -Exception
+                </prop>
+                <prop key="import*">
+                    PROPAGATION_REQUIRED, -Exception
+                </prop>
+                <prop key="*">readOnly</prop>
+			</props>
+		</property>
+	</bean>
+	
+	<bean id="clkdbMultiDataSourceProxy"
+		abstract="true" >
+		<property name="beanNames">
+			<list>
+				<!-- 需要使用读写分类的bean名称，如果不在multiDataSourceInterceptor中指定的通配符中，还需要配置方法名。-->
+				<value>accountService</value>
+			</list>
+		</property>
+		<property name="interceptorNames">
+			<list>
+				<!-- 指定获取数据源的Interceptor -->
+				<value>clkdbMultiDataSourceInterceptor</value>
+				<!-- 事务管理的Interceptor -->
+				<value>clkdbTransactionInterceptor</value>
+			</list>
+		</property>
+	</bean>
+	<!-- clkdb interceptor config end-->
+	
+</beans>

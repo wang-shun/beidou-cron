@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN 2.0//EN" "http://www.springframework.org/dtd/spring-beans-2.0.dtd">
+
+<!--
+	- Application context definition for "springapp" DispatcherServlet.
+-->
+
+<beans>
+
+	<bean id="snapShotMgr" class="com.baidu.beidou.tool.service.impl.SnapShotMgrImpl">
+		<property name="snapShotDao">
+			<ref bean="snapShotDao"/>
+		</property>
+		<property name="snapShotFileDao">
+			<ref bean="snapShotFileDao"/>
+		</property>
+		<property name="fileUtil">
+			<ref bean="snapFileUtils"/>
+		</property>				
+		<property name="expireDays">
+			<value>7</value>
+		</property>				
+		<property name="mailManager">
+			<ref bean="mailManager"/>
+		</property>			
+		<property name="unitMgr">
+			<ref bean="unitMgr"/>
+		</property>			
+		<property name="maxOutput">
+			<value>5000</value>
+		</property>			
+		<property name="userDao">
+			<ref bean="userDao"/>
+		</property>
+		<property name="cproGroupDaoOnMultiDataSource">
+			<ref bean="cproGroupDaoOnMultiDataSource"/>
+		</property>
+		<property name="snapOrderCount">  <!-- 导出给检索端的订阅，检索端需要在一批中返回的URL数量，做截图冗余重试用 -->
+			<value>20</value>
+		</property>
+	       <property name = "snapServer">  <!-- 检索端截图索引文件地址 -->
+	           <map>
+	               <entry key = "serverBnsName">
+	                   <value>${cpro.snap.serverBnsName}</value>
+	               </entry>
+	               <entry key = "port">
+	                   <value>${cpro.snap.port}</value>
+	               </entry>
+	               <entry key = "user">
+	                   <value>${cpro.snap.user}</value>
+	               </entry>
+	               <entry key = "passwd">
+	                   <value>${cpro.snap.passwd}</value>
+	               </entry>
+	               <entry key = "path">
+	                   <value>${cpro.snap.path}</value>
+	               </entry>
+	           </map>
+	       </property>
+	       <property name = "imageServer">  <!-- 截图机器上用于存放截图的ftp地址 -->
+	           <map>
+	               <entry key = "server">
+	                   <value>${ubuntu.snap.server}</value>
+	               </entry>
+	               <entry key = "port">
+	                   <value>${ubuntu.snap.port}</value>
+	               </entry>
+	               <entry key = "user">
+	                   <value>${ubuntu.snap.user}</value>
+	               </entry>
+	               <entry key = "passwd">
+	                   <value>${ubuntu.snap.passwd}</value>
+	               </entry>
+	               <entry key = "path">
+	                   <value>${ubuntu.snap.path}</value>
+	               </entry>
+	           </map>
+	       </property>
+	       <property name = "adsServer">  <!-- 截图机器上用于存放推送到该机器的ads文件的ftp地址 -->
+	           <map>
+	               <entry key = "server">
+	                   <value>${ubuntu.ads.server}</value>
+	               </entry>
+	               <entry key = "port">
+	                   <value>${ubuntu.ads.port}</value>
+	               </entry>
+	               <entry key = "user">
+	                   <value>${ubuntu.ads.user}</value>
+	               </entry>
+	               <entry key = "passwd">
+	                   <value>${ubuntu.ads.passwd}</value>
+	               </entry>
+	               <entry key = "path">
+	                   <value>${ubuntu.ads.path}</value>
+	               </entry>
+	           </map>
+	       </property>
+		<property name="snapUrl">  <!-- 截图机器上的PHP截图服务 -->
+			<value>${snap.ubuntu.url}</value>  
+		</property>			
+		<property name="allowDownload">
+			<value>3</value>
+		</property>			
+		<property name="downLoadLimit">
+			<value>2000000</value>
+		</property>			
+		<property name="downLoadPrefix">
+			<value>${snap.download.url}</value>
+		</property>			
+		<property name="snapLimit">
+			<value>40</value>
+		</property>			
+		<property name="warningMail">
+			<value>${snap.warning.mail}</value>
+		</property>
+	</bean>
+
+	<!--================ beidou-report server local service =================-->
+	
+	<bean id="mailManager" class="com.baidu.beidou.tool.mail.SnapMailManager">
+		<property name="freeMarkerConfigurer" ref="freeMarkerConfigurer"/>
+		<property name="userDao" ref="userDao"/>
+		<property name="fromAddress"><value>${mail.snap.from}</value></property>
+		<property name="failSubject"><value>您定制的网盟推广展现截图失败</value></property>
+		<property name="downloadSubject"><value>您定制的网盟推广展现截图已经生成，请进行下载</value></property>
+		<property name="groupDao">
+			<ref bean="cproGroupDao"/>
+		</property>
+		<property name="userInfoMgr" ref="userInfoMgr"></property>
+		<property name="cproGroupDaoOnMultiDataSource" ref="cproGroupDaoOnMultiDataSource"></property>
+	</bean>
+	
+	<bean id="freeMarkerConfigurer"
+		class="org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer">
+		<property name="templateLoaderPath"
+			value="classpath:com/baidu/beidou/tool/mail/template/" />
+		<property name="freemarkerSettings">
+			<props>
+				<prop key="template_update_delay">1800</prop>
+				<prop key="default_encoding">UTF-8</prop>
+				<prop key="locale">zh_CN</prop>
+			</props>
+		</property>
+	</bean>
+	
+	<bean id="snapFileUtils" class="com.baidu.beidou.util.FileUtils">
+    	<property name="baseDir"><value>${snapshot.basedir}</value></property>
+	</bean>
+	
+	<!-- Holmes受众管理平台API start -->
+	<bean id="holmesPeopleDriver" class="com.baidu.beidou.util.McpackProxyFactoryBean">
+    	<property name="serviceInterface">
+			<value>com.baidu.beidou.tool.driver.HolmesPeopleDriver</value>	
+		</property>
+		<property name="serviceUrl" value="${HM_PEOPLE_SERVICE_URL}" />	
+		<property name="servers" value="${HM_PEOPLE_SERVER}" />	
+		<property name="encoding" value="${HM_PEOPLE.encode}" />
+		<property name="connectionTimeout" value="${HM_PEOPLE.connectionTimeout}" />
+		<property name="readTimeout" value="${HM_PEOPLE.readTimeout}" />
+		<property name="hasHeaders" value="false" />
+	</bean>
+	
+	<bean id="holmesPeopleMgr"  class="com.baidu.beidou.tool.service.impl.HolmesPeopleMgrImpl">
+		<property name="holmesPeopleDriver" ref="holmesPeopleDriver"></property>
+	</bean>
+	<!-- Holmes受众管理平台API end -->
+</beans>

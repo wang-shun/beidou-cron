@@ -1,0 +1,54 @@
+﻿【任务名】	导入分行业分推广组类型分一级地域的出价信息
+【时间驱动】	30 2 15 * *	 运行超时	5分钟	等待超时	0分钟 每月更新一次
+【运行命令】	cd /home/work/beidou-cron/bin/; sh importTradeBaseAcp.sh;
+【日志地址】	/home/work/beidou-cron/log/importTradeBaseAcp.log
+【变更库表】	aot.tradebaseacp
+【任务依赖】  
+========================================================================================
+【任务描述】
+
+1.	进入数据目录/home/work/beidou-cron/data/
+2.	使用beidou_lib.sh中函数getfile抓取上游文件及其md5，在每次下载前会执行环境清理操作，删除trade_acp_${Yesterday}.txt
+wget -q –c
+ftp://yf-beidou-cron00.yf01.baidu.com:/home/work/beidou-hadoop/data/avg/output /20111220/trade_acp_20111220.txt
+wget -q –c:
+ftp://yf-beidou-cron00.yf01.baidu.com:/home/work/beidou-hadoop/data/avg/output /20111220/trade_acp_20111220.txt.md5
+校验md5正确性
+3.	检查下载文件trade_acp_${Yesterday}.txt文件列数是否为16列，将合法行数据输出至tradebaseacp.txt
+4.	如果trade_acp_${Yesterday}.txt和tradebaseacp.txt的行数不相同，则报错
+上游数据/home/work/beidou-cron/data/tradebaseacp.txt中存在$(($beforenum-$afternum))条异常数据，请进行检查
+5.	构造导入sql
+insert into aot.tradebaseacp(
+secondtradeid,
+groupclassification,
+firstregionid,
+targettype,
+bid20,
+bid25,
+bid30,
+bid40,
+bid50,
+bid60,
+bid70,
+bid75,
+bid80,
+bid90,
+avgbid,
+bidcount(16列数据)
+
+Sql文件为： /home/work/beidou-cron/data/tradebaseacp.txt.sql
+6.	执行数据导入，使用了beidou_lib中的公共函数db_retry_operation进行数据导入，在每次导入尝试钱会执行"delete from aot.tradebaseacp"操作
+dbinfo="${MYSQL_CLIENT} -h${BEIDOU_DB_IP_AOT} -P${BEIDOU_DB_PORT_AOT} -u${BEIDOU_DB_USER_AOT} -p${BEIDOU_DB_PASSWORD_AOT}"
+db_sql="source ${DATA_PATH}/${outfilename}.sql"
+clear_sql="delete from aot.tradebaseacp"
+msg="执行导入${DATA_PATH}/${outfilename}.sql文件多次失败,请高优先级查看"
+db_retry_operation "$dbinfo" "$db_sql" "$clear_sql" >> $LOG_FILE
+
+
+==========================================================================================
+【报警内容】
+1.	wget文件**失败（抓取文件和md5失败）
+2.	**文件的md5校验失败（MD5校验失败）
+3.	文件中存在非16列数据进行mail报警
+4.	删除tradebaseacp表数据失败，导入tradebaseacp数据失败
+

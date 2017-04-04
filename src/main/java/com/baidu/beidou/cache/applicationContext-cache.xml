@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN 2.0//EN"
+ "http://www.springframework.org/dtd/spring-beans-2.0.dtd">
+
+<beans>
+    <bean id="beidouDao" class="com.baidu.beidou.cache.dao.impl.BeidouDaoImpl">
+        <property name="jdbcTemplate" ref="capdbJdbcTemplate"/>
+    </bean>
+    
+    <bean id="reportDao" class="com.baidu.beidou.cache.dao.impl.ReportDaoImpl">
+        <property name="jdbcTemplate" ref="xdbJdbcTemplate"/>
+        <property name="tmpPath" value="${CLICK_LOG_CACHE_PATH}"/>
+    </bean>
+    
+    <bean id="parser" class="com.baidu.beidou.cache.parser.ClickLogParser">
+        <property name="datapath" value="${CLICK_LOG_LOCAL_PATH}"/>
+        <property name="realtimeDatapath" value="${CLICK_LOG_REALTIME_PATH}"/>
+        <property name="reportDao" ref="reportDao"/>
+    </bean>
+    
+    <bean id="olapDriver" class="com.baidu.beidou.olap.driver.OlapStatDriver">
+        <property name="reportDao" ref="reportDao"/>
+        <property name="userStatService" ref="userStatService"/>
+        <property name="nThreads" value="${DORIS_REQ_THREADS_NUM}"/>
+    </bean>
+    
+    <bean id="builder" class="com.baidu.beidou.cache.CacheBuilder">
+        <property name="beidouDao" ref="beidouDao"/>
+		<property name="reportDao" ref="reportDao"/>
+        <property name="olapDriver" ref="olapDriver"/>
+        <property name="parser" ref="parser"/>
+    </bean>
+    
+</beans>

@@ -1,0 +1,343 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN 2.0//EN" "http://www.springframework.org/dtd/spring-beans-2.0.dtd">
+
+<!--
+	- Application context definition for "springapp" DispatcherServlet.
+-->
+
+<beans>
+	<bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="ignoreUnresolvablePlaceholders" value="true"/>
+		<property name="order" value="100" />
+		<property name="locations">
+			<list>
+				<value>classpath*:com/baidu/beidou/unionsite/constant/unionsite_constant.properties</value>
+				<value>classpath*:com/baidu/beidou/unionsite/constant/wm123_sitescore_refresher.properties</value>
+			</list>
+		</property>
+	</bean>
+	<bean id="siteConstantService"
+		class="com.baidu.beidou.unionsite.service.impl.SiteConstantMgrImpl">
+		<property name="adSizeDao">
+			<ref bean="adSizeDao"/>
+		</property>
+	</bean>
+	
+	<bean id="siteImportService"
+		class="com.baidu.beidou.unionsite.service.impl.UnionSiteServiceImpl">
+		<property name="indexFileName">
+			<value>${unionsite.base.dir}/cache/unionsiteindex.dat</value>
+		</property>
+		<property name="unionSiteFile">
+			<value>${unionsite.base.dir}/cache/unionsitecache.dat</value>
+		</property>
+		<property name="unionSiteFileDao">
+			<ref bean="unionSiteFileDao"/>
+		</property>
+	</bean>
+	
+	<bean id="siteQValueService"
+		class="com.baidu.beidou.unionsite.service.impl.QValueServiceImpl">
+		<property name="qcacheFileName">
+			<value>${unionsite.base.dir}/cache/q_</value>
+		</property>
+	</bean>
+	
+	<bean id="siteStatService"
+		class="com.baidu.beidou.unionsite.service.impl.SiteStatServiceImpl">
+		<property name="dayFilePrefix">
+			<value>${unionsite.base.dir}/cache/daysitestat.</value>
+		</property>
+		<property name="avgSiteStatFile">
+			<value>${unionsite.base.dir}/cache/lastsevensitestat</value>
+		</property>
+		<property name="statFileDao">
+			<ref bean="siteStatDao"/>
+		</property>
+	</bean>
+	
+	<bean id="siteScaleAlgorithm"
+		class="com.baidu.beidou.unionsite.service.impl.SiteScaleAlgorithmImpl">
+		<property name="n11">
+			<value>${siteimport.n11}</value>
+		</property>
+		<property name="n12">
+			<value>${siteimport.n12}</value>
+		</property>
+		<property name="n13">
+			<value>${siteimport.n13}</value>
+		</property>
+		<property name="n14">
+			<value>${siteimport.n14}</value>
+		</property>
+		<property name="n15">
+			<value>${siteimport.n15}</value>
+		</property>
+		<property name="n21">
+			<value>${siteimport.n21}</value>
+		</property>
+		<property name="n22">
+			<value>${siteimport.n22}</value>
+		</property>
+		<property name="n23">
+			<value>${siteimport.n23}</value>
+		</property>
+		<property name="n24">
+			<value>${siteimport.n24}</value>
+		</property>
+		<property name="n25">
+			<value>${siteimport.n25}</value>
+		</property>
+		<property name="w1">
+			<value>${siteimport.W1}</value>
+		</property>
+		<property name="w2">
+			<value>${siteimport.W2}</value>
+		</property>
+	</bean>
+	
+	<bean id="bdSiteStatService" class="com.baidu.beidou.unionsite.service.impl.BDSiteStatServiceImpl">
+		<property name="siteDao">
+			<ref bean="bdSiteStatDao"/>
+		</property>
+		<property name="siteOnAddbDao">
+			<ref bean="bdSiteStatOnAddbDao"/>
+		</property>
+		<property name="adSizeDao">
+			<ref bean="adSizeDao"/>
+		</property>
+		<property name="scaleAlgorithm">
+			<ref bean="siteScaleAlgorithm"/>
+		</property>
+		<property name="standard_q1">
+			<value>${siteimport.Q1}</value>
+		</property>
+		<property name="standard_q2">
+			<value>${siteimport.Q2}</value>
+		</property>
+		<property name="sequenceIdDaoOnXdb">
+			<ref bean="sequenceIdDaoOnXdb"/>
+		</property>
+	</bean>
+		
+	<bean id="whiteUrlMgr"
+		class="com.baidu.beidou.unionsite.service.impl.WhiteUrlMgrImpl">
+		<property name="whiteUrlDao" ref="whiteUrlFileDao">
+		</property>
+		<property name="bdSiteDao">
+			<ref bean="bdSiteStatDao"/>
+		</property>
+		<property name="siteOnAddbDao">
+			<ref bean="bdSiteStatOnAddbDao"/>
+		</property>
+		<property name="sequenceIdDaoOnXdb">
+			<ref bean="sequenceIdDaoOnXdb"/>
+		</property>
+	</bean>
+	
+	<bean id="urlStatMgr"
+		class="com.baidu.beidou.unionsite.service.impl.UrlStatMgrImpl">
+		<property name="urlFileDao" ref="urlStatFileDao">
+		</property>
+		<property name="bdSiteDao">
+			<ref bean="bdSiteStatDao"/>
+		</property>
+		<property name="whiteUrlTop" value="${WHITE_URL_TOP_COUNT}"></property>
+		<property name="validUrlTop" value="${UNION_URL_TOP_COUNT}"></property>
+		<property name="minCountOfSize" value="${MIN_COUNT_OF_SIZE}"></property>
+	</bean>
+	
+	
+	
+	<bean id="siteImportTask"
+		class="com.baidu.beidou.unionsite.task.impl.SiteImportTaskImpl">
+		<property name="unionSiteFileName">
+			<value>${union.info.file}</value>
+		</property>
+		<property name="mainQValueFileName">
+			<value>${domain.qvalue.file}</value>
+		</property>
+		<property name="siteQValueFileName">
+			<value>${site.qvalue.file}</value>
+		</property>
+		<property name="siteService">
+			<ref bean="siteImportService"/>
+		</property>
+		<property name="qvalueService">
+			<ref bean="siteQValueService"/>
+		</property>
+		<property name="siteStatService">
+			<ref bean="siteStatService"/>
+		</property>
+		<property name="bdStatService">
+			<ref bean="bdSiteStatService"/>
+		</property>
+	</bean>
+
+	<bean id="statFileBinary2Text"
+		class="com.baidu.beidou.unionsite.StatFileBinary2Text">
+		<property name="statFileDao">
+			<ref bean="siteStatDao"/>
+		</property>
+	</bean>
+
+    <!-- wm123, add by liangshimu,2010-05-24 -->
+    <bean id="WMSiteService"
+        class="com.baidu.beidou.unionsite.service.impl.WMSiteServiceImpl">
+        <property name="siteStatDao">
+            <ref bean="WM123SiteStatDao"/>
+        </property>
+         <property name="siteStatOnCapDao">
+            <ref bean="wM123SiteStatOnCapDao"/>
+        </property>
+        <property name="siteIndexDao">
+            <ref bean="WM123SiteIndexDao"/>
+        </property>
+        <property name="bDSiteStatDao">
+			<ref bean="bdSiteStatDao"/>
+		</property>
+		 <property name="siteOnAddbDao">
+			<ref bean="bdSiteStatOnAddbDao"/>
+		</property>
+        <property name="lgabThreshold">
+            <value>${wm123.lgabThreshold}</value>
+        </property>
+        <property name="fileEncoding">
+            <value>${wm123.fileEncoding}</value>
+        </property>
+    </bean>
+    
+    <!-- wm123, add by zhangxu,2011-05-24 -->
+    <bean id="wm123SiteurlService"
+        class="com.baidu.beidou.unionsite.service.impl.WM123SiteurlServiceImpl">
+    </bean>
+    
+	<!-- wm123, add by lvzichan,2013-08-02 -->
+    <bean id="wm123SiteScoreService"
+        class="com.baidu.beidou.unionsite.service.impl.WM123SiteScoreServiceImpl">
+        <property name="siteStatDao">
+			<ref bean="bdSiteStatDao"/>
+		</property>
+		<property name="wm123SiteStatDao">
+			<ref bean="WM123SiteStatDao"/>
+		</property>
+        <property name="score1ImpactPs1">
+            <value>${score1.impact.ps1}</value>
+        </property>
+        <property name="score1ImpactPs2">
+            <value>${score1.impact.ps2}</value>
+        </property>
+        <property name="score1ImpactAlexa1">
+            <value>${score1.impact.alexa1}</value>
+        </property>
+        <property name="score1ImpactAlexa2">
+            <value>${score1.impact.alexa2}</value>
+        </property>
+        <property name="score1ImpactRank1">
+            <value>${score1.impact.rank1}</value>
+        </property>
+        <property name="score1ImpactRank2">
+            <value>${score1.impact.rank2}</value>
+        </property>
+        <property name="score1ImpactRank3">
+            <value>${score1.impact.rank3}</value>
+        </property>
+        
+        <property name="score2TrafficPv1">
+            <value>${score2.traffic.pv1}</value>
+        </property>
+        <property name="score2TrafficPv2">
+            <value>${score2.traffic.pv2}</value>
+        </property>
+        <property name="score2TrafficPv3">
+            <value>${score2.traffic.pv3}</value>
+        </property>
+        <property name="score2TrafficUv1">
+            <value>${score2.traffic.uv1}</value>
+        </property>
+        <property name="score2TrafficUv2">
+            <value>${score2.traffic.uv2}</value>
+        </property>
+        <property name="score2TrafficUv3">
+            <value>${score2.traffic.uv3}</value>
+        </property>
+        <property name="score2TrafficRank1">
+            <value>${score2.traffic.rank1}</value>
+        </property>
+        <property name="score2TrafficRank2">
+            <value>${score2.traffic.rank2}</value>
+        </property>
+        <property name="score2TrafficRank3">
+            <value>${score2.traffic.rank3}</value>
+        </property>
+        <property name="score2TrafficRank4">
+            <value>${score2.traffic.rank4}</value>
+        </property>
+        
+        <property name="score3ObviousRate">
+            <value>${score3.obvious.rate}</value>
+        </property>
+        <property name="score3ObviousArea">
+            <value>${score3.obvious.area}</value>
+        </property>
+        <property name="score3ObviousScreen">
+            <value>${score3.obvious.screen}</value>
+        </property>
+        <property name="score3ObviousIt">
+            <value>${score3.obvious.it}</value>
+        </property>
+        <property name="score3ObviousRank1">
+            <value>${score3.obvious.rank1}</value>
+        </property>
+        <property name="score3ObviousRank2">
+            <value>${score3.obvious.rank2}</value>
+        </property>
+
+		<property name="score4QualityRank1">
+            <value>${score4.quality.rank1}</value>
+        </property>
+        <property name="score4QualityRank2">
+            <value>${score4.quality.rank2}</value>
+        </property>
+        
+        <property name="domainFileName">
+            <value>${domain.file}</value>
+        </property>
+        <property name="domainTuFileName">
+            <value>${domain.tu.file}</value>
+        </property>
+        <property name="domainScoreFileName">
+            <value>${domain.score.file}</value>
+        </property>
+        <property name="domainTuFileNum">
+            <value>${domain.tu.file.num}</value>
+        </property>
+    </bean>
+	
+	<!-- wm123, add by lvzichan,2013-10-10 -->
+    <bean id="wm123AdTrade2SiteTradeService"
+        class="com.baidu.beidou.unionsite.service.impl.WM123AdTrade2SiteTradeServiceImpl">
+        <property name="wm123SiteStatOnCapDao">
+			<ref bean="wM123SiteStatOnCapDao"/>
+		</property>
+	</bean>
+	<bean id="wm123SiteCprodataService"
+        class="com.baidu.beidou.unionsite.service.impl.WM123SiteCprodataServiceImpl">
+        <property name="wm123SiteStatDao">
+			<ref bean="WM123SiteStatDao"/>
+		</property>
+	</bean>
+	
+	<!-- SiteLink Generate Strategy -->
+    <bean id="dotStrategy" class="com.baidu.beidou.unionsite.strategy.impl.GenerateSiteLinkPrefixByDotCount" />
+    <bean id="clkHisStrategy"
+        class="com.baidu.beidou.unionsite.strategy.impl.GenerateSiteLinkPrefixByClickHistory">
+        <property name="assitantGenerator">
+            <ref bean="dotStrategy"/>
+        </property>
+        <property name="file">
+            <value>${click.history.base}</value>
+        </property>
+    </bean>
+
+</beans>

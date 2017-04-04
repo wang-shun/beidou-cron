@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN 2.0//EN" "http://www.springframework.org/dtd/spring-beans-2.0.dtd">
+
+<!--
+	- Application context definition for "springapp" DispatcherServlet.
+-->
+
+<beans>
+	
+	<bean id="cproGroupMgr" class="com.baidu.beidou.cprogroup.service.impl.CproGroupMgrImpl">
+		
+		<property name="whiteListDao">
+			<ref bean="whiteListDao"/>
+		</property>
+	
+		<property name="cproGroupDao">
+			<ref bean="cproGroupDao"/>
+		</property>
+		
+		<property name="cproGroupOnXdbDao">
+			<ref bean="cproGroupOnXdbDao"/>
+		</property>
+		
+		<property name="bdSiteStatDao">
+			<ref bean="bdSiteStatDao"/>
+		</property>
+		
+		<property name="cproGroupDaoOnMultiDataSource">
+			<ref bean="cproGroupDaoOnMultiDataSource"/>
+		</property>
+		
+	</bean>
+	
+	<bean id="cproGroupMgrOnMultiDataSource" class="com.baidu.beidou.cprogroup.service.impl.CproGroupMgrOnMultiDataSourceImpl">
+		
+		<property name="userDao">
+			<ref bean="userDao"/>
+		</property>
+		
+		<property name="cproKeywordDao">
+			<ref bean="cproKeywordDao"/>
+		</property>
+		
+		<property name="groupIpFilterDao">
+			<ref bean="groupIpFilterDao"/>
+		</property>
+		
+		<property name="groupSitePriceDao">
+			<ref bean="groupSitePriceDao"/>
+		</property>
+	
+		<property name="groupSiteFilterDao">
+			<ref bean="groupSiteFilterDao"/>
+		</property>
+							
+		<property name="cproPlanMgr">
+			<ref bean="cproPlanMgr"/>
+		</property>
+		
+		<property name="cproUnitMgr">
+			<ref bean="unitMgr"/>
+		</property>
+	
+		<property name="repeateGroupOutputFilePath">
+			<value>${repeateGroup.output.filePath}</value>
+		</property>
+		
+		<property name="repeateGroupOutputFileMailFrom">
+			<value>${repeateGroup.mail.from}</value>
+		</property>
+	
+		<property name="repeateGroupOutputFileMailTo">
+			<value>${repeateGroup.mail.to}</value>
+		</property>
+			
+		<property name="cproGroupDaoOnMultiDataSource">
+			<ref bean="cproGroupDaoOnMultiDataSource"/>
+		</property>
+		
+	</bean>
+	
+	
+	<!-- added by hanxu, cpweb-271  百度团购进入网盟推广 -->
+	<bean class="com.baidu.beidou.cprogroup.constant.WhiteType">		
+		<property name="BAIDU_TRADE_COMMON_LIST">
+			<list>
+				<value>260</value>				
+			</list>
+		</property>
+	</bean>
+	
+	<bean id="cproGroupFacade" class="com.baidu.beidou.cprogroup.facade.impl.CproGroupFacadeImpl">
+		<property name="cproGroupMgr">
+			<ref bean="cproGroupMgr"/>
+		</property>
+		
+		<property name="cproGroupMgrOnMultiDataSource">
+			<ref bean="cproGroupMgrOnMultiDataSource"/>
+		</property>
+		
+	</bean>
+	
+	<!-- 相似人群批量开启 -->
+	<bean id="similarPeopleFacade" class="com.baidu.beidou.cprogroup.facade.impl.SimilarPeopleFacadeImpl">
+		<property name="similarPeopleMgr" ref="similarPeopleMgr" />
+	</bean>
+	
+	<bean id="cproGroupRegionMgr" class="com.baidu.beidou.cprogroup.service.impl.CproGroupRegionMgrImpl">
+		<property name="cproGroupDao" ref="cproGroupDao"/>
+		<property name="cproGroupDaoOnMultiDataSource" ref="cproGroupDaoOnMultiDataSource"/>
+	</bean>
+	
+	<bean id="similarPeopleMgr" class="com.baidu.beidou.cprogroup.service.impl.SimilarPeopleMgrImpl">
+		<property name="holmesPeopleMgr" ref="holmesPeopleMgr" />
+		<property name="cproGroupDao" ref="cproGroupDao" />
+		<property name="similarPeopleDao" ref="similarPeopleDao" />
+	</bean>
+</beans>

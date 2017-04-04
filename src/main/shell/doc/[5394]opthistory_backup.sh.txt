@@ -1,0 +1,82 @@
+﻿【任务名】	历史操作记录90天前数据备份及清理
+【时间驱动】	0 2 * * *	运行超时	30分钟	等待超时	 分钟
+【运行命令】	cd /home/work/beidou-cron/bin; sh opthistory_backup.sh
+【日志地址】	/home/work/beidou-cron/log/opthistory_backup.log
+【变更库表】	
+	history.operationtext_bak_${month}
+	history.operationhistory_bak_${month}
+	history.operationhistory{0-7} 
+	history.operationtext{0-7}
+
+【任务依赖】  无
+========================================================================================
+【任务描述】
+执行history_operation_backup函数
+1.	检查配置文件，检查路径
+2.	设置变量（范例）
+	toDate= 2011-07-10（90天前日期）
+	FROM=$PREVIOUS_DAYS+1（90+1）
+	fromDate= 2011-07-09（91天之前的日期）
+	month=201107（91天之前的月份）
+3.	调用“ensure_table_exist $month”
+	执行2条建表命令（根据传递的month创建对应的表）：
+	create table if not exists CREATE TABLE `operationhistory_bak_201107` (
+	  `id` bigint(20) NOT NULL,
+	  `userid` int(10) NOT NULL,
+	  `opid` bigint(20) NOT NULL,
+	  `opuser` int(10) NOT NULL,
+	  `opip` char(16) collate utf8_bin NOT NULL,
+	  `opclient` tinyint(3) unsigned NOT NULL,
+	  `optime` datetime NOT NULL,
+	  `optype` int(10) unsigned NOT NULL,
+	  `oplevel` tinyint(3) unsigned NOT NULL,
+	  `groupid` int(10) unsigned NOT NULL,
+	  `opobjid` bigint(20) unsigned NOT NULL,
+	  `beforeid` bigint(20) unsigned NOT NULL,
+	  `afterid` bigint(20) unsigned NOT NULL,
+	  PRIMARY KEY  (`id`),
+	  KEY `OPHISTORY_KEY_USERID` (`userid`),
+	  KEY `OPHISTORY_KEY_TIME` (`optime`)
+	) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin
+	
+	create table if not exists `operationtext_bak_201107` (
+	  `id` bigint(20) NOT NULL,
+	  `text` mediumtext collate utf8_bin NOT NULL,
+	  PRIMARY KEY  (`id`)
+	) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_bin
+4.	调用backup_alltable 8 $month $fromDate $toDate
+	执行8次backup_subtable子函数
+	backup_subtable {0-7} $month $fromDate $toDate
+	
+	backup_subtable执行流程：
+	(1)	执行sql查询（三个月那一天的数据）：
+	select * from operationhistory${index} where optime>='${fromDate}' and optime<'${toDate}'
+	存放到beidou-cron/data/opthistory/下的backupExport{index}文件
+	文件第一行是字段名，后面awk处理的时候需要NR>=2
+	(2)	AWK处理Export{index}文件，生成如下sql
+	insert into operationtext_bak_"${month}" select * from operationtext${index} where id in (0，A，B)，其中A，B分别是上述文件的最后两列(beforeid,afterid)，也就是operationtext{0-7}表中的id，并且A，B不等于0（实际上id=0是没有记录的，这里引入0是为了方便生成sql）
+	(3)	上一步生成的sql，依次命名为Export{0-7}.importoptxt.sql
+	(4)	导入以上sql（--max_allowed_packet=10M）
+	(5)	Load数据到operationhistory_bak_{0-7}表
+	load data local infile '${EXPORT_PATH}${OUTPUT_FILE}${index}' into table operationhistory_bak_$month ignore 1 lines
+5.	执行函数: clear_alltable 8 
+	调用8次clear_subtable函数
+	(1)	依据Export{index}文件，生成删除sql：delete from operationhistory$index where id in(第一列)，sql文件名: Export{index}.clearoptxt.sql
+	(2)	执行以上sql
+	(3)	依据Export{index}文件，生成删除sql：delete from operationtext$index where id in (0,A,B)，其中A，B分别是Export{index}的最后两列(beforeid,afterid) ，sql文件名: Export{index}.clearoptxt.sql
+	(4)	执行以上sql
+6.	删除beidou-cron/data/opthistory/下的文件
+
+
+==========================================================================================
+【报警内容】
+详细错误信息打印在日志文件中
+短信报警：任务5394执行失败，返回值255,启动时间******,可能影响下游0个任务!
+
+
+
+【备注】
+这个任务出问题后，由op手动执行recover脚本即可：
+sh opthistory_backup_recovery.sh
+
+

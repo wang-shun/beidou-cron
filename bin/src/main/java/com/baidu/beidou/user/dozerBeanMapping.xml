@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mappings xmlns="http://dozer.sourceforge.net"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://dozer.sourceforge.net
+          http://dozer.sourceforge.net/schema/beanmapping.xsd">
+          
+  <mapping> 
+    <class-a>com.baidu.beidou.user.vo.CustomerInfo</class-a>
+    <class-b>com.baidu.beidou.user.driver.vo.DrmUserInfo</class-b>   
+    <field>
+      <a>userid</a>
+      <b>userid</b>
+    </field>
+    <field>
+    	<a>email</a>
+    	<b>email</b>
+    </field>
+    <field>
+    	<a>realname</a>
+    	<b>realname</b>
+    </field>
+    <field>
+    	<a>company</a>
+    	<b>company</b>
+    </field>
+    <field>
+    	<a>phone</a>
+    	<b>phone</b>
+    </field>
+    <field>
+    	<a>address</a>
+    	<b>address</b>
+    </field>
+    <field>
+    	<a>postcode</a>
+    	<b>postcode</b>
+    </field>
+  </mapping>  
+</mappings>

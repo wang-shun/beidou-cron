@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN 2.0//EN" "http://www.springframework.org/dtd/spring-beans-2.0.dtd">
+
+<!--
+	- Application context definition for "springapp" DispatcherServlet.
+-->
+
+<beans>	
+	<!-- 输出部分 -->
+	<bean id="fileOutput" class="com.baidu.beidou.bes.FileResultOutput" scope="singleton" lazy-init="true">
+		<constructor-arg index="0" value="unit_export"/>
+		<constructor-arg index="1" value="output"/>
+	</bean>
+	
+	<!-- 过滤器部分 -->
+	<bean id="levelfilter" class="com.baidu.beidou.bes.MaterLevelFilter">
+		<property name="confidence_level" value="-1"/>
+		<property name="beauty_level" value="-1"/>
+		<property name="cheat_level" value="-1"/>
+		<property name="vulgar_level" value="-1"/>
+	</bean>
+	<bean id="sizefilter" class="com.baidu.beidou.bes.MaterSizeFilter">
+		<constructor-arg index="0" value="adsize"/>
+	</bean>
+	
+	<bean id="bescFormatter" class="com.baidu.beidou.bes.besc.BescCreativeFormatter">
+		<constructor-arg index="0" value="adsize"/>
+	</bean>	
+	
+	<!-- 数据导出bean -->
+	<bean id="creativeIdProcessor" class="com.baidu.beidou.bes.besc.CreativeIdProcessor" lazy-init="true">
+		<property name="successor">
+			<ref bean="creativeInfoProcessor"/>
+		</property>
+   		<property name="unitDao">
+  			<ref bean="unitDao"/>
+  		</property>
+	</bean>
+	
+	<bean id="creativeInfoProcessor" class="com.baidu.beidou.bes.besc.BescCreativeInfoProcessor" lazy-init="true">
+  		<property name="filters">
+  			<list>
+  				<ref bean="sizefilter"/>
+  			</list>
+  		</property>
+  		<property name="output">
+  			<ref bean="fileOutput"/>
+  		</property>
+  		<property name="userInfoMgr">
+  			<ref bean="userInfoMgr"/>
+  		</property>
+  		<property name="formatter">
+  			<ref bean="bescFormatter"/>
+  		</property>
+  	</bean>
+</beans>

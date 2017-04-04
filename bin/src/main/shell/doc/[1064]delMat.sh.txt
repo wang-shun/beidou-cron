@@ -1,0 +1,40 @@
+﻿【任务名】	清理物料
+【时间驱动】	10 2 * * *	运行超时	160分钟	等待超时	0分钟
+【运行命令】	cd /home/work/beidou-cron/bin; sh delMat.sh
+【日志地址】	/home/work/beidou-cron/log/delMat.log
+【变更库表】	
+	beidou. auditcprounithistory
+	beidou.delmater
+	beidou.tmpcprokeyword
+	beidou.tmpcprogroup、beidou.tmpcproplan
+
+【任务依赖】  无
+========================================================================================
+【任务描述】
+该任务为远程调用：url=http://${tc01}:8080/rpc/delMat
+其配置如下（beidouWebRootWEB-INF\remoting-servlet.xml）
+<bean name="/delMat"
+	class="org.springframework.remoting.caucho.HessianServiceExporter">
+		<property name="service" ref="delMatJob" />
+		<property name="serviceInterface"
+			value="com.baidu.ctclient.ITaskUsingErrorCode" />
+</bean>
+调用beidou\cprounit\job\DeleteUselessMaterialJob.java
+1.	首先执行deleteOldUnitMgr.deleteOldUnitMgr()方法
+	tmpUnitDao.deleteTmpUnitBefore(calendar);
+	（1） 将要删除的物料存入beidou.delmater表（TmpUnit表中7天前推广单元的物料）
+	（2） 从beidou.tmpcprokeyword中删除7天前的临时KT词
+	（3） 从beidou.tmpcprogroup中删除7+1天前的临时推广组
+	（4） 从beidou.tmpcproplan中删除7+2天前的临时推广计划
+	historyDao.deleteHistoryBefore
+	将指定时间（1月）之前的审核临时推广单元存入delmater中，并从auditcprounithistory表中删除该记录
+2.	其次执行deleteMaterialMgr.deleteUselessMaterial(periods);方法，periods为7
+	删除无用的物料,包括删除临时推广单元中的物料和待删除物料表中的物料
+	（1） 获得在指定时间之前的物料，每次最多返回maxCount（20000）个记录
+	（2） 先从DRMC中心删除该物料，然后依照删除是否成功删除北斗的待删除物料表中的相应记录，其中挂接dr-mc区分物料类型为：0:临时物料，1:正式物料，2:历史物料
+
+==========================================================================================
+【报警内容】
+执行远程调用-物料清理失败
+可能原因：远程调用上述程序抛出异常
+

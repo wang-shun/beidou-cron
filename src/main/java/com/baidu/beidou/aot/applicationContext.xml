@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN 2.0//EN" "http://www.springframework.org/dtd/spring-beans-2.0.dtd">
+
+<!--
+	- Application context definition for "springapp" DispatcherServlet.
+-->
+
+<beans>
+
+	 <bean id="aotMgr" class="com.baidu.beidou.aot.service.impl.AotMgrImpl">
+	 	<property name="cproGroupStatDao">
+			<ref bean="cproGroupStatDao"/>
+		</property>
+		<property name="cproGroupStatOnXdbDao">
+			<ref bean="cproGroupStatOnXdbDao"/>
+		</property>
+		<property name="cproPlanStatDao">
+			<ref bean="cproPlanStatDao"/>
+		</property>
+		<property name="cproPlanOfflineStatDao">
+			<ref bean="cproPlanOfflineStatDao"/>
+		</property>
+		<property name="cproPlanStatOnXdbDao">
+			<ref bean="cproPlanStatOnXdbDao"/>
+		</property>
+		<property name="unionSiteStatDao">
+			<ref bean="unionsiteStatDao"/>
+		</property>
+		<property name="codeStatDao">
+			<ref bean="codeStatDao"/>
+		</property>
+	</bean>
+	
+	
+	 <bean id="aotQtMgr" class="com.baidu.beidou.aot.service.impl.AotQtMgrImpl">
+	 	<property name="userDao">
+			<ref bean="userDao"/>
+		</property>
+	 	<property name="adConfigDao">
+			<ref bean="adConfigDao"/>
+		</property>
+		<property name="userInfoMgr">
+			<ref bean="userInfoMgr"/>
+		</property>
+		<property name="krRecycleDao">
+			<ref bean="krRecycleDao"/>
+		</property>
+		<property name="qtBlackListDao">
+			<ref bean="qtBlackListDao"/>
+		</property>
+		<property name="cproKeywordDao">
+			<ref bean="cproKeywordDao"/>
+		</property>
+		<property name="cproGroupOnCapDao">
+			<ref bean="cproGroupOnCapDao"/>
+		</property>
+	 	<property name="qtkrSpecialTradeDao">
+			<ref bean="qtkrSpecialTradeDao"/>
+		</property>
+		<property name="cproGroupDaoOnMultiDataSource">
+			<ref bean="cproGroupDaoOnMultiDataSource"/>
+		</property>
+	 </bean>
+	
+</beans>

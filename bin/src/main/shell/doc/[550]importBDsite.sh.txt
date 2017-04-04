@@ -1,0 +1,140 @@
+﻿【任务名】	站点统计信息文件导入
+【时间驱动】	50 21 * * *	运行超时	60分钟	等待超时	0分钟
+【运行命令】	cd /home/work/beidou-cron/bin; sh importBDsite.sh
+【日志地址】	/home/work/beidou-cron/log/importbdsite.log
+【变更库表】	beidou.unionsitebdstat, beidou.sysnvtab
+【任务依赖】  
+	上游任务：549:联盟站点文件导入;
+
+	下游任务：
+	551:站点全库导出;
+	5713:导入Beidou站点补充信息;
+	6841:给司南导出网站业务分类信息;
+	6945:url点击数据入库;
+	10365:导入url展现数据;
+========================================================================================
+【任务描述】
+1.  检查以下目录，如不存在则创建
+	UNION配置文件存放地址：
+	/home/work/beidou-cron/data/unionsite/input
+	UNIONSITE 缓存地址
+	/home/work/beidou-cron/data/unionsite/cache
+2.	打印当前日期时间戳到日志文件importbdsite.log
+3.	执行extractClickUrl >> ${LOG_PATH}/stat_sitelink.log 2>&
+4.	进入数据目录 : unionsite/input
+	抓取下列文件：
+	wget -q  
+	http://logdata.baidu.com/?m=Data&a=GetData&token=ecom_cpro_2ig4tj1tsbai41tunq5rvi&product=ecom_cpro&date=yyyymmdd&item=cm_beidou_stat_auto_sitestat_embeded -O beidousitestat.yyyymmdd
+	wget  -q 
+	http://logdata.baidu.com/?m=Data&a=GetData&token=ecom_cpro_2ig4tj1tsbai41tunq5rvi&product=ecom_cpro&date=yyyymmdd&type=md5&item=cm_beidou_stat_auto_sitestat_embeded 
+	-O cm_beidou_stat_auto_sitestat_embeded.tmp.md5
+	将以上md5文件的第2列（md5）值打印至beidousitestat.yyyymmdd.md5文件
+	校验md5
+	_ _ _ _ __ _ _ _ __ _ _ _ __ _ _ _ __ _ _ _ __ _ _ _ __ _ _ _ __ _ _ _ __ _ _ _ __ _ _ _ __ _ _ _ _
+	wget -q  
+	http://logdata.baidu.com/?m=Data&a=GetData&token=ecom_cpro_2ig4tj1tsbai41tunq5rvi&product=ecom_cpro&date=yyyymmdd&item=cm_beidou_stat_auto_sitestat_xuanfu -O beidousitestat.yyyymmdd.flow
+	wget  -q 
+	http://logdata.baidu.com/?m=Data&a=GetData&token=ecom_cpro_2ig4tj1tsbai41tunq5rvi&product=ecom_cpro&date=yyyymmdd&type=md5&item=cm_beidou_stat_auto_sitestat_xuanfu 
+	-O cm_beidou_stat_auto_sitestat_xuanfu.tmp.md5
+	将以上md5文件的第2列（md5）值打印至beidousitestat.yyyymmdd.flow.md5文件
+	校验md5
+	_ _ _ _ __ _ _ _ __ _ _ _ __ _ _ _ __ _ _ _ __ _ _ _ __ _ _ _ __ _ _ _ __ _ _ _ __ _ _ _ __ _ _ _ _ 
+	wget -q  
+	http://logdata.baidu.com/?m=Data&a=GetData&token=ecom_cpro_2ig4tj1tsbai41tunq5rvi&product=ecom_cpro&date=yyyymmdd&item=cm_beidou_stat_auto_sitestat_tiepian -O beidousitestat.yyyymmdd.tiepian
+	wget  -q 
+	http://logdata.baidu.com/?m=Data&a=GetData&token=ecom_cpro_2ig4tj1tsbai41tunq5rvi&product=ecom_cpro&date=yyyymmdd&type=md5&item=cm_beidou_stat_auto_sitestat_tiepian -O cm_beidou_stat_auto_sitestat_tiepian.tmp.md5
+	将以上md5文件的第2列（md5）打印至beidousitestat.yyyymmdd.tiepian.md5文件
+	校验md5
+	_ _ _ _ __ _ _ _ __ _ _ _ __ _ _ _ __ _ _ _ __ _ _ _ __ _ _ _ __ _ _ _ __ _ _ _ __ _ _ _ __ _ _ _ _
+	wget -q  
+	http://logdata.baidu.com/?m=Data&a=GetData&token=ecom_cpro_2ig4tj1tsbai41tunq5rvi&product=ecom_cpro&date=yyyymmdd&item=cm_beidou_stat_auto_siteinfo -O beidousiteinfo.yyyymmdd
+	wget  -q 
+	http://logdata.baidu.com/?m=Data&a=GetData&token=ecom_cpro_2ig4tj1tsbai41tunq5rvi&product=ecom_cpro&date=yyyymmdd&type=md5&item=cm_beidou_stat_auto_siteinfo  -O beidousiteinfo.yyyymmdd.tmp.md5
+	将以上md5文件的第2列（md5）打印至beidousiteinfo.yyyymmdd.md5文件
+	校验md5
+
+5.	将beidousiteinfo.yyyymmdd更名为beidousitestat.yyyymmdd.ipcookie
+6.	进入工作目录: /home/work/beidou-cron/bin
+7.	接下来调用Java类BDSiteImporter.java，根据传递参数不同完成4项任务：
+	（1）导入beidou站点Q值
+	com.baidu.beidou.unionsite.BDSiteImporter 
+	-q ${Q_CACHE_FILE_NAME}
+	其中Q_CACHE_FILE_NAME是cache目录下的qcachefilename文件
+
+	（2）日数据进行排序
+	com.baidu.beidou.unionsite.BDSiteImporter 
+	-s ${SITE_DATA_PATH}/${STATFILE_PRI}${FILE_SUF}
+	其中输入文件是input目录下的beidousitestat.yyyymmdd、beidousitestat.yyyymmdd.flow, beidousitestat.yyyymmdd.tiepian
+	
+	（3）计算站点平均值
+	com.baidu.beidou.unionsite.BDSiteImporter –a
+	
+	（4）导入beidou站点
+	com.baidu.beidou.unionsite.–c ${Q_CATCH_FILE}
+	其中Q_CATCH_FILE是cache/qcachefilename文件的内容
+	如：/home/work/beidou-cron/data/unionsite/cache/q_200910211235
+	==========================================================================================
+	以下分开介绍上述四个Java的调用过程：
+	==========================================================================================
+	【导入beidou站点Q值】
+	（1）加载siteblacklist.txt到内存
+		调用方法importTask.importQValue(false, qcache);其中qcache为传入的缓存文件名
+	（2）调用：qvalueService.loadQValue(
+		mainQValueFileName, siteQValueFileName,forceGenerate);
+		其中：mainQValueFileName对应beidou-cron/data/q-domain文件
+		siteQValueFileName对应beidou-cron/data/q-q_site文件
+
+		以上获得Q值的二进制配置文件，如果配置文件发生变化，则排序，过滤，处理(对QValue列进行排序，并过滤掉其中重复的，重复的取最小值)，然后以二进制文件存储，如果文件没有发生变化，则直接返回上次保存的二进制文件
+		
+		配置文件有5列：如
+		photo.cts2008.com       85.5000     76.8000     1       3
+		对应含义分别为：
+		站点/主域：字符串类型，长度256以内的变长字符串
+		质量度得分1：浮点数
+		质量度得分2：浮点数（注：质量度得分1和2分别是以不同的方式对分维度指标加权汇总的）
+		质量度类型：整型，1表示站点，2表示主域
+		该站点质量度覆盖的分指标类型：整型，在beidou使用过程中可不关注
+
+	（3）将上一步得到的存放结果的文件名存入cache/qcachefilename文件
+	
+	【日数据进行排序】
+	调用sortDaySiteStat方法
+	该方法首先调用statFileDao.getFileRange();返回cpro-stat站点统计数据的个数和起始序号
+	之后调用readAndSortSiteStat(String fileName, int displayType)方法分别获得固定、悬浮、贴片的排序List，该方法处理文件beidousitestat.yyyymmdd、beidousitestat.yyyymmdd.flow, beidousitestat.yyyymmdd.tiepian，上述文件正常情况下有7-9列（少于7列报错，多余9列报警），如：
+	YT3721_cpr  shzhlonggang.168rc.cn  9   1   3   0    0   200*200|640*60  3|1
+	其含义分别为（cntn，domain，retrieve，ads，wuliao，clicks，cost，size，sizeFlowList）
+	如果支持站点图片物料会有后面两列，其中size和sizeFlowlist段数相同
+	得到statList、flowList、filmList后，对其进行merge，存储为daysitestat.**文件
+	将beidousitestat.yyyymmdd.ipcookie进行排序，存储到data/unionsite/cache/下的daysitestat.**.ipcookie文件中
+	更新数据库beidou.sysnvtab中的statfilestart和statfilesize
+	
+	【计算站点平均值】
+	调用genAvgSiteStat进行统计，计算，获得7日平均数据
+	该方法继续调用siteStatService.averageSiteStat();完成计算，调用两个方法：
+	（1）	averageSiteStatNoIp 
+	读取daysitestat.**系列文件，结果输出到lastsevensitestat
+	（2）	averageSiteIpCookieStat
+	读取daysitestat.**.ipcookie系列文件，结果输出到lastsevensitestat.ipcookie文件
+	
+	【导入beidou站点】
+	调用bdSiteStoreAndCalculate方法，已有平均数据，导入站点数据并计算热度，传入的参数为cache/qcachefilename文件的内容，如：
+	/home/work/beidou-cron/data/unionsite/cache/q_200910211235
+	调用：   bdSiteStore(final String unionsiteFile,
+				final String unionSiteListFile, final String qListFile,
+				final String siteStatListFile,
+	final Set<String> currentValidDomain)，该方法返回新的站点id信息(热度计算中需要使用的值)，用于热度的计算
+	
+	继续调用bdSiteCalculate(SiteCmpLevelCalculateVo siteListVo) 计算全库站点的等级和热度
+	
+==========================================================================================
+【报警内容】
+1.	执行extractclickurl失败，请查看错误日志[stat_sitelink.log],该异常不影响线上服务
+（可能原因：执行extractClickUrl失败）
+2.	进入数据目录${SITE_DATA_PATH}失败（可能原因：进入cache目录失败）
+3.	wget文件**失败，**文件的md5校验失败（可能原因：抓取文件错误）
+4.	进入工作目录**失败（进入bin目录失败）
+5.	导入beidou站点Q值发生异常,请使用恢复脚本进行恢复
+6.	统计站点数据发生异常,请使用恢复脚本进行恢复
+7.	计算站点平均值发生异常,请使用恢复脚本进行恢复
+8.	导入beidou站点发生异常,请使用恢复脚本进行恢复
+9.	q值缓存文件名为空（可能原因：cache/qcachefilename文件内容为空）

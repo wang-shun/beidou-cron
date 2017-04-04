@@ -1,0 +1,35 @@
+﻿【任务名】	
+【时间驱动】 0,30 * * * *	运行超时	2分钟	等待超时	0分钟
+【运行命令】	cd /home/work/beidou-cron/bin; sh adtrade_export.sh
+【日志地址】	/home/work/beidou-cron/log/adtrade_export.log
+【变更库表】	beidou.cprounitstate0-7
+【任务依赖】  下游任务; 529:cpro/PGS网页抓取and提词;60312:BD-PH新增广告分类;
+========================================================================================
+【任务描述】
+如果参数个数为0，则执行adtrade_export（本任务），否则执行adtrade_export_full（558）
+（1）开启日志（open_log函数，adtrade_export.log）
+（2）检查路径（check_path函数）
+（3）备份文件。将/data/adtrade/export/output下最新的beidouad.txt文件重命名为/data/adtrade/export/backup目录下的beidouad.txt.YYmmddHHMM，并生成相应的md5文件
+（4）调用子函数alltable_export，该函数中8次调用subtable_export子函数，subtable_export函数执行以下操作：
+	执行sql查询，如下：
+	select s.id, s.targetUrl, t.gid, t.pid, t.uid, IF(s.title='', 'NULL', s.title), IF(s.description1='', 'NULL', s.description1), IF(s.description2='', 'NULL', s.description2) from cprounitstate$1 t, cprounitmater$1 s where t.id = s.id and s.adtradeid=0;结果输出到output目录下的beidouad.tmp文件，包括（推广单元id，点击链接，推广组id，计划id，用户id，标题，描述1，描述2）
+	对beidouad.tmp进行awk处理，生成如下sql语句
+	update cprounitstate{0-7} s, cprounitmater{0-7} m set s.helpstatus=s.helpstatus|4 where s.helpstatus<>s.helpstatus|4 and s.id in （**） and s.id=m.id and m.adtradeid=0
+	生成的sql存储到beidouad.tmp.sql文件中
+	执行上一步生成的sql文件，并将临时文件内容追加打印至beidouad.txt
+（5）如以上操作执行成功，则置标记为sucFlagFull=1，否则sucFlagFull=0并删除输出文件
+（6）sucFlagFull=0，报警；否则表示执行成功
+	进入output目录，执行touch命令(保证beidouad.txt这个文件一定存在)，并生成beidouad.txt.md5
+（7）执行close_log（打印日志最后一行记录），内容为：
+	adtrade_export * 13402 < - > Normally end process（成功），或者
+	adtrade_export * 13402 < - > Abnormally end process（失败）
+
+==========================================================================================
+【报警内容】
+1.	adtrade: Incremental Export Error（执行subtable_export子函数失败）
+2.	adtrade: Fail to generate md5 for incremental export（生成md5文件失败）
+
+==========================================================================================
+【备注】
+CT任务553（修改推广组的网站数和热度，发送无效推广组邮件 远tc00）运行失败，运行耗时351分，该任务无下游任务，未做重跑，无增量无需恢复
+CT任务553（修改推广组的网站数和热度，发送无效推广组邮件 远tc00）运行失败，重跑了一次，运行成功。失败原因为图文项目在做一个小的升级

@@ -1,0 +1,66 @@
+﻿【任务名】	联盟站点文件导入
+【时间驱动】	0 5 * * *	运行超时	480分钟	等待超时	0分钟
+【运行命令】	cd /home/work/beidou-cron/bin; sh importUnionSite.sh
+【日志地址】	/home/work/beidou-cron/log/importunionsite.log
+【变更库表】	无
+【任务依赖】  下游任务：550:站点统计信息文件导入;
+========================================================================================
+【任务描述】
+1.检查以下目录，如不存在则创建
+	UNION配置文件存放地址：
+	/home/work/beidou-cron/data/unionsite/input
+	UNIONSITE 缓存地址
+	/home/work/beidou-cron/data/unionsite/cache
+2.打印当前日期时间戳到日志文件
+3.备份union站点文件
+	mv sitemediuminfo.new.txt sitemediuminfo.txt.{YYYYmmdd}
+4.远程抓取文件及md5
+	wget –q 
+	ftp://yf-un-dataio00.yf01.baidu.com/home/work/union/export/siteMediumInfo/
+	sitemediuminfo.new.txt
+	wget –q 
+	ftp://yf-un-dataio00.yf01.baidu.com/home/work/union/export/siteMediumInfo/
+	sitemediuminfo.new.txt.md5
+	校验md5
+5.将sitemediuminfo.new.txt重命名为sitemediuminfo.txt
+6.判断网站白名单beidou_baidusite_data1.txt是否存在（14列），对该文件进行处理：
+	取前14列，同时追加1到到后一列以配合union一二级域名合并
+	结果追加到sitemediuminfo.txt，从而该文件共有15列，其意义依次为：
+		// 用户名 字符串，最大48
+		// 计费名 字符串，最大64
+		// 网站域名 字符串，最大256
+		// 网站名称 字符串，最大128, 可为空
+		// 网站描述 字符串，最大1024, 可为空
+		// 北斗二级行业一级类别 整数，最大2位, 可为空
+		// 北斗二级行业二级类别 整数，最大4位, 可为空
+		// 认证等级 整数，最大1位
+		// 财务对象 0：个人； 1：企业
+		// 信誉指数 整数，最大10位, 可为空
+		// 直营/二级 0：直营； 1：二级
+		// 通路 整数，最大10位
+		// 作弊次数 整数，最大10位, 可为空
+		// 广告过滤行业 字符串，id之间以半角逗号分隔，最大256, 可为空
+		// 标识 整数 0：真实网站URL；1：虚拟网站URL，不可为空		
+7.进入工作目录，执行Java调用
+	java -Xms512m -Xmx2048m -classpath 
+	${CUR_CLASSPATH} com.baidu.beidou.unionsite.UnionSiteImporter
+	该Java类位于：
+	/beidou-cron/src/com/baidu/beidou/unionsite/UnionSiteImporter.java
+8.UnionSiteImporter.java的执行流程如下：
+	(1)	从文件中siteblacklist.txt加载配置项（站点黑名单，在黑名单中的站点及其子域名不进入beidou站点全库），存储到SiteConstant.BLACK_SITE中
+	(2)	调用importTask.importUnionSite方法载入联盟站点数据，进行验证(此处用到黑名单)，排序，存入二进制文件中
+	(3)	importUnionSite方法的输入文件为sitemediuminfo.txt，也就是第6步的结果
+		方法首先创建一个文件unionsite.dat（已有的删除），之后处理输入文件的每一行数据，将站点名称、计费名、标识等包装到一个List<UnionSiteIndex>中
+		根据域名（反向排序比较）、showFlag对以上的List进行排序
+		过滤掉格式为IP和包含端口号的域名
+		对于过滤后的List，通过对其域名进行解析，设置domainFlag字段
+		最后将List存入unionsite.dat文件
+		联盟站点的索引信息存入unionsiteindex.dat
+==========================================================================================
+【报警内容】
+1.进入数据目录****失败（可能原因：数据目录不存在）
+2.wget文件****失败（可能原因：文件抓取错误）
+3.****文件的md5校验失败（可能原因：文件不完整，或抓取错误）
+4.追加百度自有流量文件****失败（可能原因：追加网站白名单beidou_baidusite_data1.txt错误）
+5.进入工作目录****失败（可能原因：工作目录不存在）
+6.导入union站点发生异常（UnionSiteImporter.java执行错误）

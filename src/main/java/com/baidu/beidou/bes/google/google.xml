@@ -1,0 +1,222 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN 2.0//EN" "http://www.springframework.org/dtd/spring-beans-2.0.dtd">
+
+<!--
+	- Application context definition for "springapp" DispatcherServlet.
+-->
+
+<beans>
+	<!-- 工具bean，获取物料大小使用 -->
+	<bean id="ubmcServiceExtension" class="com.baidu.beidou.bes.UbmcServiceExtension">
+		<property name="ubmcService">
+			<ref bean="ubmcService" />
+		</property>
+	</bean>
+	
+	<!-- 输出部分 -->
+	<bean id="fileOutput" class="com.baidu.beidou.bes.FileResultOutput" scope="singleton" lazy-init="true">
+		<constructor-arg index="0" value="whitelist_unit" />
+		<constructor-arg index="1" value="google"/>
+	</bean>
+	
+	<!-- 过滤器部分 -->
+	<bean id="sizefilter" class="com.baidu.beidou.bes.MaterSizeFilter">
+		<property name="checkSize" value="false"/>
+		<property name="sizeList">
+			<list>
+				<bean id="size1" class="com.baidu.beidou.bes.MaterSize">
+					<property name="width"><value>120</value></property>
+					<property name="height"><value>600</value></property>
+					<!-- <property name="size"><value>100</value></property> -->
+					<!-- <property name="sizeByStr"><value>10k</value></property> -->
+				</bean>
+				<bean id="size2" class="com.baidu.beidou.bes.MaterSize">
+					<property name="width"><value>160</value></property>
+					<property name="height"><value>600</value></property>
+				</bean>
+				<bean id="size3" class="com.baidu.beidou.bes.MaterSize">
+					<property name="width"><value>200</value></property>
+					<property name="height"><value>200</value></property>
+				</bean>
+				<bean id="size4" class="com.baidu.beidou.bes.MaterSize">
+					<property name="width"><value>250</value></property>
+					<property name="height"><value>250</value></property>
+				</bean>
+				<bean id="size5" class="com.baidu.beidou.bes.MaterSize">
+					<property name="width"><value>300</value></property>
+					<property name="height"><value>250</value></property>
+				</bean>
+				<bean id="size6" class="com.baidu.beidou.bes.MaterSize">
+					<property name="width"><value>336</value></property>
+					<property name="height"><value>280</value></property>
+				</bean>
+				<bean id="size7" class="com.baidu.beidou.bes.MaterSize">
+					<property name="width"><value>468</value></property>
+					<property name="height"><value>60</value></property>
+				</bean>
+				<bean id="size8" class="com.baidu.beidou.bes.MaterSize">
+					<property name="width"><value>728</value></property>
+					<property name="height"><value>90</value></property>
+				</bean>
+			</list>
+		</property>
+	</bean>
+  <bean id="tradeFilter" class="com.baidu.beidou.bes.MaterTradeFilter">
+    <property name="ranges">
+      <list>
+        <bean id="trade1" class="com.baidu.beidou.bes.MaterTradeRange">
+          <property name="minTradeId"><value>530100</value></property>
+          <property name="maxTradeId"><value>530200</value></property>
+        </bean>
+        <bean id="trade2" class="com.baidu.beidou.bes.MaterTradeRange">
+          <property name="minTradeId"><value>550100</value></property>
+          <property name="maxTradeId"><value>550200</value></property>
+        </bean>
+        <bean id="trade3" class="com.baidu.beidou.bes.MaterTradeRange">
+          <property name="minTradeId"><value>690400</value></property>
+          <property name="maxTradeId"><value>690500</value></property>
+        </bean>
+        <bean id="trade4" class="com.baidu.beidou.bes.MaterTradeRange">
+          <property name="minTradeId"><value>700100</value></property>
+          <property name="maxTradeId"><value>700200</value></property>
+        </bean>
+        <bean id="trade5" class="com.baidu.beidou.bes.MaterTradeRange">
+          <property name="minTradeId"><value>761000</value></property>
+          <property name="maxTradeId"><value>761100</value></property>
+        </bean>
+        <bean id="trade6" class="com.baidu.beidou.bes.MaterTradeRange">
+          <property name="minTradeId"><value>761300</value></property>
+          <property name="maxTradeId"><value>761400</value></property>
+        </bean>
+        <bean id="trade7" class="com.baidu.beidou.bes.MaterTradeRange">
+          <property name="minTradeId"><value>770300</value></property>
+          <property name="maxTradeId"><value>770400</value></property>
+        </bean>
+        <bean id="trade8" class="com.baidu.beidou.bes.MaterTradeRange">
+          <property name="minTradeId"><value>780400</value></property>
+          <property name="maxTradeId"><value>780600</value></property>
+        </bean>
+        <bean id="trade9" class="com.baidu.beidou.bes.MaterTradeRange">
+          <property name="minTradeId"><value>820100</value></property>
+          <property name="maxTradeId"><value>820400</value></property>
+        </bean>
+        <bean class="com.baidu.beidou.bes.MaterTradeRange">
+          <property name="minTradeId"><value>820800</value></property>
+          <property name="maxTradeId"><value>820900</value></property>
+        </bean>
+        <bean class="com.baidu.beidou.bes.MaterTradeRange">
+          <property name="minTradeId"><value>830200</value></property>
+          <property name="maxTradeId"><value>830300</value></property>
+        </bean>
+        <bean class="com.baidu.beidou.bes.MaterTradeRange">
+          <property name="minTradeId"><value>840300</value></property>
+          <property name="maxTradeId"><value>840400</value></property>
+        </bean>
+        <bean class="com.baidu.beidou.bes.MaterTradeRange">
+          <property name="minTradeId"><value>990000</value></property>
+          <property name="maxTradeId"><value>1000000</value></property>
+        </bean>
+      </list>
+    </property>
+  </bean>
+  	
+	<bean id="defaultFormatter" class="com.baidu.beidou.bes.UnitMaterFormatter"/>
+	
+	<!-- 数据导出bean -->
+	<bean id="planIdProcessor" class="com.baidu.beidou.bes.PlanIdProcessor" lazy-init="true">
+		<property name="successor">
+			<ref bean="unitMaterProcessor"/>
+		</property>
+   		<property name="unitDao">
+  			<ref bean="unitDao"/>
+  		</property>
+  		<property name="wuliaoType">
+  			<list>
+				<value>2</value>
+				<value>3</value>
+			</list>
+  		</property>
+  	</bean>
+  	<bean id="unitMaterProcessor" class="com.baidu.beidou.bes.UnitMaterProcessor" lazy-init="true">
+  		<property name="filters">
+  			<list>
+  				<ref bean="sizefilter"/>
+                <ref bean="tradeFilter"/>
+  			</list>
+  		</property>
+  		<property name="output">
+  			<ref bean="fileOutput"/>
+  		</property>
+  		<property name="formatter">
+  			<ref bean="defaultFormatter"/>
+  		</property>
+	</bean>
+	
+	<!-- 数据交叉比对部分  -->
+	<bean id="crossCheckAdxUnit" class="com.baidu.beidou.bes.CrossCheckAdxUnit" scope="prototype">
+		<property name="inputFile">
+			<value>whitelist_unit</value>
+		</property>
+  		<property name="addFileOutput">
+			<value>adx_unit_to_add</value>
+  		</property>
+  		<property name="delFileOutput">
+  			<value>adx_unit_to_del</value>
+  		</property>
+	</bean>
+	
+	<!-- 数据准备阶段 -->
+	<!--
+	也可以使用一个runnable来执行datapreparation的操作，
+	shellScript和runnbale 二选一，只执行其一，都存在则执行shellScript 
+	-->
+	<bean id="adxDataPreparation" class="com.baidu.beidou.bes.AdxDataPreparation" scope="prototype">
+		<property name="shellScript">
+			<value>google_adx_unit_import.sh adx_unit_to_add</value>
+		</property>
+	</bean>
+	
+	<!-- 数据库入库部分 -->
+	<!-- userid,id,wuliaoType,mcId,mcVersionId -->
+	<!-- 
+	userid文件的第一个字段
+	adid文件的第二个字段
+	adx_type字段是系统自动写入;
+	audit_state_0可选字段: $AUDIT_NOT_CHECKED(1) $AUDIT_DISAPPROVED(2) $AUDIT_APPROVED(0);
+	audit_adx_type在state状态为$AUDIT_ACCEPT是写入的，意味着不用审核;
+	-->
+	<bean id="rowmapper_flash" class="com.baidu.beidou.bes.FileRowMapper" scope="prototype">
+		<property name="inputFile"><value>adx_unit_to_add_admaker_flash</value></property>
+		<property name="fieldMapper">
+			<map>
+              <entry key="audit_state_0" value="$AUDIT_DISAPPROVED"/>
+              <entry key="google_snapshot" value="1"/>
+            </map>
+		</property>
+	</bean>
+	
+	<bean id="rowmapper_pic" class="com.baidu.beidou.bes.FileRowMapper" scope="prototype">
+		<property name="inputFile"><value>adx_unit_to_add_pic</value></property>
+		<property name="fieldMapper">
+			<map>
+              <entry key="audit_state_0" value="$AUDIT_INITIAL"/>
+              <entry key="google_snapshot" value="0"/>
+            </map>
+		</property>
+	</bean>
+	
+	<bean id="dboperator" class="com.baidu.beidou.bes.DBOperator" scope="prototype">
+		<property name="rowmappers">
+			<list>
+				<ref bean="rowmapper_flash"/>
+				<ref bean="rowmapper_pic"/>
+			</list>
+		</property>
+		<property name="delFile">
+			<value>adx_unit_to_del</value>
+		</property>
+   		<property name="unitAdxDao">
+  			<ref bean="unitAdxDao"/>
+  		</property>
+	</bean>
+</beans>

@@ -1,0 +1,39 @@
+﻿【任务名】	导入用户拒绝理由监控
+【时间驱动】	1 0 * * *	运行超时	60分钟	等待超时	0分钟
+【运行命令】	cd /home/work/beidou-cron/bin; sh userAuditMonitor.sh
+【日志地址】/home/work/beidou-cron/log/userAuditMonitor.log.yyyymmdd
+【变更库表】Beidou.userauditmonitor表
+【任务依赖】  无
+========================================================================================
+【任务描述】
+1.	建立数据目录：/home/work/beidou-cron/data/userAuditMonitor
+2.	调用com.baidu.beidou.auditmanager.ImportAuditMonitor
+	传递参数： 
+	monitorFile:conf/audit_monitor_reason.conf（监控的拒绝理由,目前的值有两行数字：8,13）
+	output file:userauditmonitor.txt(输出的文件名)
+3.	ImportAuditMonitor调用generateMonitorFile 方法生成监控文件，其中调用底层的historyDao.findAuditHistoryAndOutputMonitorFile，执行查询sql
+	SELECT userid, refuseReason from auditcprounithistory WHERE auditresult = 1 AND optime >当前时间
+	并过滤出audit_monitor_reason.conf中监控拒绝理由的记录，输出到文件userauditmonitor.txt并按userid排序，文件如下所示：
+	1005816 8
+	1006152 13
+4.	创建表userauditmonitor_tmp，导入数据userauditmonitor.txt
+5.	删除原有表userauditmonitor
+6.	重命名表userauditmonitor_tmp为userauditmonitor
+
+==========================================================================================
+【报警内容】
+1.	建立日志目录****失败（可能原因：建立日志目录beidou-cron/log/错误）
+2.	建立数据目录****失败（可能原因：建立数据目录beidou-cron/data/userAuditMonitor错误）
+3.	进入工作目录****失败（可能原因：进入脚本目录beidou-cron/data/bin失败）
+4.	更新销售管理员的综述信息发生异常
+	可能原因：调用com.baidu.beidou.auditmanager.ImportAuditMonitor错误
+5.	sort -u ****失败
+6.	mv ****.u **** 失败
+7.	更新数据库userauditmonitor发生异常
+	可能原因：导入数据到userauditmonitor.tmp，并改名为userauditmonitor表出错
+
+
+
+【备注】
+
+

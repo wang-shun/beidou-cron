@@ -1,0 +1,22 @@
+【任务名】	导入QT推广组主动推荐的关键词
+【时间驱动】	0 1 * * *	 运行超时	150分钟	等待超时	0分钟 每日更新一次
+【运行命令】	cd /home/work/beidou-cron/bin/; sh getAotQtkrWord.sh;
+【日志地址】	/home/work/beidou-cron/log/getAotQtkrWord.log
+【变更库表】	beidou.aotqtkrword(mongodb)
+【任务依赖】  上游任务：***号生成（因检索端机器未到位，暂时没有noah平台上游任务的ID）
+========================================================================================
+【任务描述】
+1.	进入数据目录/home/work/beidou-cron/data/
+2.	使用beidou_lib.sh中函数getfile抓取上游文件及其md5，在每次下载前会执行环境清理操作"cd $DATA_PATH && if [[ -z ${filename} ]];then rm ${filename} fi"
+	wget -q ftp://db-cm-ctrd01.db01/home/work/datamine/qtkr-online/data/final/kr.adview.20111229
+	wget -q ftp://db-cm-ctrd01.db01/home/work/datamine/qtkr-online/data/final/kr.adview.20111229.md5
+3.	校验md5正确性
+4.	读入抓取的推荐关键词文件，过滤相关性较低的词，过滤黑名单词，过滤QT推广组已购词，将剩下的推荐词及groupid写入文件
+5.	使用mongo的命令行将文件导入数据库
+
+==========================================================================================
+【报警内容】
+1.	wget文件**失败（抓取文件和md5失败）
+2.	**文件的md5校验失败（MD5校验失败）
+3.	删除aotqtkrword表数据失败，导入aotqtkrword数据失败
+

@@ -1,0 +1,84 @@
+﻿【任务名】	定时重新分配错误的审核任务
+【时间驱动】	5,10,20,30 2 * * *	运行超时	60分钟	等待超时	0分钟
+【运行命令】	cd /home/work/beidou-cron/bin; sh output_shifen.sh
+【日志地址】	/home/work/beidou-cron/log/output_shifen.log.yyyymmdd
+【变更库表】	beidoufinan.cost_yyyymmdd表
+【任务依赖】  无
+========================================================================================
+【任务描述】
+1.	判断/home/work/var/beidou_cost/yyyymmdd下是否存在名称为finish.yyyymmdd的文件，如果存在，则认为已经执行完毕，不继续执行
+2.	抓取消费数据
+	ftp://ftp:ftp@tc-sf-drd21.tc.baidu.com:/home/work/var/bdcharge/charge_log/yyyymmdd/dcharge.bd.log.list
+	ftp://ftp:ftp@tc-sf-drd21.tc.baidu.com:/home/work/var/bdcharge/charge_log/yyyymmdd/dcharge.bd.log.list.md5
+
+3.	以上文件内容如下所示：
+	dcharge.bd. yyyymmdd-0000.log
+	dcharge.bd. yyyymmdd-0015.log
+	……
+	遍历dcharge.bd.log.list内容，对于每一行，抓取对应的log文件及其md5,
+	计费日志各字段的格式如下：
+	1	keywid	Beidou的Adid
+	2	wordid	AtomId
+	3	wgrpid	推广计划id
+	4	userid	用户id
+	5	cntnid	计费名id
+	6	cmatch	频道号
+	7	provid	地域
+	8	bid	出价（单位元）
+	9	price	计费价格（单位元）
+	10	cashrate	现金比例（k/r值）
+	11	rank	
+	12	ip	点击IP（点分格式）
+	13	balance	余额
+	14	clktime	点击时间
+	15	cnttime	计费时间
+	16	srchid	展现id
+	17	Orderrow	订单行
+	18	unitid	组id
+	19	field K	K域信息
+	20	clickid	
+	21	urate	优惠券比例值
+	22	baiduid	
+	23	descid	qtkeywordId
+
+4.	对于上述文件，取前面的17列，同名存储于
+	home/work/var/beidou_cost/yyyymmdd/下
+5.	调用以下程序
+	beidou-cron/src/com/baidu/beidou/account/OutputShifenData.java
+	该程序首先调用importClkData，处理如下文件
+	/home/work/var/beidou_cost/yyyymmdd/dcharge.bd.log.list
+	将上述文件中各行对应的文件名读取到shifenClkFileList列表，之后生成对应的三种接口文件：
+	outputUserCostFile方法导出文件为：
+	beidou.charge. yyyymmdd.log（userid,clks,charge,cash）
+	outputMaCostFile 方法导出文件格式为：
+	beidou.ma.yyyymmdd.log（userId, orderline,clks,charge,cash）
+	outputUnCostFile方法导出文件格式为：
+	beidou.un.yyyymmdd.log（cntnId,clks,charge,cash）
+	之后调用createDailyLogTable方法创建表beidoufinan.cost_ yyyymmdd
+6.	将dcharge.bd.log.list中每一行文件名对应数据加载到beidoufinan. cost_yyyymmdd表
+
+[辅助图片]http://bave.baidu.com/api/images/863d8634-1dd4-4b61-b3db-b3718adfaade
+
+==========================================================================================
+【报警内容】
+1.	Error: sf_log_click download click log,文件不存在
+可能原因：dcharge.bd.log.list.md5抓取失败
+2.	Error: sf_log_click download dcahrge.bd.log.list,文件不存在
+可能原因：download dcahrge.bd.log.list抓取失败
+3.	Error: sf_log_click download ****.md5,执行wget命令有问题
+可能原因：抓取某个日志文件的md5失败
+4.	Error: sf_log_click download ****,执行wget命令有问题
+可能原因：抓取某个日志文件失败
+****文件md5校验失败（可能原因：日志文件失败md5校验失败）
+awk文件****失败（可能原因：处理dcharge.bd. yyyymmdd-hhmm.log失败）
+mv文件****失败（可能原因：重命名dcharge.bd.20110703-0000.log.tmp失败）
+导入计费模块数据失败（可能原因：调用OutputShifenData失败）
+5.	md5sum****失败
+可能原因：（生成beidou.charge. yyyymmdd.log、beidou.ma.yyyymmdd.log、beidou.un.yyyymmdd.log的md5文件失败）
+插入计费数据文件****到数据库中出错，请检查（可能原因：load data到beidoufinan. cost_yyyymmdd表失败）
+
+
+
+【备注】
+
+

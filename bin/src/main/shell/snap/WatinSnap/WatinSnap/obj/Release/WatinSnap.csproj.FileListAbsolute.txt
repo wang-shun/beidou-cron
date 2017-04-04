@@ -1,0 +1,9 @@
+E:\beidou\work\app\ecom\cpweb\beidou-cron\snap\WatinSnap\WatinSnap\bin\Release\WatinSnap.exe
+E:\beidou\work\app\ecom\cpweb\beidou-cron\snap\WatinSnap\WatinSnap\bin\Release\WatinSnap.pdb
+E:\beidou\work\app\ecom\cpweb\beidou-cron\snap\WatinSnap\WatinSnap\bin\Release\Interop.SHDocVw.dll
+E:\beidou\work\app\ecom\cpweb\beidou-cron\snap\WatinSnap\WatinSnap\bin\Release\WatiN.Core.dll
+E:\beidou\work\app\ecom\cpweb\beidou-cron\snap\WatinSnap\WatinSnap\bin\Release\WatiN.Core.UnitTests.dll
+E:\beidou\work\app\ecom\cpweb\beidou-cron\snap\WatinSnap\WatinSnap\bin\Release\WatiN.Core.xml
+E:\beidou\work\app\ecom\cpweb\beidou-cron\snap\WatinSnap\WatinSnap\obj\Release\ResolveAssemblyReference.cache
+E:\beidou\work\app\ecom\cpweb\beidou-cron\snap\WatinSnap\WatinSnap\obj\Release\WatinSnap.exe
+E:\beidou\work\app\ecom\cpweb\beidou-cron\snap\WatinSnap\WatinSnap\obj\Release\WatinSnap.pdb

@@ -1,0 +1,32 @@
+﻿【任务名】	通知aot将数据库中所需数据载入内存
+【时间驱动】	无（事件依赖）	运行超时	30分钟	等待超时	0分钟
+【运行命令】	cd /home/work/beidou-cron/bin/; sh loadAotDB.sh 
+【日志地址】	/home/work/beidou-cron/aot/log/loadAotDB.log
+【变更库表】	aot.userstate
+
+【任务依赖】  
+上游任务：42004获取doris相关数据，并导入数据库
+
+========================================================================================
+【任务描述】
+1.	遍历AOT服务器，执行远程调用：http://$1:8080/rpc/loadDBInfo
+2.	loadDBInfoCTTask,对应Java类：com.baidu.beidou.aot.store.LoadDBInfoCTTask
+execute流程，执行aotStoreMgr.loadDBInfo();//供每日缓存更新及模块初始化使用
+(1)	打印日志：开始加载缓存
+(2)	loadSiteInfo();//调用UnionSiteDao.getSiteStat()获取站点汇总信息列表，存入AOTStore.siteStatList遍历该列表，将元素按key=siteid存入AOTStore.siteStatStore中,同时将行业映射信息存入AOTStore.siteTradeIndex
+(3)	AotStore.setPlanTradeInfo////获取推广计划行业信息
+(4)	AotStore. setGroupTradeInfo//获取推广组行业信息
+(5)	AotStore. setPlanStat//获取推广计划统计信息
+(6)	AotStore. setGroupStat//获取推广组统计信息
+(7)	AotStore. setUnitStat///获取创意统计信息
+(8)	AotStore. setSiteSumInfo///获取所有站点汇总信息
+(9)	AotStore. setRegCount//获取地域计数信息
+3.	userStateDao.cleanAll();//用户状态清零.
+update userstate set userstate=0//用户的cache状态，0表示该用户的cache无效
+
+
+
+==========================================================================================
+【报警内容】
+执行远程调用-载入账户优化缓存失败
+

@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN 2.0//EN" "http://www.springframework.org/dtd/spring-beans-2.0.dtd">
+
+<!--
+	- Application context definition for "springapp" DispatcherServlet.
+-->
+
+<beans>
+	<import
+		resource="classpath:/com/baidu/beidou/auditmanager/applicationContext-hibernate.xml" />
+	<import
+		resource="classpath:applicationContext-audit-blacklist.xml" />
+		
+	<bean id="auditMonitorMgr"
+		class="com.baidu.beidou.auditmanager.service.impl.AuditMonitorMgrImpl">
+		<property name="historyDao">
+			<ref bean="historyDao" />
+		</property>
+		
+		<property name="validity" value="${AUDIT_MONITOR_VALIDITY}">
+		</property>
+	</bean>
+	
+	<bean id="patrolValidMgr" class="com.baidu.beidou.auditmanager.service.impl.PatrolValidMgrImpl">
+		<property name="userInfoMgr">
+			<ref bean="userInfoMgr"/>
+		</property>
+		<property name="patrolValidDao">
+			<ref bean="patrolValidDao" />
+		</property>
+		<property name="patrolValidOnCapDao">
+			<ref bean="patrolValidOnCapDao" />
+		</property>
+	</bean>
+
+	<bean id="patrolValidTask"
+		class="com.baidu.beidou.auditmanager.task.impl.PatrolValidTaskImpl">
+		<property name="patrolValidMgr">
+			<ref bean="patrolValidMgr" />
+		</property>
+		<property name="cntPerReq" value="${CNT_PER_REQUEST}">
+		</property>
+	</bean>
+
+	<bean id="urlJumpCheckMgr" class="com.baidu.beidou.auditmanager.service.impl.UrlJumpCheckMgrImpl">
+		<property name="userInfoMgr">
+			<ref bean="userInfoMgr"/>
+		</property>
+		<property name="urlJumpCheckDao">
+			<ref bean="urlJumpCheckDao" />
+		</property>
+		<property name="urlJumpCheckOnCapDao">
+			<ref bean="urlJumpCheckOnCapDao" />
+		</property>
+		<property name="urlCheckHistoryDao">
+			<ref bean="urlCheckHistoryDao" />
+		</property>
+	</bean>
+	
+	<bean id="urlJumpCheckTask"
+		class="com.baidu.beidou.auditmanager.task.impl.UrlJumpCheckTaskImpl">
+		<property name="urlJumpCheckMgr">
+			<ref bean="urlJumpCheckMgr" />
+		</property>
+		<property name="waitShortSecs" value="${URL_CHECK_WAIT_SHORT_SECONDS}">
+		</property>
+		<property name="cntPerReq" value="${URL_CHECK_CNT_PER_REQ}">
+		</property>
+		<property name="frequencyForInstantUrl" value="${FREQUENCY_INSTANT_URL}">
+		</property>
+		<property name="frequencyForPatrolUrl" value="${FREQUENCY_PATROL_URL}">
+		</property>
+		<property name="patrolSwitch" value="${PATROL_SWITCH}">
+		</property>
+		<property name="instantSwitch" value="${INSTANT_SWITCH}">
+		</property>
+	</bean>
+	
+	<bean id="auditUnitMgr" class="com.baidu.beidou.auditmanager.service.impl.AuditUnitMgrImpl">
+		<property name="auditUnitDao">
+			<ref bean="auditUnitDao"/>
+		</property>
+	</bean>
+	
+	<bean id="auditUnitPatrolTask" class="com.baidu.beidou.auditmanager.task.impl.AuditUnitPatrolTaskImpl">
+		<property name="auditUnitMgr">
+			<ref bean="auditUnitMgr"/>
+		</property>
+		<property name="callBack">
+			<ref bean="auditTaskSendResultSetCallBack" />
+		</property>
+	</bean>
+	<!--  迁移到classpath:applicationContext-audit-blacklist.xml中了，方便配置blackuserlist
+	<bean id="auditTaskSendResultSetCallBack" class="com.baidu.beidou.auditmanager.service.impl.AuditTaskSendResultSetCallBack">
+		<property name="userInfoMgr">
+			<ref bean="userInfoMgr" />
+		</property>
+		<property name="auditredisCacheMgr">
+			<ref bean="auditredisCacheMgr" />
+		</property>
+		<property name="blackUserList">
+			<set>
+				<value></value>
+			</set>
+		</property>
+	</bean>
+	 -->
+</beans>

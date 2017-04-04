@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN 2.0//EN" "http://www.springframework.org/dtd/spring-beans-2.0.dtd">
+
+<!-- - Application context definition for "springapp" DispatcherServlet. -->
+
+<beans>
+    <bean
+        class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        <property name="ignoreUnresolvablePlaceholders" value="true" />
+        <property name="locations">
+            <list>
+                <value>classpath:indexGrade.properties</value>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="userStatDataExporter" class="com.baidu.beidou.indexgrade.exporter.impl.UserStatDataExporter" >
+        <property name="filePath">
+            <value>${user_consume_file}</value>
+        </property>
+    </bean>
+    <bean id="userHandler" class="com.baidu.beidou.indexgrade.user.UserHandler" >
+        <property name="highConsumeUserFile">
+            <value>${high_consume_user_file}</value>
+        </property>
+        <property name="allConsumeUserFile">
+            <value>${all_consume_user_file}</value>
+        </property>
+    </bean>
+    <bean id="groupHandler" class="com.baidu.beidou.indexgrade.group.GroupHandler" >
+        <property name="userHandler" ref="userHandler" />
+        <property name="cproGroup" ref="cproGroupMgrOnMultiDataSource" />
+        <property name="keywordGradeService" ref="keywordGradeService" />
+        <property name="groupFilePath">
+            <value>${group_file_path}</value>
+        </property>
+        <property name="filteredGroupFilePath">
+            <value>${filtered_group_file_path}</value>
+        </property>
+        <property name="filteredGroupFilePathYestoday">
+            <value>${filtered_group_file_path_yestoday}</value>
+        </property>
+        <property name="groupOnlineFilePath">
+            <value>${group_online_file_path}</value>
+        </property>
+    </bean>
+    
+    <bean id="keywordGradeService" class="com.baidu.beidou.util.McpackProxyFactoryBean">
+        <property name="serviceInterface">
+            <value>com.baidu.beidou.indexgrade.rpc.KeywordGradeService</value>
+        </property>
+        <property name="serviceUrl" value="${BEIDOU_API_INDEX_GRADE_SERVICE_URL}" />	
+        <property name="servers" value="${BEIDOU_API_SERVER}" />	
+        <property name="encoding" value="UTF-8" />
+        <property name="connectionTimeout" value="${BEIDOU_API.connectionTimeout}" />
+        <property name="readTimeout" value="${BEIDOU_API.readTimeout}" />
+        <property name="hasHeaders" value="false" />
+    </bean>
+    
+</beans>

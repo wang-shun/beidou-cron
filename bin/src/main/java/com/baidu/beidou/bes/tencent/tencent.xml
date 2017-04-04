@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN 2.0//EN" "http://www.springframework.org/dtd/spring-beans-2.0.dtd">
+
+<!--
+	- Application context definition for "springapp" DispatcherServlet.
+-->
+
+<beans>
+	<!-- 工具bean，获取物料大小使用 -->
+	<bean id="ubmcServiceExtension" class="com.baidu.beidou.bes.UbmcServiceExtension">
+		<property name="ubmcService">
+			<ref bean="ubmcService" />
+		</property>
+	</bean>
+	
+	<!-- 输出部分 -->
+	<bean id="fileOutput" class="com.baidu.beidou.bes.FileResultOutput" scope="singleton" lazy-init="true">
+		<constructor-arg index="0" value="whitelist_unit"/>
+		<constructor-arg index="1" value="tencent"/>
+	</bean>
+	
+	<!-- 过滤器部分 -->
+	<bean id="levelfilter" class="com.baidu.beidou.bes.MaterLevelFilter">
+		<property name="confidence_level" value="-1"/>
+		<property name="beauty_level" value="-1"/>
+		<property name="cheat_level" value="-1"/>
+		<property name="vulgar_level" value="-1"/>
+	</bean>
+	
+	
+	<!-- 数据导出bean -->
+	<bean id="planIdProcessor" class="com.baidu.beidou.bes.PlanIdProcessor" lazy-init="true">
+		<property name="successor">
+			<ref bean="unitMaterProcessor"/>
+		</property>
+   		<property name="unitDao">
+  			<ref bean="unitDao"/>
+  		</property>
+  		<property name="wuliaoType">
+  			<list>
+				<value>2</value>
+				<value>3</value>
+			</list>
+  		</property>
+	</bean>
+	
+	<bean id="unitMaterProcessor" class="com.baidu.beidou.bes.UnitMaterProcessor" lazy-init="true">
+  		<property name="filters">
+  			<list>
+  				<ref bean="levelfilter"/>
+  			</list>
+  		</property>
+  		<property name="output">
+  			<ref bean="fileOutput"/>
+  		</property>
+  	</bean>
+	
+	<!-- 数据交叉比对部分  -->
+	<bean id="crossCheckAdxUnit" class="com.baidu.beidou.bes.CrossCheckAdxUnit">
+		<property name="inputFile">
+			<value>whitelist_unit</value>
+		</property>
+  		<property name="addFileOutput">
+			<value>adx_unit_to_add</value>
+  		</property>
+  		<property name="delFileOutput">
+  			<value>adx_unit_to_del</value>
+  		</property>
+	</bean>
+	
+	<!-- 数据准备阶段 -->
+	<!--
+	也可以使用一个runnable来执行datapreparation的操作，
+	shellScript和runnbale 二选一，只执行其一，都存在则执行shellScript 
+	-->
+	
+	<!-- 数据库入库部分 -->
+	<!-- userid,id,wuliaoType,mcId,mcVersionId -->
+	<!-- 
+	userid文件的第一个字段
+	adid文件的第二个字段
+	adxtype字段是系统自动写入;
+	audit_state_0可选字段: $AUDIT_NOT_CHECKED(1) $AUDIT_DISAPPROVED(2) $AUDIT_APPROVED(0);
+	audit_adx_type在state状态为$AUDIT_ACCEPT是写入的，意味着不用审核;
+	-->
+	<bean id="rowmapper_approved" class="com.baidu.beidou.bes.FileRowMapper" scope="prototype">
+		<property name="inputFile"><value>adx_unit_to_add</value></property>
+		<property name="fieldMapper">
+			<map>
+              <entry key="audit_state_0" value="$AUDIT_INITIAL"/>
+              <entry key="google_snapshot" value="0"/>
+            </map>
+		</property>
+	</bean>
+	
+	<bean id="dboperator" class="com.baidu.beidou.bes.DBOperator" scope="prototype">
+		<property name="rowmappers">
+			<list>
+				<ref bean="rowmapper_approved"/>
+			</list>
+		</property>
+		<property name="delFile">
+			<value>adx_unit_to_del</value>
+		</property>
+   		<property name="unitAdxDao">
+  			<ref bean="unitAdxDao"/>
+  		</property>
+	</bean>
+</beans>

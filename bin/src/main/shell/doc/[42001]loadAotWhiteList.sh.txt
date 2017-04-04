@@ -1,0 +1,23 @@
+﻿【任务名】	通知beidou将数据库中黑白名单载入beidou-web内存
+【时间驱动】	6 0 * * *	运行超时	1分钟	等待超时	0分钟
+【运行命令】	cd /home/work/beidou-cron/bin/; sh loadAotWhiteList.sh
+【日志地址】	/home/work/beidou-cron/log/loadAotWhiteList.log
+【变更库表】	无
+【任务依赖】  上游任务：42000: 下载总控账户黑白名单，并导入数据库
+========================================================================================
+【任务描述】
+执行远程调用：
+http://$1:8080/rpc/loadAotWhiteList（依次遍历Web机器：($tc00 $tc01 $tc02 $tc03 $jx00 $jx01 $jx02 $jx03 $tcmgr00 $tcmgr01 $aimgr00 $aimgr01)）
+调用com.baidu.beidou.cprogroup.task.LoadAotWhiteListCTTask
+对应beidou\src\com\baidu\beidou\cprogroup\task\LoadAotWhiteListCTTask.java
+流程：
+执行execute方法，调用UnionSiteMgr.loadWhiteAotList();
+（1）	List<Integer> blackList = whiteListDao.getBaiduAotBlackList();
+WhiteListCache.baiduAot.setBlackList(blackList);
+（2）	List<Integer> whiteList = whiteListDao.getBaiduAotWhiteList();
+WhiteListCache.baiduAot.setWhiteList(whiteList);
+
+
+==========================================================================================
+【报警内容】
+执行远程调用-载入账户优化黑白名单失败{服务器名}

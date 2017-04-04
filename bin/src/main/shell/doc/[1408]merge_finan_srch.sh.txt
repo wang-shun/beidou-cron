@@ -1,0 +1,77 @@
+﻿【任务名】	新版导出数据给crm
+【时间驱动】	无（事件驱动）	运行超时5分钟	等待超时	0分钟
+【运行命令】	cd /home/work/beidou-cron/bin; sh merge_finan_srch.sh
+【日志地址】	/home/work/beidou-cron/log/crm.log.yyyymmdd（昨天）
+【变更库表】	无
+【任务依赖】  
+	上游任务
+	9117-新版生成CRM数据中的消费信息_合并数据文件 事件驱动	
+
+	下游任务
+	440-[大客户模块]导入北斗客户日数据（无展现）(立即处理) 50 7 * * *
+	442-[维护模块]导入北斗客户日数据（无展现）(立即处理) 事件驱动
+	485-[渠道模块]导入北斗客户日数据（无展现）(立即处理) 30 8 * * *
+
+========================================================================================
+【任务描述】
+1.	检查并创建日志目录和数据目录
+	日志目录：home/work/beidou-cron/log/
+	数据目录：/home/work/beidou-cron/data/crm/
+2.	如果传递的参数不为空，并且为日期时间戳如（20111029），则取该参数，否则取昨天的日期，记为STAT_DATE，并打印日志“merge_finan_srch.sh stat date:${ STAT_DATE}”
+3.	进入数据目录/home/work/beidou-cron/data/crm/
+	对business文件进行按字符进行排序，因为join只处理字符排序的文件
+	sort -k1,1 business > business.tmp，business.tmp共有32列 
+	1	Userid
+	2	Clks
+	3	Cost
+	4	消费现金
+	5	预算
+	6	日有消费计划
+	7	周有消费计划
+	8	月有消费计划
+	9	季有消费计划
+	10	日有消费组
+	11	周有消费组
+	12	月有消费组
+	13	季有消费组
+	14	日有消费单元
+	15	周有消费单元
+	16	月有消费单元
+	17	季有消费单元
+	18	有效计划
+	19	有效组
+	20	有效单元
+	21	当天是否撞线
+	22	是否大客户（这个会被替换）
+	23	日有消费主域
+	24	周消费主域
+	25	月消费主域
+	26	季消费主域
+	27	日有消费站点
+	28	周有消费站点
+	29	月有消费站点
+	30	季有消费站点
+	31	昨日最早下线推广计划名
+	32	昨日最早下线推广计划时间（可能没有）
+	
+	将business.tmp与day_srchs（两列：userid，展现）进行merge，将展现插入到第二列（如果没有则补0），结果输出到crm_yyyymmdd.dat.tmp
+4.	下载shifen的用户文件
+	ftp://ftp:ftp@ tc-sf-cron03.tc.baidu.com//home/work/var/sf_data/userinfo${YYYYMMDD}.dat*
+	md5sum userinfo20111030.dat | cut -d' ' -f1获取md5，与md5文件中的进行比较
+5.	对userinfo2011103（username，ulevelid，userid）文件进行处理
+	如果第二列为10101（普通）则打印第3列和0
+	如果第二列为10104（VIP），则打印第3列和1
+	结果生成到userinfo.tmp
+6.	对crm_yyyymmdd.dat.tmp（33列）和userinfo.tmp（2列）进行join，输出格式中第一个文件的33列中，第22列会被userinfo.tmp的第2列替换
+7.	生成结果为crm_yyyymmdd.dat，同时生成md5
+8.	Mv结果到/home/work/var/crm/目录下（保留14天）
+
+
+==========================================================================================
+【报警内容】
+1.	合并业务数据和展现数据失败（步骤3失败）
+2.	校验shifen的用户文件MD5失败（步骤4失败）
+3.	生成ulevel文件失败（步骤5失败）
+4.	生成CRM接口文件MD5发出异常（步骤6失败）
+5.	mv结果文件至/home/work/var/crm/失败（步骤7失败）
+

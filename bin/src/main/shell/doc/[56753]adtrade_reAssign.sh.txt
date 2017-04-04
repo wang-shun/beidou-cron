@@ -1,0 +1,31 @@
+﻿【任务名】	定期将分类为其他的广告修改成0，使其可重新导出分类
+【时间驱动】	5,35 0,1,2,3,4,5,6,7,21,22,23 * * *	运行超时	5分钟	等待超时	 0分钟
+【运行命令】	cd /home/work/beidou-cron/bin/; sh adtrade_reAssign.sh
+【日志地址】	/home/work/beidou-cron/log/adtrade_reAssign.log
+【变更库表】	cprounitmater{0-7}
+【任务依赖】  无
+========================================================================================
+【任务描述】
+1.	检查路径
+2.	CACHE_FILE=/home/work/beidou-cron/data/adtrade/reassign/beidouad.cache.yyyymm（每个周期使用同一份cache文件，使得同一个ad在一定时间内只导出一次，即使它又被分类成9900）
+	如果CACHE_FILE不存在，则touch一个出来
+3.	调用adtrade_alltable_reAssign 8 ${CACHE_FILE}
+	adtrade_alltable_reAssign调用adtrade_subtable_reAssign ${index} ${CACHE_FILE}
+	执行8次
+	(1)	首先将该表内全部状态为有效且分类为9900的广告id取出
+		select s.id from cprounitstate$1 s, cprounitmater$1 m where s.id=m.id and s.state=0 and m.adtradeid=9900 and s.helpstatus&6=4
+		结果存储到：beidouad.tmp
+	(2)	调用awk将beidouad.tmp 中已经存在于cache的广告去掉，并取其前N（200）个，结果存储到beidouad.cache.tmp
+	(3)	调用awk将上面这N个广告拼成sql弄成update语句，并更新DB，把文件cat进CACHE中
+		Update cprounitstate${index} ,cprounitmater${index} m set m.adtradeid=0 where s.id in (…) and s.id=m.id and m.adtradeid=9900 and s.helpstatus&6=4;
+		结果为beidouad.cache.tmp.sql
+	(4)	执行上述sql
+	(5)	cat beidouad.cache.tmp>> beidouad.cache.yyyymm
+
+
+==========================================================================================
+【报警内容】
+adtrade_reAssign.sh run failed!
+
+【备注】
+这个任务失败过一次，是在导出数据的过程中连接中断所致，一般情况下直接重跑即可

@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module org.jetbrains.idea.maven.project.MavenProjectsManager.isMavenModule="true" type="JAVA_MODULE" version="4">
+  <component name="FacetManager">
+    <facet type="Spring" name="Spring">
+      <configuration>
+        <fileset id="fileset" name="Spring Application Context" removed="false">
+          <file>file://$MODULE_DIR$/src/main/resources/applicationContext.xml</file>
+          <file>file://$MODULE_DIR$/src/main/java/com/baidu/beidou/accountmove/datasource.xml</file>
+          <file>file://$MODULE_DIR$/src/main/resources/applicationContext-olap.xml</file>
+          <file>file://$MODULE_DIR$/bin/src/main/resources/applicationContext-olap.xml</file>
+          <file>file://$MODULE_DIR$/bin/src/main/online-resources/applicationContext.xml</file>
+          <file>file://$MODULE_DIR$/bin/src/main/resources/applicationContext.xml</file>
+          <file>file://$MODULE_DIR$/src/main/online-resources/applicationContext.xml</file>
+          <file>file://$MODULE_DIR$/bin/src/main/java/com/baidu/beidou/accountmove/datasource.xml</file>
+          <file>file://$MODULE_DIR$/src/main/online-resources/applicationContext-olap.xml</file>
+          <file>file://$MODULE_DIR$/bin/src/main/online-resources/applicationContext-olap.xml</file>
+          <file>file://$MODULE_DIR$/bin/src/test/resources/applicationContext-olap-test.xml</file>
+          <file>file://$MODULE_DIR$/src/main/java/com/baidu/beidou/bes/user/applicationContext.xml</file>
+          <file>file://$MODULE_DIR$/bin/src/main/java/com/baidu/beidou/accountmove/applicationContext-accountmove.xml</file>
+          <file>file://$MODULE_DIR$/src/main/java/com/baidu/beidou/accountmove/applicationContext-accountmove.xml</file>
+          <file>file://$MODULE_DIR$/src/main/java/com/baidu/beidou/bes/tencent/tencent.xml</file>
+          <file>file://$MODULE_DIR$/bin/src/main/java/com/baidu/beidou/bes/publish/publish.xml</file>
+          <file>file://$MODULE_DIR$/bin/src/main/java/com/baidu/beidou/bes/tencent/tencent.xml</file>
+          <file>file://$MODULE_DIR$/src/main/java/com/baidu/beidou/bes/publish/publish.xml</file>
+          <file>file://$MODULE_DIR$/src/main/java/com/baidu/beidou/bes/ifeng/ifeng.xml</file>
+          <file>file://$MODULE_DIR$/bin/src/main/java/com/baidu/beidou/bes/ifeng/ifeng.xml</file>
+          <file>file://$MODULE_DIR$/bin/src/main/java/com/baidu/beidou/bes/google/google.xml</file>
+          <file>file://$MODULE_DIR$/src/main/java/com/baidu/beidou/bes/google/google.xml</file>
+          <file>file://$MODULE_DIR$/bin/src/main/java/com/baidu/beidou/bes/besc/besc.xml</file>
+          <file>file://$MODULE_DIR$/src/main/java/com/baidu/beidou/bes/besc/besc.xml</file>
+          <file>file://$MODULE_DIR$/src/main/java/com/baidu/beidou/atleft/applicationContext.xml</file>
+          <file>file://$MODULE_DIR$/bin/src/main/java/com/baidu/beidou/aot/applicationContext.xml</file>
+          <file>file://$MODULE_DIR$/src/main/java/com/baidu/beidou/cprounit/applicationContext.xml</file>
+          <file>file://$MODULE_DIR$/bin/src/main/java/com/baidu/beidou/unionsite/applicationContext.xml</file>
+          <file>file://$MODULE_DIR$/bin/src/main/java/com/baidu/beidou/salemanager/applicationContext.xml</file>
+          <file>file://$MODULE_DIR$/bin/src/main/java/com/baidu/beidou/stat/applicationContext.xml</file>
+          <file>file://$MODULE_DIR$/bin/src/main/java/com/baidu/beidou/bes/user/applicationContext.xml</file>
+          <file>file://$MODULE_DIR$/src/main/java/com/baidu/beidou/auditmanager/applicationContext.xml</file>
+          <file>file://$MODULE_DIR$/bin/src/main/java/com/baidu/beidou/tool/applicationContext.xml</file>
+          <file>file://$MODULE_DIR$/src/main/java/com/baidu/beidou/aot/applicationContext.xml</file>
+          <file>file://$MODULE_DIR$/bin/src/main/java/com/baidu/beidou/atleft/applicationContext.xml</file>
+          <file>file://$MODULE_DIR$/src/main/java/com/baidu/beidou/account/applicationContext.xml</file>
+          <file>file://$MODULE_DIR$/src/main/java/com/baidu/beidou/unionsite/applicationContext.xml</file>
+          <file>file://$MODULE_DIR$/src/main/java/com/baidu/beidou/cprogroup/applicationContext.xml</file>
+          <file>file://$MODULE_DIR$/src/main/java/com/baidu/beidou/cproplan/applicationContext.xml</file>
+          <file>file://$MODULE_DIR$/bin/src/main/java/com/baidu/beidou/auditmanager/applicationContext.xml</file>
+          <file>file://$MODULE_DIR$/src/main/java/com/baidu/beidou/user/applicationContext.xml</file>
+          <file>file://$MODULE_DIR$/src/main/java/com/baidu/beidou/shrink/applicationContext.xml</file>
+          <file>file://$MODULE_DIR$/bin/src/main/java/com/baidu/beidou/cproplan/applicationContext.xml</file>
+          <file>file://$MODULE_DIR$/src/main/java/com/baidu/beidou/tool/applicationContext.xml</file>
+          <file>file://$MODULE_DIR$/bin/src/main/java/com/baidu/beidou/message/applicationContext.xml</file>
+          <file>file://$MODULE_DIR$/bin/src/main/java/com/baidu/beidou/cprounit/applicationContext.xml</file>
+          <file>file://$MODULE_DIR$/bin/src/main/java/com/baidu/beidou/user/applicationContext.xml</file>
+          <file>file://$MODULE_DIR$/src/main/java/com/baidu/beidou/message/applicationContext.xml</file>
+          <file>file://$MODULE_DIR$/src/main/resources/applicationContext-transaction-config.xml</file>
+          <file>file://$MODULE_DIR$/bin/src/main/resources/applicationContext-transaction-config.xml</file>
+          <file>file://$MODULE_DIR$/src/main/online-resources/applicationContext-transaction-config.xml</file>
+          <file>file://$MODULE_DIR$/bin/src/main/online-resources/applicationContext-transaction-config.xml</file>
+          <file>file://$MODULE_DIR$/bin/src/main/java/com/baidu/beidou/cprogroup/applicationContext.xml</file>
+          <file>file://$MODULE_DIR$/src/main/java/com/baidu/beidou/salemanager/applicationContext.xml</file>
+          <file>file://$MODULE_DIR$/bin/src/main/java/com/baidu/beidou/shrink/applicationContext.xml</file>
+          <file>file://$MODULE_DIR$/src/main/java/com/baidu/beidou/indexgrade/applicationContext.xml</file>
+          <file>file://$MODULE_DIR$/src/main/java/com/baidu/beidou/stat/applicationContext.xml</file>
+          <file>file://$MODULE_DIR$/bin/src/main/online-resources/applicationContext-mapping.xml</file>
+          <file>file://$MODULE_DIR$/src/main/resources/applicationContext-mapping.xml</file>
+          <file>file://$MODULE_DIR$/src/main/online-resources/applicationContext-mapping.xml</file>
+          <file>file://$MODULE_DIR$/bin/src/main/resources/applicationContext-mapping.xml</file>
+          <file>file://$MODULE_DIR$/bin/src/main/java/com/baidu/beidou/cproplan/applicationContext-hibernate.xml</file>
+          <file>file://$MODULE_DIR$/src/main/java/com/baidu/beidou/cprogroup/applicationContext-hibernate.xml</file>
+          <file>file://$MODULE_DIR$/src/main/java/com/baidu/beidou/auditmanager/applicationContext-hibernate.xml</file>
+          <file>file://$MODULE_DIR$/src/main/java/com/baidu/beidou/account/applicationContext-hibernate.xml</file>
+          <file>file://$MODULE_DIR$/bin/src/main/java/com/baidu/beidou/aot/applicationContext-hibernate.xml</file>
+          <file>file://$MODULE_DIR$/src/main/java/com/baidu/beidou/aot/applicationContext-hibernate.xml</file>
+          <file>file://$MODULE_DIR$/bin/src/main/java/com/baidu/beidou/account/applicationContext-hibernate.xml</file>
+          <file>file://$MODULE_DIR$/src/main/online-resources/applicationContext-hibernate.xml</file>
+          <file>file://$MODULE_DIR$/bin/src/main/java/com/baidu/beidou/user/applicationContext-hibernate.xml</file>
+          <file>file://$MODULE_DIR$/src/main/resources/applicationContext-hibernate.xml</file>
+          <file>file://$MODULE_DIR$/src/main/java/com/baidu/beidou/bes/user/applicationContext-hibernate.xml</file>
+          <file>file://$MODULE_DIR$/bin/src/main/java/com/baidu/beidou/auditmanager/applicationContext-hibernate.xml</file>
+          <file>file://$MODULE_DIR$/src/main/java/com/baidu/beidou/shrink/applicationContext-hibernate.xml</file>
+          <file>file://$MODULE_DIR$/bin/src/main/java/com/baidu/beidou/cprounit/applicationContext-hibernate.xml</file>
+          <file>file://$MODULE_DIR$/bin/src/main/java/com/baidu/beidou/tool/applicationContext-hibernate.xml</file>
+          <file>file://$MODULE_DIR$/src/main/java/com/baidu/beidou/user/applicationContext-hibernate.xml</file>
+          <file>file://$MODULE_DIR$/src/main/java/com/baidu/beidou/cprounit/applicationContext-hibernate.xml</file>
+          <file>file://$MODULE_DIR$/bin/src/main/java/com/baidu/beidou/bes/user/applicationContext-hibernate.xml</file>
+          <file>file://$MODULE_DIR$/src/main/java/com/baidu/beidou/unionsite/applicationContext-hibernate.xml</file>
+          <file>file://$MODULE_DIR$/src/main/java/com/baidu/beidou/tool/applicationContext-hibernate.xml</file>
+          <file>file://$MODULE_DIR$/bin/src/main/resources/applicationContext-hibernate.xml</file>
+          <file>file://$MODULE_DIR$/bin/src/main/java/com/baidu/beidou/shrink/applicationContext-hibernate.xml</file>
+          <file>file://$MODULE_DIR$/src/main/java/com/baidu/beidou/atleft/applicationContext-hibernate.xml</file>
+          <file>file://$MODULE_DIR$/bin/src/main/java/com/baidu/beidou/cprogroup/applicationContext-hibernate.xml</file>
+          <file>file://$MODULE_DIR$/src/main/java/com/baidu/beidou/cproplan/applicationContext-hibernate.xml</file>
+          <file>file://$MODULE_DIR$/bin/src/main/java/com/baidu/beidou/unionsite/applicationContext-hibernate.xml</file>
+          <file>file://$MODULE_DIR$/bin/src/main/online-resources/applicationContext-audit-blacklist.xml</file>
+          <file>file://$MODULE_DIR$/src/main/resources/applicationContext-audit-blacklist.xml</file>
+          <file>file://$MODULE_DIR$/src/main/online-resources/applicationContext-audit-blacklist.xml</file>
+          <file>file://$MODULE_DIR$/bin/src/main/resources/applicationContext-audit-blacklist.xml</file>
+          <file>file://$MODULE_DIR$/bin/src/main/java/com/baidu/beidou/cache/applicationContext-cache.xml</file>
+          <file>file://$MODULE_DIR$/bin/src/main/online-resources/applicationContext-cache.xml</file>
+          <file>file://$MODULE_DIR$/src/main/online-resources/applicationContext-cache.xml</file>
+          <file>file://$MODULE_DIR$/src/main/resources/applicationContext-cache.xml</file>
+          <file>file://$MODULE_DIR$/bin/src/main/resources/applicationContext-cache.xml</file>
+          <file>file://$MODULE_DIR$/src/main/java/com/baidu/beidou/cache/applicationContext-cache.xml</file>
+          <file>file://$MODULE_DIR$/src/main/resources/applicationContext-core-multidb.xml</file>
+          <file>file://$MODULE_DIR$/src/main/online-resources/applicationContext-core-multidb.xml</file>
+          <file>file://$MODULE_DIR$/bin/src/main/resources/applicationContext-core-multidb.xml</file>
+          <file>file://$MODULE_DIR$/bin/src/main/online-resources/applicationContext-core-multidb.xml</file>
+          <file>file://$MODULE_DIR$/bin/src/test/resources/applicationContext-cron-test.xml</file>
+          <file>file://$MODULE_DIR$/bin/src/main/online-resources/applicationContext-hibernate.xml</file>
+          <file>file://$MODULE_DIR$/bin/src/main/java/com/baidu/beidou/atleft/applicationContext-hibernate.xml</file>
+          <file>file://$MODULE_DIR$/bin/src/main/java/com/baidu/beidou/account/applicationContext.xml</file>
+        </fileset>
+      </configuration>
+    </facet>
+  </component>
+  <component name="NewModuleRootManager" LANGUAGE_LEVEL="JDK_1_5" inherit-compiler-output="false">
+    <output url="file://$MODULE_DIR$/target/classes" />
+    <output-test url="file://$MODULE_DIR$/target/test-classes" />
+    <content url="file://$MODULE_DIR$">
+      <sourceFolder url="file://$MODULE_DIR$/src/main/java" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/main/resources" type="java-resource" />
+      <sourceFolder url="file://$MODULE_DIR$/src/test/java" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/src/test/resources" type="java-test-resource" />
+      <excludeFolder url="file://$MODULE_DIR$/target" />
+    </content>
+    <orderEntry type="inheritedJdk" />
+    <orderEntry type="sourceFolder" forTests="false" />
+  </component>
+</module>

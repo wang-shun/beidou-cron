@@ -1,0 +1,37 @@
+﻿【任务名】	更新待审核用户的次优先状态
+【时间驱动】	3 23 * * *	运行超时	10分钟	等待超时	0分钟
+【运行命令】	cd /home/work/beidou-cron/bin; sh updateAuditerVicePriority.sh
+【日志地址】/home/work/beidou-cron/log/updateAuditerVicePriority.log
+【变更库表】	beidou.userauditinfo
+【任务依赖】  无
+========================================================================================
+【任务描述】
+执行远程调用：http://${tcmgr00}:8080/rpc/updateAuditerVicePriorityTask（单点任务）
+com.baidu.beidou.auditmanager.task.updateAuditerVicePriorityTask，对应Java类
+beidou/src/com/baidu/beidou/auditmanager/task/UpdateAuditerCacheTask.java
+execute方法：
+1．	打印日志：开始更新用户次优先状态任务
+2．	调用auditMgr.updateAuditerVicePriority();
+	 * updateAuditerVicePriority:更新用户次优先状态位；
+	 * 1. 用户次优先状态复位；
+	      * 2. 对存在待审核物料的用户设置次优先状态位；
+	（1）auditInfoDao.clearAllViceStatus();//清空次优先状态
+		update userauditinfo set helpstatus = helpstatus & "+(~AuditmanagerConstant.USER_PRIORITY_VICE)
+		其中USER_PRIORITY_VICE= 2;——用户次优先的辅助状态位
+	
+	（2）List<Integer> auditUsers = auditViewDao.findAuditUserIdsIngoreTrade(excludeShifenState);
+		//查询待审核的用户id
+		SELECT distinct a.userid FROM useraccount a join cprounitstate3 b on a.userid=b.uid where b.state=3 and a.ustate =0 and a.ushifenstatid !=7 and a.ushifenstatid !=4 and a.ushifenstatid !=1 and a.ushifenstatid !=6
+	
+	（3）遍历auditUsers中的userid
+		UserAuditInfo info = auditInfoDao.findById(userid);
+		info.setHelpStatus(info.getHelpStatus()|AuditmanagerConstant.USER_PRIORITY_VICE);
+3．	打印日志：结束更新用户次优先状态任务
+
+
+
+==========================================================================================
+【报警内容】
+执行远程调用-更新待审核用户的次优先状态失败
+
+【备注】

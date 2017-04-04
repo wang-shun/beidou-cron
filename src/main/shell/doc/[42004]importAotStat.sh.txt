@@ -1,0 +1,55 @@
+﻿【任务名】	获取doris相关数据，并导入数据库
+【时间驱动】	无（事件依赖）	运行超时	40分钟	等待超时	0分钟
+【运行命令】	cd /home/work/beidou-cron/bin/; sh importAotStat.sh 
+【日志地址】	//home/work/beidou-cron/aot/log/importAotStat.log
+【变更库表】	导入数据到aot. cproplanstat_tmp，aot.cprogroupstat_tmp并重命名为aot. cproplanstat，aot.cprogroupstat 导入数据到cprounitstat
+
+【任务依赖】  
+上游任务：42003: 将一些昨日数据库数据及时保存起来
+下游任务：42005: 通知aot将数据库中所需数据载入内存
+
+========================================================================================
+【任务描述】
+1.	进入数据目录cd /home/work/beidou-cron/data/aot/
+2.	复制数据文件
+Cp /home/work/beidou-stat/data/output/stat_ad_20111208(前一天) ./ad_stat
+3.	重试3回，执行sql：“drop table if exists cprounitstat”
+4.	创建表
+CREATE TABLE cprounitstat(\
+  adid bigint(20) NOT NULL,\
+  srchs bigint(20) NOT NULL,\
+  clks int(11) NOT NULL,\
+  cost int(11) NOT NULL,\
+  userid int(10) NOT NULL,\
+  planid int(10) NOT NULL,\
+  groupid int(10) NOT NULL,\
+  PRIMARY  KEY adid (adid),\
+KEY planid (planid),\
+KEY groupid (groupid)\
+) ENGINE=MyISAM DEFAULT CHARSET=binary
+5.	导入数据
+load data local infile '/home/work/beidou-cron/data/aot/ad_stat' into table cprounitstat
+6.	以组维度对点击，展现，消费进行汇总计算，存储到group_stat(groupid,srchs,clks,cost)
+7.	更新aot.cprogroupstat_tmp（批量sql）：
+update cprogroupstat_tmp set srchs="$2", clks="$3", cost="$4" where groupid="$1";
+8.	以计划维度对点击，展现，消费进行汇总计算，存储到group_stat(planid,srchs,clks,cost)
+9.	更新aot. cproplanstat_tmp（批量sql）：
+update cproplanstat_tmp set srchs="$2", clks="$3", cost="$4" where planid="$1";
+10.	重命名cprogroupstat表、cproplanstat表
+drop table if exists cproplanstat; rename table cproplanstat_tmp to cproplanstat;
+drop table if exists cprogroupstat; rename table cprogroupstat_tmp to cprogroupstat;
+
+
+==========================================================================================
+【报警内容】
+1.	创建cprounitstat表失败
+2.	导入cprounitstat表失败
+3.	计算groupstat失败
+4.	生成groupstat的sql失败
+5.	加载groupstat的sql失败
+6.	计算planstat失败
+7.	生成planstat的sql失败
+8.	加载planstat的sql失败
+9.	重命名cproplanstat表失败
+10.重命名cprogroupstat表失败
+

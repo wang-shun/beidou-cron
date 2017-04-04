@@ -1,0 +1,23 @@
+【任务名】	导入同行业推广组有效提词数量
+【时间驱动】	0 3 * * *	 运行超时	150分钟	等待超时	0分钟 每月更新一次
+【运行命令】	cd /home/work/beidou-cron/bin/; sh getAotQtWordNum.sh;
+【日志地址】	/home/work/beidou-cron/log/getAotQtWordNum.log
+【变更库表】	aot.qtwordnum
+【任务依赖】  上游任务：***号生成（因检索端机器未到位，暂时没有noah平台上游任务的ID）
+========================================================================================
+【任务描述】
+1.	进入数据目录/home/work/beidou-cron/data/
+2.	使用beidou_lib.sh中函数getfile抓取上游文件及其md5，在每次下载前会执行环境清理操作"cd $DATA_PATH && if [[ -z ${filename} ]];then rm ${filename} fi"
+	wget -q -c ftp://tc-sf-cron07.tc.baidu.com:/home/work/var/sf-stat/data/usertrade.txt
+	wget -q -c ftp://tc-sf-cron07.tc.baidu.com:/home/work/var/sf-stat/data/usertrade.txt.md5
+3.	校验md5正确性
+4.	读入用户行业文件，去掉非有效客户和大客户，去掉其他行业客户，过滤黑名单词，将剩下的关键词个数存入文件
+5.	使用beidou_lib.sh中函数db_retry_operation进行数据导入，在每次导入尝试前会执行"delete from aot.qtwordnum"操作
+
+==========================================================================================
+【报警内容】
+1.	wget文件**失败（抓取文件和md5失败）
+2.	**文件的md5校验失败（MD5校验失败）
+3.	计算同行业推广组有效提词数量失败
+4.	删除qtwordnum表数据失败，导入qtwordnum数据失败
+

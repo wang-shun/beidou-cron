@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN 2.0//EN"
+			  "http://www.springframework.org/dtd/spring-beans-2.0.dtd">
+
+
+<!-- - Application context definition for Petclinic on Hibernate. -->
+<beans>
+	<bean id="propertyConfigurerAccount"
+		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="ignoreUnresolvablePlaceholders" value="true" />
+		<property name="order" value="100" />  	<!-- 设置优先级，将应用优先级较高(值越小，优先级越高)的属性值 -->
+		<property name="locations">
+			<list>
+				<value>classpath*:com/baidu/beidou/account/constant/account_constant.properties</value>
+			</list>
+		</property>
+	</bean>
+
+	<bean id="userPerFundDAO" class="com.baidu.beidou.account.dao.impl.UserPerFundDAOImpl"
+		parent="clkdbBaseDaoSupport">
+	</bean>
+
+	<bean id="autoTransferDao" class="com.baidu.beidou.account.dao.impl.AutoTransferDAOImpl"
+		parent="xdbBaseDaoSupport">
+	</bean>
+
+	<bean id="userFundPerDayDAO" class="com.baidu.beidou.account.dao.impl.UserFundPerDayDAOImpl"
+		parent="xdbBaseDaoSupport">
+	</bean>
+
+	<bean id="userRemindDAO" class="com.baidu.beidou.account.dao.impl.UserRemindDAOImpl"
+		parent="xdbBaseDaoSupport">
+	</bean>
+	
+	<bean id="remindTypeDAO" class="com.baidu.beidou.account.dao.impl.RemindTypeDAOImpl"
+		parent="capdbBaseDaoSupport">
+	</bean>
+
+	<bean id="sfClickDao" class="com.baidu.beidou.account.dao.impl.SfClickDAOImpl" 
+		parent="clkdbBaseDaoSupport">
+	</bean>
+</beans>

@@ -1,0 +1,44 @@
+﻿【任务名】	下载总控账户黑白名单，并导入数据库
+【时间驱动】	1 0 * * *	运行超时	5分钟	等待超时	0分钟
+【运行命令】	cd /home/work/beidou-cron/bin/; sh importAotWhiteList.sh;
+【日志地址】	/home/work/beidou-cron/log/aot
+【变更库表】	beidou.whitelist
+【任务依赖】  下游任务：42001通知beidou将数据库中黑白名单载入
+========================================================================================
+【任务描述】
+1.	进入数据目录/home/work/beidou-cron/data/aot
+2.	抓取白名单及其md5：
+	wget –q 
+	ftp://jx-dr-mgr00.jx/home/work/darwin/dr-mgr/var/dict/aot_whitelist/aot_whitelist_data.txt(.md5)
+3.	抓取黑名单及其md5：
+	wget –q 
+	ftp://tc-dr-mgr00.tc/home/work/darwin/dr-mgr/var/dict/aot_blacklist/aot_blacklist_data.txt (.md5) 
+4.	处理抓取的aot_whitelist_data.txt和aot_blacklist_data.txt，自原有文件（只有1列数据）前加一列数字，白名单为6，黑名单为5
+	分别保存到：aotWhiteList，aotBlackList，如
+	5       123456
+	5       2774490
+	5       2755736
+	5       2708291
+	5       2689373
+5.	执行以下sql
+	delete from whitelist where type=6
+	load data local infile 'aotWhiteList' into table whitelist
+	delete from whitelist where type=5
+	load data local infile ' aotBlackList' into table whitelist
+	补充：type目前共有6个，对应
+	beidou-core\src\com\baidu\beidou\cprogroup\constant\WhiteListCache.java中
+			public static final int BAIDU_SITES= 1;（网站白名单）
+			public static final int BAIDU_TRADES = 2;（行业白名单）
+			public static final int USE_BAIDU_USERS = 3;（用户白名单）
+			public static final int BAIDU_FILM =4;（贴片白名单）
+			public static final int BAIDU_AOT_BLACK = 5;（AOT白名单）
+			public static final int BAIDU_AOT_WHITE = 6;（AOT黑名单）
+
+
+==========================================================================================
+【报警内容】
+1.	wget文件**失败（抓取黑白名单失败）
+2.	**文件的md5校验失败（MD5校验失败）
+3.	awk 白（黑）名单失败（awk命令错误）
+4.	删除数据库账户优化白名单失败，导入账户优化白名单失败，删除数据库账户优化黑名单失败，导入账户优化黑名单失败（sql语句执行错误）
+

@@ -1,0 +1,23 @@
+﻿【任务名】	导出预算给nova
+【时间驱动】	*/5 * * * *		运行超时	1分钟	等待超时	0分钟
+【运行命令】	cd /home/work/beidou-cron/bin; sh -x export_plan_nova.sh >> ../log/export_plan_nova.log.tmp 2>&1
+【日志地址】/home/work/beidou-cron/log/export_plan_nova.log.tmp
+【变更库表】	无
+【任务依赖】  无
+========================================================================================
+【任务描述】
+1.	执行sql查询(重试3次)
+	select planid, userid, budget*100 from beidou.cproplan
+	结果导出到文件:
+	/home/work/beidou-cron/data/budgetserver_beidou.tmp,内容如下所示：
+	http://bave.baidu.com/api/images/ee8637ec-964f-42ac-8aa7-c4b85feda1b4
+ 
+2.	生成budgetserver_beidou.md5.tmp文件
+3.	将前两步生成的文件改名（去掉tmp）
+
+
+
+==========================================================================================
+【报警内容】
+1.	从DB中读取预算信息失败(可能原因：执行sql查询失败)
+2.	替换文件失败（可能原因：文件重命名失败）

@@ -1,0 +1,30 @@
+﻿【任务名】	网站白名单加载内存(远ALL)
+【时间驱动】10 22 * * *	运行超时 分钟	等待超时	分钟
+【运行命令】 	cd /home/work/beidou-cron/bin; sh loadsitewhitelist.sh
+【日志地址】	/home/work/beidou-cron/log/loadsitewhitelist.log
+【变更库表】	无
+【任务依赖】  上游任务:1440:BaiduSites:网站白名单入库;
+
+========================================================================================
+【任务描述】
+执行rpc调用，url：http://$1:8080/rpc/loadSiteWhiteList（全部Web服务器）
+调用：com.baidu.beidou.cprogroup.task.LoadSiteWhiteListCTTask
+Execute方法：unionSiteMgr.loadWhiteSiteList();
+(1)	// 获取所有的白名单网站
+	List<Integer> siteIdList = whiteListDao.getBaiduSitesWhiteList();
+(2)	// 获取所有用户可见的百度行业
+	List<Integer> commonTradeList = new ArrayList<Integer>();
+	列表内容来自：WhiteListCache.BAIDU_TRADE_COMMON_LIST
+(3)	// 根据上一步结果，进一步获取所有用户可见的百度网站
+	List<Integer> commonSiteIdList = new ArrayList<Integer>();
+	来源：通过commonTradeList 的tradeId获取该行业所包含的有效站点列表
+(4)	// 将所有的白名单行业的网站和白名单网站做merge，交集为白名单行业对应的白名单网站
+	WhiteListCache.baiduSites.setCommonIdList(commonSiteIdList);
+(5)	// 设置所有用户可见的百度网站的index
+	WhiteListCache.baiduSites.setCommonSeqIdList(commonSeqIdList);
+(6)	加载普通百度自主流量网站分类（白名单用户可见） 
+
+==========================================================================================
+【报警内容】
+执行远程调用-载入百度自有流量网站失败{服务器名}	
+

@@ -1,0 +1,44 @@
+﻿【任务名】	发送昨日审核记录监控邮件
+【时间驱动】	20 6 * * *	运行超时	120分钟	等待超时	0分钟
+【运行命令】	cd /home/work/beidou-cron/bin; sh auditmon.sh mail(如果没有mail参数，则执行912号任务)
+【日志地址】	/home/work/beidou-cron/log/auditmon.log
+【变更库表】	无
+【任务依赖】  无
+========================================================================================
+【任务描述】
+1.	检查配置文件及内容，检查文件存放路径: /home/work/beidou-cron/data/auditmon
+2.	发送邮件：
+	(1)	确定邮件标题名：审核监控数据-yyyymmdd
+		确定目标文件名：audithistory-dd.csv，如audithistory-31.csv
+	(2)	读取昨日生成的计数值，并打印“截至yyyymmdd剩余未审核物料数：**”到目标文件中
+	(3)	执行查询，失败重试3次
+		select (
+			(select count(*) from cprounitstate0 where chaTime >= 昨日 and chaTime < 今日 + 
+			(select count(*) from cprounitstate1 where chaTime >= 昨日 and chaTime < 今日 +
+			(select count(*) from cprounitstate2 where chaTime >= 昨日 and chaTime < 今日 +
+			(select count(*) from cprounitstate3 where chaTime >= 昨日 and chaTime < 今日 +
+			(select count(*) from cprounitstate4 where chaTime >= 昨日 and chaTime < 今日 +
+			(select count(*) from cprounitstate5 where chaTime >= 昨日 and chaTime < 今日 +
+			(select count(*) from cprounitstate6 where chaTime >= 昨日 and chaTime < 今日 +
+			(select count(*) from cprounitstate7 where chaTime >= 昨日 and chaTime < 今日 +
+		) count
+		输出结果到/home/work/beidou-cron/data/auditmon/countYest中
+	(4)	从countYest读取昨天一天的计数值，打印“新提交待审核物料数：**”到目标文件
+	(5)	联表查询auditcprounithistory、SF_User.userinfo、useraccount，获取如下字段内容：
+		userid,客户名,创意属性,标题,描述1,描述2,物料地址,物料尺寸,显示链接,点击链接,提交时间,审核时间,审核人,审核结果,拒绝理由,备注
+		结果集中文字字段需要用双引号引起，空字段或默认值为“-”
+		结果输出到临时文件history.tmp
+	(6)	执行查询，失败重试3次
+		select id, manager from refusereason
+		结果输出到reason.txt 中
+	(7)	awk处理reason.txt 用具体的文字替换history.tmp中的“拒绝理由”字段，结果输出到audithistory-dd.csv中
+	(8)	执行命令发送邮件
+		SendMailAttach "发件人" "收件人" "[数据][beidou] 审核监控数据-yyyymmdd“ "text/plain" "" "text/csv" "audithistory-dd.csv" audithistory-dd.csv
+
+==========================================================================================
+【报警内容】
+1.	auditmon_mail [yesterday remain count] Error（可能原因：读取count**文件错误）
+2.	auditmon_mail [yesterday modification count] Error(可能原因：查询昨日新提交待审核物料数错误)
+3.	auditmon_mail [raw content export] Error（可能原因：联表查询16个字段错误）
+4.	auditmon_mail [refusereason export] Error（可能原因：查询拒绝理由错误）
+

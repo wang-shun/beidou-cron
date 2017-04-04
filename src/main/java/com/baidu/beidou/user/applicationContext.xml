@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN 2.0//EN"
+			  "http://www.springframework.org/dtd/spring-beans-2.0.dtd">
+
+
+<!--
+	- Application context definition for Petclinic on Hibernate.
+-->
+<beans>
+	<import
+		resource="classpath*:/applicationContext-mapping.xml" />
+	<bean id="propertyConfigurerUser"
+		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="ignoreUnresolvablePlaceholders" value="true"/>
+		<property name="order" value="101" />  	<!-- 设置优先级，将应用优先级较高(值越小，优先级越高)的属性值 -->
+		<property name="locations">
+			<list>
+				<value>classpath*:com/baidu/beidou/user/constant/shifen_login.properties</value>
+			</list>
+		</property>
+	</bean>
+	
+	<bean id="userMapper" class="org.dozer.DozerBeanMapper">
+		<property name="mappingFiles">
+			<list>
+				<value>com/baidu/beidou/user/dozerBeanMapping.xml</value>
+			</list>
+		</property>
+	</bean>
+	
+	<bean id="userInfoMgr"  class="com.baidu.beidou.user.service.impl.UserInfoMgrImpl">
+		<constructor-arg index="0" value="${DRM_USERNAME}"/>
+		<constructor-arg index="1" value="${DRM_PASSWORD}"/>
+		<property name="sfDrmDriverProxy" ref="sfDrmDriverProxy"></property>
+		<property name="drucDriver" ref="drucDriver"></property>
+		
+		<property name="AUDITER_NAME_EXPIRE" value="${AUDITER_NAME_EXPIRE}"></property>
+		<property name="mapper" ref="userMapper"></property>
+		<property name="USER_OP_AUTH_EXPIRE" value="${USER_OP_AUTH_EXPIRE}"></property>
+		<property name="USER_RELATION_AUTH_EXPIRE" value="${USER_RELATION_AUTH_EXPIRE}"></property>
+		<property name="USER_RELATION_USERLIST_EXPIRE" value="${USER_RELATION_USERLIST_EXPIRE}"></property>
+		<property name="AUDITER_TYPE_LIST_EXPIRE" value="${AUDITER_TYPE_LIST_EXPIRE}"></property>
+		<property name="USER_TYPE_HEAVY_EXPIRE" value="${USER_TYPE_HEAVY_EXPIRE}"></property>
+	</bean>
+	
+	<bean id="drucDriver" class="com.baidu.beidou.util.McpackProxyFactoryBean">
+    	<property name="serviceInterface">
+			<value>com.baidu.beidou.user.driver.DrucDriver</value>	
+		</property>
+		<property name="serviceUrl" value="${UC_SERVICE_URL}" />	
+		<property name="servers" value="${UC_SERVER}" />	
+		<property name="encoding" value="UTF-8" />
+		<property name="connectionTimeout" value="${UC.connectionTimeout}" />
+		<property name="readTimeout" value="${UC.readTimeout}" />
+		<!-- 不需要发送消息头 -->
+		<property name="hasHeaders" value="false" />
+	</bean>
+	
+	<bean id="sfDrmDriverProxy" class="com.baidu.beidou.util.McpackProxyFactoryBean">
+    	<property name="serviceInterface">
+			<value>com.baidu.beidou.user.driver.SfDrmDriverProxy</value>	
+		</property>
+		<property name="serviceUrl" value="${DRM_SERVICE_URL}" />	
+		<property name="servers" value="${DRM_SERVER}" />	
+		<property name="encoding" value="UTF-8" />
+		<property name="connectionTimeout" value="${UC.connectionTimeout}" />
+		<property name="readTimeout" value="${UC.readTimeout}" />
+		<property name="hasHeaders" value="true" />
+	</bean>
+</beans>

@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN 2.0//EN"
+			  "http://www.springframework.org/dtd/spring-beans-2.0.dtd">
+
+
+<!-- - Application context definition for Petclinic on Hibernate. -->
+<beans>
+	<bean id="propertyConfigurerUnit"
+		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="ignoreUnresolvablePlaceholders" value="true" />
+		<property name="order" value="100" />  	<!-- 设置优先级，将应用优先级较高(值越小，优先级越高)的属性值 -->
+		<property name="locations">
+			<list>
+				<value>classpath*:com/baidu/beidou/cprounit/constant/cprounit_constant.properties</value>
+			</list>
+		</property>
+	</bean>
+
+	<bean id="unitPartitionStrategy"
+		class="com.baidu.beidou.util.partition.strategy.impl.HashPartitionStrategy">
+		<constructor-arg index="0" value="cprounitstate" />
+		<constructor-arg index="1" value="com.baidu.beidou.cprounit.bo.Unit" />
+		<constructor-arg index="2" value="8"></constructor-arg>
+		<!-- <constructor-arg index="3" value="10000,20000"></constructor-arg> -->
+		<constructor-arg index="3" value="10000000"></constructor-arg>
+	</bean>
+	<bean id="unitMaterPartitionStrategy"
+		class="com.baidu.beidou.util.partition.strategy.impl.HashPartitionStrategy">
+		<constructor-arg index="0" value="cprounitmater" />
+		<constructor-arg index="1" value="com.baidu.beidou.cprounit.bo.UnitMater" />
+		<constructor-arg index="2" value="8"></constructor-arg>
+		<!-- <constructor-arg index="3" value="10000,20000"></constructor-arg> -->
+		<constructor-arg index="3" value="10000000"></constructor-arg>
+	</bean>
+	<bean id="unitDao" class="com.baidu.beidou.cprounit.dao.impl.UnitDaoImpl"
+		parent="addbBaseDaoSupport">
+		<property name="strategy">
+			<ref bean="unitPartitionStrategy" />
+		</property>
+		<property name="materStrategy">
+			<ref bean="unitMaterPartitionStrategy" />
+		</property>
+		<property name="dataSourceSupport" ref="dataSourceSupport">
+		</property>
+	</bean>
+	
+	<bean id="unitAdxPartitionStrategy"
+		class="com.baidu.beidou.util.partition.strategy.impl.HashPartitionStrategy">
+		<constructor-arg index="0" value="cprounitadx" />
+		<constructor-arg index="1" value="com.baidu.beidou.cprounit.bo.UnitAdx" />
+		<constructor-arg index="2" value="8"></constructor-arg>
+		<constructor-arg index="3" value="10000000"></constructor-arg>
+	</bean>
+	
+	<bean id="unitAdxDao" class="com.baidu.beidou.cprounit.dao.impl.UnitAdxDaoImpl" parent="addbBaseDaoSupport">
+		<property name="strategy">
+			<ref bean="unitAdxPartitionStrategy" />
+		</property>
+		<property name="dataSourceSupport" ref="dataSourceSupport">
+		</property>
+	</bean>
+	
+	<bean id="preMaterDao" class="com.baidu.beidou.cprounit.dao.impl.PreMaterDaoImpl"
+		parent="addbBaseDaoSupport">
+		<property name="dataSourceSupport" ref="dataSourceSupport">
+		</property>
+	</bean>
+	
+	<bean id="tmpUnitDao" class="com.baidu.beidou.cprounit.dao.impl.TmpUnitDaoImpl"
+		parent="addbBaseDaoSupport">
+		<property name="dataSourceSupport" ref="dataSourceSupport">
+		</property>
+	</bean>
+	
+	<bean id="unitWriteDao" class="com.baidu.beidou.cprounit.dao.impl.UnitWriteDaoImpl"
+		parent="addbBaseDaoSupport">
+		<property name="strategy">
+			<ref bean="unitPartitionStrategy" />
+		</property>
+		<property name="materStrategy">
+			<ref bean="unitMaterPartitionStrategy" />
+		</property>
+	</bean>
+
+	<bean id="userUploadIconDao"
+		class="com.baidu.beidou.cprounit.icon.dao.impl.UserUploadIconDaoImpl" parent="xdbBaseDaoSupport">
+		<property name="jdbcTemplate">
+			<ref bean="xdbJdbcTemplate" />
+		 </property>
+	</bean>
+
+	<bean id="systemIconDao"
+		class="com.baidu.beidou.cprounit.icon.dao.impl.SystemIconDaoImpl" parent="xdbBaseDaoSupport">
+		<property name="jdbcTemplate">
+			<ref bean="xdbJdbcTemplate" />
+		 </property>
+	</bean>
+	<bean id="purposeDao" class="com.baidu.beidou.cprounit.icon.dao.impl.PurposeDaoImpl" parent="xdbBaseDaoSupport">
+		<property name="jdbcTemplate">
+			<ref bean="xdbJdbcTemplate" />
+		</property>
+	</bean>
+	<bean id="iconPurposeDao"
+		class="com.baidu.beidou.cprounit.icon.dao.impl.IconPurposeDaoImpl" parent="xdbBaseDaoSupport">
+		<property name="jdbcTemplate">
+			<ref bean="xdbJdbcTemplate" />
+		</property>
+	</bean>
+	<bean id="adConfigDao" class="com.baidu.beidou.cprounit.icon.dao.impl.AdConfigDaoImpl" parent="capdbBaseDaoSupport">
+	</bean>
+
+</beans>

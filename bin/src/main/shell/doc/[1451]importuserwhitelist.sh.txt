@@ -1,0 +1,37 @@
+﻿【任务名】	用户白名单入库
+【时间驱动】	30 22 * * *	运行超时 10分钟	等待超时	 1分钟
+【运行命令】 	cd /home/work/beidou-cron/bin; sh importuserwhitelist.sh  
+【日志地址】	/home/work/beidou-cron/log/importuserwhitelist.log
+【变更库表】	beidou.whitelist   beidou.cprogroupinfo
+【任务依赖】  下游任务：1452:用户白名单加载内存(远ALL);
+
+========================================================================================
+【任务描述】
+1.	进入数据目录：/home/work/beidou-cron/data/unionsite/input
+2.	备份beidou_uid_whitelist_data.txt为beidou_uid_whitelist_data.txt.20110929(昨天)
+3.	抓取文件及MD5，并进行校验
+	wget 
+	ftp://tc-sf-ct01.tc//home/work/var/sf-ct/filesvr/data/759/beidou_uid_whitelist_data.txt(.md5) 
+4.	如果文件内容为空则报警通知
+5.	执行Cron调用：com.baidu.beidou.cprogroup.ImportUserWhiteList，传递抓取的文件（userid列表-newUserList）
+	beidou-cron\src\com\baidu\beidou\cprogroup\ImportUserWhiteList.java
+	Main方法：groupMgr.updateUserWhiteList(getUserListFromFile(filepath));
+	（1）//获取所有可投放百度自有流量的白名单用户
+		List<Integer> oldUserList = whiteListDao.findAllWhiteUsers();
+		if(CollectionUtils.isEmpty(newUserList)){
+			toResetUserList = oldUserList;
+		}else if(!CollectionUtils.isEmpty(oldUserList)){
+			oldUserList.removeAll(newUserList);
+			toResetUserList.addAll(oldUserList);
+		}
+	
+	（2）whiteListDao.updateWhiteUsers(newUserList);
+	（3）更新可投放百度自有流量的白名单用户列表(先删除，再插入)
+		//whiteListDao.updateWhiteUsers(newUserList);
+	（4）// 获取需要删除的百度自有流量行业和网站，对于toResetUserList中的每一个userid
+		resetUserWhiteConfig(userid, whiteSites, whiteTrades);(去除行业和网站列表中需要删除的项)
+
+
+==========================================================================================
+【报警内容】
+

@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN 2.0//EN"
+"http://www.springframework.org/dtd/spring-beans-2.0.dtd">
+
+<beans>
+	<bean id="mappingUtil"
+		class="com.baidu.beidou.user.util.MappingUtil">
+		<!-- 权限的tag到数字的映射管辖，注意：这里的id和UC没有关系，只是用于在memcache中节省空间 -->
+		<property name="privilegeStrToInt">
+			<map>
+
+				<entry key="Beidou_Message">
+					<value>1</value>
+				</entry>
+				<entry key="Beidou_SaleInfo">
+					<value>2</value>
+				</entry>
+				<entry key="Beidou_CustomList">
+					<value>3</value>
+				</entry>
+				<entry key="Beidou_Audit">
+					<value>4</value>
+				</entry>
+				<entry key="Beidou_ReAudit">
+					<value>5</value>
+				</entry>
+				<entry key="Beidou_AuditHistory">
+					<value>6</value>
+				</entry>
+				<entry key="Beidou_Cprounit">
+					<value>7</value>
+				</entry>
+				<entry key="Beidou_Cproplan">
+					<value>8</value>
+				</entry>
+				<entry key="Beidou_Cprogroup">
+					<value>9</value>
+				</entry>
+				<entry key="Beidou_Stat">
+					<value>10</value>
+				</entry>
+				<entry key="Beidou_Account">
+					<value>11</value>
+				</entry>
+				<entry key="Beidou_Index">
+					<value>12</value>
+				</entry>
+				<entry key="Beidou_ToolIndex">
+					<value>13</value>
+				</entry>
+				<entry key="Beidou_ToolSnapShot">
+					<value>14</value>
+				</entry>
+				<entry key="Beidou_ToolGroupClone">
+					<value>15</value>
+				</entry>
+				<entry key="Beidou_ToolFcImport">
+					<value>16</value>
+				</entry>
+				<entry key="Beidou_ToolMultiMediaUnit">
+					<value>17</value>
+				</entry>
+				<entry key="Beidou_ManageAllClient">
+					<value>18</value>
+				</entry>
+				<entry key="Beidou_AuditHeavy">
+					<value>19</value>
+				</entry>
+				<entry key="Beidou_AssignAudit">
+					<value>20</value>
+				</entry>
+				<entry key="Beidou_AuditIndex">
+					<value>21</value>
+				</entry>
+			</map>
+		</property>
+		<property name="auditPrivilege">
+			<set>
+				<value>Beidou_Audit</value>
+				<value>Beidou_ReAudit</value>
+				<value>Beidou_AuditHistory</value>
+				<value>Beidou_AuditIndex</value>
+				<value>Beidou_AuditHeavy</value>
+				<value>Beidou_AssignAudit</value>
+			</set>
+		</property>
+		<!-- shifen到beidou的权限映射关系 -->
+		<property name="roleSfToBd">
+			<map>
+				<entry key="sys_admin" value="BEIDOU_SYS_MANAGER"></entry>
+				<entry key="first_client_admin"
+					value="BEIDOU_CLIENT_ADMIN">
+				</entry>
+				<entry key="keyword_admin" value="BEIDOU_SALER_SUPER"></entry>
+				<entry key="first_direct_admin"
+					value="BEIDOU_SALER_FIRST">
+				</entry>
+				<entry key="second_direct_admin"
+					value="BEIDOU_SALER_SECOND">
+				</entry>
+				<entry key="first_branch_admin"
+					value="BEIDOU_SALER_FIRST">
+				</entry>
+				<entry key="second_branch_admin"
+					value="BEIDOU_SALER_SECOND">
+				</entry>
+				<entry key="first_agent" value="BEIDOU_SALER_FIRST"></entry>
+				<entry key="first_area_agent"
+					value="BEIDOU_SALER_FIRST">
+				</entry>
+				<entry key="second_agent" value="BEIDOU_SALER_SECOND"></entry>
+				<entry key="second_area_agent"
+					value="BEIDOU_SALER_SECOND">
+				</entry>
+				<entry key="agent_son_a"
+					value="BEIDOU_CUSTOMER_NORMAL">
+				</entry>
+				<entry key="agent_son_b"
+					value="BEIDOU_CUSTOMER_NORMAL">
+				</entry>
+				<entry key="agent_son_c"
+					value="BEIDOU_CUSTOMER_NORMAL">
+				</entry>
+				<entry key="agent_son_d"
+					value="BEIDOU_CUSTOMER_NORMAL">
+				</entry>
+				<entry key="agent_son" value="BEIDOU_CUSTOMER_NORMAL"></entry>
+				<entry key="direct_son"
+					value="BEIDOU_CUSTOMER_NORMAL">
+				</entry>
+				<entry key="branch_son"
+					value="BEIDOU_CUSTOMER_NORMAL">
+				</entry>
+				<entry key="sys_common_independent"
+					value="BEIDOU_CUSTOMER_NORMAL">
+				</entry>
+				<entry key="heavy_custmer"
+					value="BEIDOU_CUSTOMER_HEAVY">
+				</entry>
+				<entry key="noright_agent" value="BEIDOU_SALER_FIRST"></entry>
+				<entry key="vip_customer" value="BEIDOU_CUSTOMER_VIP"></entry>
+				<entry key="BEIDOU_AUDITER" value="BEIDOU_AUDITER"></entry>
+				<entry key="BEIDOU_WANGMENG" value="BEIDOU_WANGMENG"></entry>
+			</map>
+		</property>
+	</bean>
+</beans>

@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN 2.0//EN"
+			  "http://www.springframework.org/dtd/spring-beans-2.0.dtd">
+
+
+<!--
+	- Application context definition for Petclinic on Hibernate.
+-->
+<beans>
+	<bean id="accountConfig" class="com.baidu.beidou.account.constant.AccountConfig">
+		<property name="MFC_BEIDOU_PRODUCTID">
+			<value>${MFC_BEIDOU_PRODUCTID}</value>
+		</property>
+		<property name="MFC_FENGCHAO_PRODUCTID">
+			<value>${MFC_FENGCHAO_PRODUCTID}</value>
+		</property>		
+	</bean>
+	
+	<bean id="mfcService" class="com.baidu.beidou.account.service.impl.MfcServiceImpl">
+		<constructor-arg index="0" value="100"/>
+		<constructor-arg index="1" value="${MFC_BEIDOU_USERNAME}"/>
+		<constructor-arg index="2" value="${MFC_BEIDOU_PASSWORD}"/>
+		<property name="mfcStatDriver" ref="mfcStatDriverProxy" />
+		<property name="mfcAccountDriver" ref="mfcAccountDriverProxy" />
+		<property name="mfcOperationDriver" ref="mfcOperationDriverProxy" />
+		<property name="mfcFinanceDriver" ref="mfcFinanceDriverProxy" />
+	</bean>
+	
+	<bean id="mfcStatDriverProxy" class="com.baidu.beidou.util.McpackProxyFactoryBean">
+    	<property name="serviceInterface">
+			<value>com.baidu.beidou.account.mfcdriver.MfcStatDriverProxy</value>	
+		</property>
+		<property name="serviceUrl" value="${MFC_SERVICEURL_STAT}" />	
+		<property name="servers" value="${MFC_SERVER}" />	
+		<property name="encoding" value="UTF-8" />
+		<property name="connectionTimeout" value="${MFC.connectionTimeout}" />
+		<property name="readTimeout" value="${MFC.readTimeout}" />
+		<property name="hasHeaders" value="true" />
+	</bean>
+	
+	<bean id="mfcAccountDriverProxy" class="com.baidu.beidou.util.McpackProxyFactoryBean">
+    	<property name="serviceInterface">
+			<value>com.baidu.beidou.account.mfcdriver.MfcAccountDriverProxy</value>	
+		</property>
+		<property name="serviceUrl" value="${MFC_SERVICEURL_ACCOUNT}" />	
+		<property name="servers" value="${MFC_SERVER}" />	
+		<property name="encoding" value="UTF-8" />
+		<property name="connectionTimeout" value="${MFC.connectionTimeout}" />
+		<property name="readTimeout" value="${MFC.readTimeout}" />
+		<property name="hasHeaders" value="true" />
+	</bean>
+	
+	<bean id="mfcOperationDriverProxy" class="com.baidu.beidou.util.McpackProxyFactoryBean">
+    	<property name="serviceInterface">
+			<value>com.baidu.beidou.account.mfcdriver.MfcOperationDriverProxy</value>	
+		</property>
+		<property name="serviceUrl" value="${MFC_SERVICEURL_OPERATION}" />	
+		<property name="servers" value="${MFC_SERVER}" />	
+		<property name="encoding" value="UTF-8" />
+		<property name="connectionTimeout" value="${MFC.connectionTimeout}" />
+		<property name="readTimeout" value="${MFC.readTimeout}" />
+		<property name="hasHeaders" value="true" />
+	</bean>
+
+	<bean id="mfcFinanceDriverProxy" class="com.baidu.beidou.util.McpackProxyFactoryBean">
+    	<property name="serviceInterface">
+			<value>com.baidu.beidou.account.mfcdriver.MfcFinanceDriverProxy</value>	
+		</property>
+		<property name="serviceUrl" value="${MFC_SERVICEURL_FINANCE}" />	
+		<property name="servers" value="${MFC_SERVER}" />	
+		<property name="encoding" value="UTF-8" />
+		<property name="connectionTimeout" value="${MFC.connectionTimeout}" />
+		<property name="readTimeout" value="${MFC.readTimeout}" />
+		<property name="hasHeaders" value="true" />
+	</bean>
+	
+	<bean id="userFundService" class="com.baidu.beidou.account.service.impl.UserFundServiceImpl">
+		<property name="userPerFundDAO">
+			<ref bean="userPerFundDAO"/>
+		</property>
+		<property name="userDao">
+			<ref bean="userDao"/>
+		</property>
+		<property name="userFundPerDayDAO">
+			<ref bean="userFundPerDayDAO"/>
+		</property>
+		<property name="autoTransferDao">
+			<ref bean="autoTransferDao"/>
+		</property>
+		<property name="mfcService">
+			<ref bean="mfcService"/>
+		</property>
+		<property name="autotransfer_logpath">
+			<value>${autofundtransfer.resultlog.path}</value>
+		</property>
+		<property name="fundFilePath">
+			<value>${perfund.file.path}</value>
+		</property>
+		<property name="syncFilePath">
+			<value>${sync.file.path}</value>
+		</property>
+		<property name="costFilePath">
+			<value>${cost.file.path}</value>
+		</property>
+		<property name="useridsForBalanceFilePath">
+			<value>${userids.file.path}</value>
+		</property>
+		<property name="costFileList">
+			<value>${cost.file.list.name}</value>
+		</property>
+		<property name="shifenUserFundFile">
+			<value>${shifen.cost.file.name}</value>
+		</property>
+		<property name="shifenUnFundFile">
+			<value>${un.cost.file.name}</value>
+		</property>
+		<property name="shifenMaFundFile">
+			<value>${ma.cost.file.name}</value>
+		</property>
+		<property name="shifenDataFilePath">
+			<value>${shifen.check.file.path}</value>
+		</property>
+		<property name="shifenUserFinanFile">
+			<value>${shifen.user.finan.file}</value>
+		</property>
+		<property name="mailSender">
+			<ref bean="mailSender"/>
+		</property>
+		<property name="rdMailList">
+			<value>${rd.mail.list}</value>
+		</property>
+		<property name="templateDir">
+			<value>${template.dir}</value>
+		</property>
+		<property name="userInfoMgr" ref="userInfoMgr"></property>
+		<property name="remindService" ref="remindService"></property>
+	</bean>
+	
+	<bean id="accountService" class="com.baidu.beidou.account.service.impl.AccountServiceImpl">
+		<property name="sfClickDao">
+			<ref bean="sfClickDao"/>
+		</property>
+	</bean>
+	
+	<bean id="remindService" class="com.baidu.beidou.account.service.impl.RemindServiceImpl">
+				<property name="userRemindDAO">
+					<ref bean="userRemindDAO"/>
+				</property>
+				<property name="userDao">
+					<ref bean="userDao"/>
+				</property>
+				<property name="userInfoMgr">
+					<ref bean="userInfoMgr"/>
+				</property>
+				<property name="handler">
+					<ref bean="remindHandler"/>
+				</property>
+				<property name="mfcService">
+					<ref bean="mfcService"/>
+				</property>
+				<property name="successTemplate">
+					<value>com/baidu/beidou/account/template/transferSuccMail.ftl</value>
+				</property>
+				<property name="failTemplate">
+					<value>com/baidu/beidou/account/template/transferFailMail.ftl</value>
+				</property>
+				<property name="limitFrom">
+					<value>${TIME_LIMIT_FROM}</value>
+				</property>
+				<property name="limitTo">
+					<value>${TIME_LIMIT_TO}</value>
+				</property>
+    </bean>
+    <bean id="remindHandler" class="com.baidu.beidou.account.userremind.UserRemindHandler">
+    			<property name="mobileGate">
+					<value>adsms01.baidu.com</value>
+				</property>
+				<property name="mobilePort">
+					<value>15089</value>
+				</property>
+				<property name="remindMailSender">
+					<ref bean="mailSender"/>
+				</property>
+    </bean>
+	<bean id="notifyZeroBalanceTask" class="com.baidu.beidou.account.service.NotifyZeroBalanceTask">
+		<property name="accountService">
+			<ref bean="accountService"/>
+		</property>
+		<property name="userDao">
+			<ref bean="userDao"/>
+		</property>
+		<property name="businessMailFrom">
+			<value>${business.mail.from}</value>
+		</property>
+		<property name="pageSize">
+			<value>${notify.zero.balance.user.page.size}</value>
+		</property>
+		<property name="zeroBalanceUserListPath">
+			<value>${notify.zero.balance.zeroBalanceUserListPath}</value>
+		</property>
+		<property name="userInfoMgr" ref="userInfoMgr"></property>
+	</bean>
+</beans>

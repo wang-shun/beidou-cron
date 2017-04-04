@@ -1,0 +1,176 @@
+准备：查看ubuntu版本确认为11.10，可以通过如下命令查看：
+1）#cat /etc/issue 
+Ubuntu 11.10 \n \l
+2）# lsb_release -a
+No LSB modules are available.
+Distributor ID: Ubuntu
+Description:    Ubuntu 11.10
+Release:        11.10
+Codename:       oneiric
+
+1.将work账号加入sudoer中
+1）chmod u+w /etc/sudoers
+2）编辑/etc/sudoers文件。也就是输入命令"gedit /etc/sudoers",进入编辑模式，找到这一 行："root ALL=(ALL) ALL"在起下面添加"work ALL=(ALL) ALL"(这里的xxx是你的用户名)，然后保存退出。
+3）chmod u-w /etc/sudoers
+4）su - work
+注：也可以用root操作，不强制配置work也可行。
+
+5）修改work密码为“passw0rd”
+# su - work
+$ passwd
+Changing password for work.
+(current) UNIX password: 
+Enter new UNIX password: 
+Retype new UNIX password: 
+passwd: password updated successfully
+$ 
+
+2 安装依赖
+sudo apt-get install xvfb git build-essential gtk2-engines-pixbuf xfonts-100dpi x11-xkb-utils xfonts-100dpi xfonts-75dpi xfonts-scalable xfonts-cyrillic
+sudo apt-get install libqt4-dev libqtwebkit-dev qt4-qmake python-qt4
+
+3. 运行并配置xvfb
+Xvfb -fp /usr/share/fonts/X11/misc/ :0 -screen 0 1024x768x24 &
+
+如果没有报错，xvfb就充当xserver跑在后台了。
+
+正式使用的时候，要做成守护进程，创建一个脚本，/etc/init.d/Xvfb：
+
+#! /bin/sh
+
+### BEGIN INIT INFO
+# Provides: Xvfb
+# Required-Start: $local_fs $remote_fs
+# Required-Stop:
+# X-Start-Before:
+# Default-Start: 2 3 4 5
+# Default-Stop:
+### END INIT INFO
+
+N=/etc/init.d/Xvfb
+
+set -e
+
+case "$1″ in
+  start)
+Xvfb :0 -screen 0 1024x768x24 &
+;;
+  stop|reload|restart|force-reload)
+;;
+  *)
+echo "Usage: $N {start|stop|restart|force-reload}" >&2exit 1
+;;
+esac
+
+exit 0
+
+4. 编译phantomjs
+通过git下载phantomjs的源代码：
+
+git clone git://github.com/ariya/phantomjs.git
+
+cd phantomjs
+
+可以这样看到所有的版本：
+
+git tag
+
+我使用的代码主干，看issues里的对话，应该接近1.5版本了。如果你需要稳定版本，可以切换到该版本下：
+
+git checkout 1.4.1
+
+编译和安装：
+
+qmake-qt4
+make
+sudo cp bin/phantomjs /usr/local/bin/
+
+运行一下，看是否能得到截图：
+
+DISPLAY=:0 phantomjs ~/phantomjs/examples/rasterize.js http://www.baidu.com screenshot.png
+
+百度首页保存在 screenshot.png
+
+5. 中文字体拷贝
+ubuntu默认无中文字体，需要自行安装，将font.tar.gz解压，拷贝到/usr/share/fonts/目录
+[注]字体可以从自己的windows机器上拷贝常用的中文字体，然后打包上传到/usr/share/fonts/目录
+
+然后再执行：fc-cache
+
+6. 安装FTP
+1）sudo apt-get install vsftpd
+2）配置vsftpd
+打开/etc/vsftpd.conf文件，将下面的配置前面的“#”解注掉。
+
+anonymous_enable=YES
+local_enable=YES
+write_enable=YES
+anon_upload_enable=YES
+anon_mkdir_write_enable=YES
+
+chroot_local_user=YES
+chroot_local_user=YES
+chroot_list_enable=YES
+chroot_list_file=/etc/vsftpd.chroot_list
+
+编辑/etc/vsftpd.chroot_list加入work
+
+3）重启ftp
+sudo /etc/init.d/vsftpd restart
+
+7. 安装apache2与php环境
+apt-get install apache2
+apt-get install php5
+
+修改/etc/apache2/ports.conf中的端口为8080，修改/etc/apache2/sites-avaliable/default 中端口为8080
+
+例如，
+<VirtualHost *:8080>  
+        ServerAdmin webmaster@localhost  
+  
+        ServerName www.ccy.com  
+  
+        DocumentRoot /var/www/ccy  
+        <Directory /var/www/ccy>  
+                Options Indexes FollowSymLinks MultiViews  
+                AllowOverride None  
+                Order allow,deny  
+                allow from all  
+        </Directory>  
+  
+        ScriptAlias /cgi-bin/ /usr/lib/cgi-bin/  
+        <Directory "/usr/lib/cgi-bin">  
+                AllowOverride None  
+                Options +ExecCGI -MultiViews +SymLinksIfOwnerMatch  
+                Order allow,deny  
+                Allow from all  
+        </Directory>  
+  
+        ErrorLog ${APACHE_LOG_DIR}/error.log  
+  
+        # Possible values include: debug, info, notice, warn, error, crit,  
+        # alert, emerg.  
+        LogLevel warn  
+
+输入 http://ip:8080/test.php 可以打开页面。
+
+-----------------------------------------------------------------------------------
+参考资料：
+http://marshal.easymorse.com/archives/4769
+http://yoodey.com/how-install-and-run-phantomjs-ubuntu-oneiric-1110
+
+目录结构：
+
+/home/work/snapshot/bin 将bin.tar解压到此
+/home/work/snapshot/ads
+/home/work/snapshot/api
+/home/work/snapshot/images
+/home/work/snapshot/logs
+/home/work/www  将www.tar解压到此
+
+
+8. 安装lz,sz
+// 新装的系统一定要先执行下面这个命令
+sudo apt-get update
+sudo apt-get install lrzsz
+

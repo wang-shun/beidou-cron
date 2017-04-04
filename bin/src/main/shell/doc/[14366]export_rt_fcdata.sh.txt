@@ -1,0 +1,28 @@
+﻿【任务名】	导出数据给凤巢
+【时间驱动】	 	运行超时 分钟	等待超时	 分钟
+【运行命令】	cd /home/work/beidou-cron/bin/; sh export_rt_fcdata.sh
+【日志地址】	/home/work/beidou-cron/log/export_rt_fcdata
+【变更库表】	无
+【任务依赖】  下游任务：13939:(周期运行)凤巢为北斗导出计划对应单元ID;
+========================================================================================
+【任务描述】
+1.	联表执行如下查询：
+	select rt.groupid, rt.fcplanid from cprogroup g, cproplan p, cprogrouprt{0-7} rt where g.groupstate=0 and g.targettype=1 and g.planid=p.planid and p.planstate=0 and g.groupid=rt.groupid and rt.relationtype=1;（推广计划、推广组均有效、人群定向为RT、关联推广计划）
+	数据导出至文件beidou.rt2.groupid-fcplanid
+2.	选择fcplanid一列，去重排序后输出至beidou.rt2.groupid-fcplanid
+	该文件是北斗推广组关联的凤巢推广计划
+3.	联表执行如下查询：
+	select rt.groupid, rt.fcunitid from cprogroup g, cproplan p, cprogrouprt{0-7} rt where g.groupstate=0 and g.targettype=1 and g.planid=p.planid and p.planstate=0 and g.groupid=rt.groupid and rt.relationtype=0;（推广计划、推广组均有效、人群定向为RT、关联推广单元）
+	数据导出至文件beidou.rt2.groupid-fcunitid
+	该文件是北斗推广组关联的凤巢推广单元。在导给nova时会被merge
+4.	联表执行如下查询：
+	select day.groupid, day.alivedays from cprogroup g, cproplan p, cprogrouprtday day where g.groupstate=0 and g.targettype=1 and g.planid=p.planid and p.planstate=0 and g.groupid=day.groupid（推广计划、推广组均有效、人群定向为RT）
+	数据去重排序后输出至beidou.rt2.day
+	该文件是北斗推广组人群定向的有效时间。会提供给nova用
+5.	备份2-4步骤中生成的文件，“文件名+时间戳”，存放于：
+	/home/work/beidou-cron/data/retargeting/bak/
+
+==========================================================================================
+【报警内容】
+报警内容	错误打印在log中
+

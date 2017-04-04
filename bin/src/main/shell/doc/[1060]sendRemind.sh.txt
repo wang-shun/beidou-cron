@@ -1,0 +1,36 @@
+﻿【任务名】	余额不足提醒任务
+【时间驱动】	0 10 * * *	运行超时	60分钟	等待超时	分钟
+【运行命令】	cd /home/work/beidou-cron/bin; sh sendRemind.sh
+【日志地址】	/home/work/beidou-cron/log/sendRemind.log
+【变更库表】	无
+【任务依赖】  无
+========================================================================================
+【任务描述】
+执行远程调用：
+http://10.23.240.106:8080/rpc/sendRemind  ctclient1  R2Q5D7Xo5rH83h0s
+com.baidu.beidou.account.task.impl.RemindSendTaskImpl
+对应/beidou/src/com/baidu/beidou/account/task/impl/RemindSendTaskImpl.java
+Execute方法流程如下：
+1.	List<UserRemind> urList=remindRecService.findAllAccountRemindType();//所有设置了账户充值提醒的设置
+其中UserRemind对象包括remindId、userId、remindType、email、mobile
+2.	遍历urList中的每个对象，执行remindService.handleUserRemind(ur);
+3.	handleUserRemind方法首先根据提醒类型创建一个提醒实例handler，
+createUserRemindByType(int type);
+之后调用handler.handldRemindByUser方法发送提醒
+4.	handldRemindByUser的具体流程为：
+(1)	根据userid查找用户
+(2)	判断删除和关闭状态的用户（userstate=1 or 2），是则退出，不发送提醒
+(3)	userInfoMgr.getCustomerInfo(user.getUserid());获取用户信息
+(4)	cproPlanDao.findEffectiveByUserId(user.getUserid());获取用户有效推广计划，计算budget总和，同时获取余额
+(5)	判断条件：余额 < budget * 3，如果是则发送短信和邮件提醒
+this.sendSms(content, userRemind);
+this.sendMailRemind(userRemind);
+内容：尊敬的****先生/小姐， 您在百度的网盟推广账户 "****"余额已经不足3日预算，为了不影响您的推广效果，请追加新的款项
+发送邮件：增加发送给销售管理员
+
+[辅助图片]http://bave.baidu.com/api/images/39c438bf-4d24-432f-b08d-4fd9bdddca1c
+
+==========================================================================================
+【报警内容】
+执行远程调用-发送余额不足提醒失败
+

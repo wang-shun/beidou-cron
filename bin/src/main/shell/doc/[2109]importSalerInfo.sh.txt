@@ -1,0 +1,46 @@
+﻿【任务名】	导入销售管理员综述信息
+【时间驱动】	35 0 * * *	运行超时	60分钟	等待超时	30分钟
+【运行命令】	cd /home/work/beidou-cron/bin; sh importSalerInfo.sh
+【日志地址】	/home/work/beidou-cron/log/importSalerInfo.log.yyyymmdd
+【变更库表】	beidou.salercustomerinfo
+【任务依赖】  上游任务：1803: 抓取用户余额
+========================================================================================
+【任务描述】
+（1）判断是否在data/balance/目录下生成了当天的余额数据文件（1803号任务）
+（2）调用beidou-cron\src\com\baidu\beidou\salemanager\ImportSalerInfo.java
+	传递参数：
+	-b data/balance/userblns.dat.yyyymmdd（输入文件）
+	-o data/balance/salerinfo.txt（输出文件）
+（3）ImportSalerInfo.java流程
+	a.	解析参数，获取输入文件和输出文件名
+	b.	获取所有用户的beidou业务数据：有效推广计划数，有效推广计划预算，其中用户和推广计划需要进行状态值过滤，返回的数据为一个Map：
+		<userid，SalerCustInfo>其中SalerCustInfo的属性包括：
+		balance（分）、normalPlanNumber、normalPlanBudge（元）、total（分）
+		有效计划数，有效推广计划预算总额分别对应normalPlanNumber、normalPlanBudge
+	c.	根据输入文件和b中的数据，读取财务文件，设置余额和投资
+		设置余额(balance)：输入文件中的余额值*100+0.5（分）,取整
+		设置投资(total)：输入文件中的invest值*100+0.5（分），取整
+	d.	从UC中获取所有的销售管理员id
+	e.	对于每个id，获取其管辖的所有外部用户id，设集合为A
+	f.	计算集合A中所有用户的总余额，总预算，总有效推广计划数，总投资及A中的用户数，打印到输出文件中，格式为6列，使用\t分隔
+	（3161260      21         13             39900  24177000  87459）
+	（销售管理员id  管辖用户数  总有效推广计划 总预算 总投资      总余额）
+（4）创建表salercustomerinfo_tmp，并导入上述数据
+（5）drop原表，并将salercustomerinfo_tmp改名为salercustomerinfo（销售管理员客户信息表），其字段分别为： 销售管理员id（userid）、网盟推广客户数（custcnt）、有效推广计划数（plancnt）、有效推广计划预算（budget，元）、客户总投资（invest，分）、客户账面余额（balance，分）
+（6）将salerinfo.txt更名为salerinfo.txt.yyyymmdd，并生成md5
+
+==========================================================================================
+【报警内容】
+1.	进入文件目录****失败（可能原因：cd目录失败）
+2.	更新销售管理员的综述信息发生异常（可能原因：ImportSalerInfo.java执行异常）
+3.	更新数据库salercustomerinfo发生异常（可能原因：load数据错误）
+4.	生成MD5文件发生异常（可能原因：md5生成错误）
+
+
+【备注】
+这个任务经常出现的问题是importPlanOffline.sh执行失败。一般来说，是因为某个查询planId->userId关系或者数据文件load进数据库失败，这时候
+查看/home/work/beidou-cron/data/planoffline/input/{今天}/的目录下最近的几个文件，看是否有某个文件没有load到beidou.cproplan_offline库(目前的规模大概是600多行/文件)，如果存在的话，联系OP将这个文件备份删除或者mv到其他路径即可，下个周期任务执行时会自动补上这个文件并重新入库。
+现在以上工作脚本已经可以自动完成，当检测到失败时，脚本会自动删除本周期文件并且发短信提醒，下个周期会自动回溯。
+
+
+

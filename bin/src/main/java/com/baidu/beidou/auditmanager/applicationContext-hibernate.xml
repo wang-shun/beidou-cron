@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN 2.0//EN"
+			  "http://www.springframework.org/dtd/spring-beans-2.0.dtd">
+
+
+<!--
+	- Application context definition for Petclinic on Hibernate.
+-->
+<beans>
+	<bean id="historyDao" class="com.baidu.beidou.auditmanager.dao.impl.AuditHistoryDaoImpl" parent="addbBaseDaoSupport">
+		<property name="dataSourceSupport" ref="dataSourceSupport">
+		</property>
+	</bean>
+	
+	<bean id="patrolValidDao" class="com.baidu.beidou.auditmanager.dao.impl.PatrolValidDaoImpl" parent="addbBaseDaoSupport">
+		<property name="strategy">
+			<ref bean="unitPartitionStrategy" />
+		</property>
+		<property name="dataSourceSupport" ref="dataSourceSupport">
+		</property>
+	</bean>
+
+	<bean id="patrolValidOnCapDao" class="com.baidu.beidou.auditmanager.dao.impl.PatrolValidOnCapDaoImpl" parent="capdbBaseDaoSupport">
+	</bean>
+	
+	<bean id="urlJumpCheckDao" class="com.baidu.beidou.auditmanager.dao.impl.UrlJumpCheckDaoImpl" parent="addbBaseDaoSupport">
+		<property name="strategy">
+			<ref bean="unitPartitionStrategy" />
+		</property>
+		<property name="dataSourceSupport" ref="dataSourceSupport">
+		</property>
+	</bean>
+
+	<bean id="urlJumpCheckOnCapDao" class="com.baidu.beidou.auditmanager.dao.impl.UrlJumpCheckOnCapDaoImpl" parent="capdbBaseDaoSupport">
+	</bean>
+	
+	<bean id="urlCheckHistoryDao" class="com.baidu.beidou.auditmanager.dao.impl.UrlCheckHistoryDaoImpl" parent="xdbBaseDaoSupport">
+		<property name="CNT_PER_INSERT_SQL" value="${CNT_PER_INSERT_SQL}">
+		</property>
+	</bean>
+	
+	<bean id="auditUnitDao" class="com.baidu.beidou.auditmanager.dao.impl.AuditUnitDaoOnMultiAddbImpl" parent="addbBaseDaoSupport">
+		<property name="dataSourceSupport">
+			<ref bean="dataSourceSupport" />
+		</property>
+	</bean>
+</beans>

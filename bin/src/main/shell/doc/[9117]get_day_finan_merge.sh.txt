@@ -1,0 +1,37 @@
+﻿【任务名】	新版生成CRM数据中的消费信息_合并数据文件
+【时间驱动】	30 6 * * *	运行超时	5分钟	等待超时	0分钟
+【运行命令】	cd /home/work/beidou-cron/bin; sh get_day_finan_merge.sh
+【日志地址】	/home/work/beidou-cron/log/crm_new.log.${YYYYMMDD}
+【变更库表】	无
+【任务依赖】  无
+========================================================================================
+【任务描述】
+(1)	将/home/work/beidou-cron/data/crm/下的如下文件cat到同一个文件中(以前是两个文件，但执行时间太长，后来分拆成4个任务，所以需要合并4个文件)
+	cat business.1, business.2, business.3, business.4 > business.old
+(2)	取得计划上下线时间
+	select p.pid, p.uid, p.time, p.flag from (select planid as pid, userid as uid, offtime as time, 1 as flag from beidou.cproplan_offline where offtime>=${yesterday} and offtime<${today} 
+	union all 
+	select planid as pid, userid as uid, ontime as time, 0 as flag from beidou.cproplan_online where ontime>=${yesterday} and ontime<${today}) p order by p.uid, p.pid, p.time;
+	结果存储到plan.time,文件共四列，planid、userid、time、flag，按照userid、planid、time进行升序排列
+(3)	Awk处理plan.time文件，得到用户最早下线推广计划，存储于plan.offtime
+ 
+(4)	执行sql查询：select planid, planname from beidou.cproplan获取推广计划的名称，结果存储到plan.name
+(5)	合并plan.offtime和plan.name输出user.offtime,如
+
+(6)	合并user.offtime和business.old文件，结果为business（即在business追加两列，最早下线的计划名和时间）
+(7)	生成business.md5文件，同时备份business文件为business.yyyymmdd，生成对应md5
+
+
+==========================================================================================
+【报警内容】
+取得计划上下线时间失败(第2步sql查询失败)
+获取最早下线推广计划失败（第3步awk处理文件失败）
+读取推广计划名失败（第4步sql查询失败）
+合并推广计划名失败（第5步合并文件失败）
+生成business文件失败（第6步合并文件失败）
+生成business md5文件失败（第7步生成md5失败）
+
+
+【备注】
+这个脚本使用的读库是jx-beidou-aotdb01.jx，所以如果该库进行了handoff操作，除了两台aot服务器需要切流量外，cron机器也需要切换流量
+

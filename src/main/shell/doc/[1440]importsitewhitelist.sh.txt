@@ -1,0 +1,25 @@
+﻿【任务名】	BaiduSites:网站白名单入库
+【时间驱动】	9 22 * * *	运行超时10分钟	等待超时	210分钟
+【运行命令】 	cd /home/work/beidou-cron/bin; sh importsitewhitelist.sh
+【日志地址】	/home/work/beidou-cron/log/importsitewhitelist.log
+【变更库表】	beidou.whitelist
+【任务依赖】  
+	上游任务：552:站点全库加载内存(远all);
+	下游任务：1441:网站白名单加载内存(远ALL);
+
+========================================================================================
+【任务描述】
+1.	进入数据目录：/home/work/beidou-cron/data/unionsite/input
+2.	确定文件beidou_baidusite_data1.txt存在
+3.	执行sql：use beidou; delete from whitelist where type = 1
+4.	读取文件beidou_baidusite_data1.txt，逐一添加新的网站
+	for url in `awk -F '\t' '{print $3}' ${WHITE_SITE_FILE}` 
+	do
+	        执行sql： use beidou; insert into whitelist select 1, siteid from unionsite where siteurl = '${url}'";
+	done
+
+
+==========================================================================================
+【报警内容】
+更新网站whitelist失败
+

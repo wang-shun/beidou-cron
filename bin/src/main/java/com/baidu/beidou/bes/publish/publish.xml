@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN 2.0//EN" "http://www.springframework.org/dtd/spring-beans-2.0.dtd">
+
+<!-- - Application context definition for "springapp" DispatcherServlet. -->
+
+<beans>
+  <!-- 工具bean，获取物料大小使用 -->
+  <bean id="ubmcServiceExtension" class="com.baidu.beidou.bes.UbmcServiceExtension">
+    <property name="ubmcService">
+      <ref bean="ubmcService" />
+    </property>
+  </bean>
+
+  <!-- 输出部分 -->
+  <bean id="fileOutput" class="com.baidu.beidou.bes.FileResultOutput" scope="singleton" lazy-init="true">
+    <constructor-arg index="0" value="whitelist_unit" />
+    <constructor-arg index="1" value="publish" />
+  </bean>
+  
+  <!-- 数据导出bean -->
+  <bean id="defaultFormatter" class="com.baidu.beidou.bes.UnitMaterFormatter" />
+
+  <bean id="planIdProcessor" class="com.baidu.beidou.bes.PlanIdProcessor" lazy-init="true">
+    <property name="successor">
+      <ref bean="unitMaterProcessor" />
+    </property>
+    <property name="unitDao">
+      <ref bean="unitDao" />
+    </property>
+    <property name="wuliaoType">
+      <list>
+        <value>2</value>
+        <value>3</value>
+        <value>9</value>
+      </list>
+    </property>
+  </bean>
+
+  <bean id="unitMaterProcessor" class="com.baidu.beidou.bes.UnitMaterProcessor" lazy-init="true">
+    <property name="filters">
+      <list />
+    </property>
+    <property name="output">
+      <ref bean="fileOutput" />
+    </property>
+    <property name="formatter">
+      <ref bean="defaultFormatter" />
+    </property>
+    <property name="ubmcService">
+      <ref bean="ubmcServiceExtension" />
+    </property>
+    <property name="adxGateService">
+      <ref bean="adxGateService" />
+    </property>
+    <property name="submitToAdxGateService" value="true" />
+  </bean>
+
+  <bean id="adxGateService" class="com.baidu.beidou.util.McpackProxyFactoryBean">
+    <property name="serviceInterface">
+      <value>com.baidu.adxgate.share.AdxGateService</value>
+    </property>
+    <property name="serviceUrl" value="/api/AdxGateService" />
+    <property name="servers" value="adx-gate.baidu.com" />
+    <property name="encoding" value="UTF-8" />
+    <property name="connectionTimeout" value="3000" />
+    <property name="readTimeout" value="3000" />
+    <property name="hasHeaders" value="false" />
+  </bean>
+  
+  <bean id="advertiserSubmiter" class="com.baidu.beidou.bes.AdvertiserSubmiter">
+    <property name="adxGateService">
+      <ref bean="adxGateService" />
+    </property>
+  </bean>
+</beans>

@@ -1,0 +1,80 @@
+﻿【任务名】	抓取展现结果进行截图
+【时间驱动】	10 1-23 * * * 运行超时  分钟	等待超时	 分钟
+【运行命令】	cd /home/work/beidou-cron; sh snap_ad_get.sh
+【日志地址】	/home/work/snapshot/logs/snap_ad_get.${today}.log
+【变更库表】	无
+【任务依赖】  上游任务：1010:合并索引文件;
+========================================================================================
+【任务描述】
+执行Java调用：
+java -classpath ${CUR_CLASSPATH} com.baidu.beidou.tool.MergeSnapIndex ${day}>> ${logfile}
+logfile是带有今天时间戳的日志文件
+day参数可选，为传递的第一个参数（该任务中没有，表示默认抓取今天截图，如果抓取其他日期的截图，可以传递具体的日期参数）
+对应Cron中的Java类/beidou-cron/src/com/baidu/beidou/tool/MergeSnapIndex.java
+1.	打印日志：file merge start 20110808（此处的时间戳d可以是传递的参数）
+2.	boolean success=snapShotMgr.downloadIndex(d);//下载snap_index文件，该方法从ftp上下载文件：snap_index.txt以及snap_index.txt.md5，存放到
+	/home/work/snapshot/tmp目录下
+	文件内容如下所示：
+	177917    float_xuanfusld_120_270  http://www.fjganghan.com/ 
+	177500  baiduxml_tiepian     http://www.pomoho.com/
+	(底层调用FileUtils.downloadFileCheckMd5方法)
+	具体参数：
+	cpro.snap.server=tc-cp-url01.tc
+	cpro.snap.port=21
+	cpro.snap.user=ftp
+	cpro.snap.passwd=ftp
+	cpro.snap.path=/home/cpro/snapshot/data/output
+	  校验MD5(FileUtils.checkFileMd5方法完成)
+3.	如果success返回false，则打印日志index file md5 error，并发送报警邮件，否则继续执行
+4.	读取，计算snap_index.txt文件行数，并且打印日志：“tmp file line count {行数}”
+5.	过滤模板信息：
+	需要验证以下内容：
+	(1)	snap_index.txt文件中的每一行都是\t分隔的3列，否则报错：合并snap_index文件出错：格式错误"+{行号}
+	(2)	第一列需为整数，且大于0，否则报错：“合并snap_index文件出错：orderid格式错误“
+	(3)	snapShotMgr.isSnapable({文件第2列内容})，判断是否是可截的模板。实际是判断filterTpl所定义的列表中是否包含传递的参数（即snap_index.txt第2列），如果包含返回false，不包含返回true；
+		<property name="filterTpl">
+		     <list> 
+				<value>baiduCADS</value>
+				<value>baiduCPRO0101</value>
+				<value>baiduCPRO0201</value>
+				<value>baiduCPROiknow</value>
+				<value>baiduCPROXML</value>
+				<value>baiduCPROXMLSimple</value>
+				<value>baiduCPROXMLTP</value>
+				<value>baiduDEFINE</value>
+				<value>baiduNONE</value>
+    		 </list> 
+		</property>	
+	符合以上条件的行会被添加到newLines列表中，
+	(4)	验证错误的行会被添加到errLines，并发邮件
+	最终打印过滤后的行数记录到日志
+	LogUtils.info(LOG, "filter tmp line count "+newLines.size());
+6.	保证需要处理文件存在	   fileUtils.checkFileExist(SnapShotConstant.DIR_AD+d, "snap_index.txt");
+	（路径：/home/work/snapshot/adfile/20110808/snap_index.txt）
+7.	Diff文件
+	将第6步中的文件读到lines中（List<String>），对于newLines中的每一行L，如果lines中不含有以L开始的记录，那么执行
+	String newLine=snapShotMgr.mergeLine(L);
+	（a）	将L按照\t分隔为3列，依据第一列snapId，获取对应的截图对象snapObj
+	（select * from user_snapshot WHERE user_snap_id =**）
+	如果对象不存在，报警：snap shot not found ** 请高优先级查看
+	如果snapObj.getStatus() != SnapShotConstant.STATUS_DEAL（0）
+	打印日志：snap shot already captured **+" omit、（表示已经处理过了，直接跳过）
+	（b）	如果未处理过，则从之前的ftp上下载文件和md5，下载的文件名newName由snapId和HHMMSS拼成，如178185_061009.ads（.md5），ftp上的路径为：/home/cpro/snapshot/data/output/yyyyMMdd/
+	本地存放路径为：/home/work/snapshot/adfile/yyyyMMdd/下
+	方法返回：L+"\t"+newName;
+8.	如果第7步中的newLine不为空，添加到appendLines列表中
+9.	循环处理完毕后，打印appendLines列表的大小到日志：
+	after diff line count "+appendLines.size()
+10.	将appendLines追加到/home/work/snapshot/adfile/yyyyMMdd/snap_index.txt中（即after diff line count：**的diff之和，就是snap_index.txtafter diff line count的行数）
+11.	打印完成信息：finish merge 20110808
+
+==========================================================================================
+【报警内容】
+（1）	index file md5 error
+（2）	合并snap_index文件出错：orderid格式错误““
+（3）	合并snap_index文件出错：格式错误““
+（4）	合并snap_index失败，请高优先级查看
+（5）	create file fail
+（6）	read file lines fail
+（7）	snap shot not found
+（8）	ads md5 error

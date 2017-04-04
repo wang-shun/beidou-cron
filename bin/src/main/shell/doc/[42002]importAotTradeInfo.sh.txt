@@ -1,0 +1,32 @@
+﻿【任务名】	下载总控账户账户优化分行业信息，并导入数据库
+【时间驱动】	1 0 * * *	运行超时	5分钟	等待超时	0分钟
+【运行命令】	cd /home/work/beidou-cron/bin/; sh importAotTradeInfo.sh
+【日志地址】	/home/work/beidou-cron/log/importAotTradeInfo.log
+【变更库表】	aot. cproplantradeinfo
+【任务依赖】  无
+========================================================================================
+【任务描述】
+1.	进入数据目录/home/work/beidou-cron/data/aot
+2.	抓取白名单及其md5：
+	wget –q 
+	ftp://tc-dr-mgr00.tc/home/work/darwin/dr-mgr/var/dict/plantable/plantable_data.txt(.md5)
+3.	抓取黑名单及其md5：
+	wget –q 
+	ftp://tc-dr-mgr00.tc/home/work/darwin/dr-mgr/var/dict/grouptable/grouptable_data.txt (.md5) 
+4.	处理抓取的plantable_data.txt: print $1,$2,$3,$4/100000 到aotPlanTradeInfo
+5.	处理抓取的grouptable_data.txt print $1,$2,$3,$4,$5/100000到aotGroupTradeInfo
+6.	执行以下sql
+	delete from cproplantradeinfo
+	load data local infile 'plantable_data.txt' into table cproplantradeinfo CHARACTER SET gbk FIELDS TERMINATED BY '\t' ENCLOSED BY '' LINES TERMINATED BY '\n'
+	delete from cprogrouptradeinfo
+	列名：（firsttrade，secondtrade，acp，ctr）
+	load data local infile 'grouptable_data.txt' into table cprogrouptradeinfo CHARACTER SET gbk FIELDS TERMINATED BY '\t' ENCLOSED BY '' LINES TERMINATED BY '\n'
+	列名：（firsttrade，secondtrade，grouptype，acp，ctr）
+
+
+==========================================================================================
+【报警内容】
+1.	wget文件**失败（抓取文件失败）
+2.	**文件的md5校验失败（MD5校验失败）
+3.	awk推广计划行业信息失败，awk推广组行业信息失败（awk命令错误）
+4.	删除数据库账户优化推广计划分行业信息失败，导入账户优化推广计划分行业信息失败，删除数据库账户优化推广组分行业信息失败，导入账户优化推广组分行业信息失败（sql语句执行错误）

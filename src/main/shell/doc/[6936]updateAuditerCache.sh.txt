@@ -1,0 +1,60 @@
+﻿【任务名】	更新审核员缓存
+【时间驱动】	*/2 1-23 * * *	运行超时	2分钟	等待超时	0分钟
+【运行命令】	cd /home/work/beidou-cron/bin;sh updateAuditerCache.sh
+【日志地址】/home/work/beidou-cron/log/updateAuditerCache.log
+【变更库表】	无
+【任务依赖】  无
+========================================================================================
+【任务描述】
+执行远程调用：http://${tcmgr00}:8080/rpc/updateAuditerCacheTask（单点任务）
+com.baidu.beidou.auditmanager.task.UpdateAuditerCacheTask，对应Java类
+beidou/src/com/baidu/beidou/auditmanager/task/UpdateAuditerCacheTask.java
+execute方法：
+1．	打印日志：开始更新审核员缓存任务
+2．	AuditListService.updateAuditCache();
+	（1）	List<AuditUserInfoCache> list = auditMgr.findAuditUserInfo();
+		//待审核的用户信息列表
+		底层调用auditViewDao.findAuditUserInfo(excludeShifenState);
+		其中excludeShifenState包括：
+		Shifen用户状态：7（被禁用），4（被拒绝），1（暂未生效），6（需管理员审核）
+		拼合后的查询sql为
+		select a.userid, a.balancestat, a.username, b.aid, c.helpstatus, count(d.id), min(d.chaTime),(max(d.helpstatus)&8=8) 
+		from useraccount a 
+		left join useraurelation b 
+		on a.userid=b.uid 
+		left join userauditinfo c on a.userid=c.userid 
+		join cprounitstate{0-7} d on a.userid=d.uid 
+		join cprounitmater{0-7} e on d.id=e.id 
+		where d.state=3 and e.adtradeid!=0 and a.ustate=0
+		a.ushifenstatid !=7 and a.ushifenstatid !=4 and a.ushifenstatid !=1 and a.ushifenstatid !=6
+		AuditUserInfoCache对象的属性包括：
+			int userId;（a.userid结果）
+			byte userType;	//0:普通客户；1:vip客户；2:大客户；
+			byte balancestat;	//0:无（a.balancestat结果）
+			String username;（a.username结果）
+			int auditerId;（b.aid结果）
+			byte priority;	//0：不优先；1：次优先；2：优先；3：优先&&次优先(c.helpstatus结果)
+			int auditingUnitNum;	//待审核的创意数（count(d.id)结果）
+			Date firstSubTime; //（min(d.chaTime)结果）
+		 int sensitive;  //0:不敏感  1:敏感（max(d.helpstatus)&8=8结果）
+	
+	（2）	int[] clients = userInfoMgr.getAllClientCustomersFromUc();
+		//获取所有的大客户
+	（3）	int[] vips = userInfoMgr.getAllVipsFromUc();
+		//获取所有的vip客户
+	（4）	遍历步骤（1）中的list，根据（2）,（3）的结果设置userType字段
+	（5）	Collections.sort(list);//排序
+	（6）	AuditingUserCache cache = new AuditingUserCache(list);
+		设置AuditingUserCache.auditingUserList为list
+		设置AuditingUserCache.auditerInfo（Map<Integer, int[]>对象，key值为审核员id，int值为其所审核用户的待审创意数之和）
+	（7）	cache.testDumpCache(); //打印缓存内容到test日志
+	（8）	设置AuditListService.auditingCache=cache
+3．	打印日志：结束更新审核员缓存任务
+
+
+==========================================================================================
+【报警内容】
+执行远程调用-更新审核员缓存失败
+
+【备注】
+这个任务由于是2分钟跑一次，而且是再mgr机器上单点执行，因此在上线的过程中，经常会出现报警，上线完毕后可恢复正常。

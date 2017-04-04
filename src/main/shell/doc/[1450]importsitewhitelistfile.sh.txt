@@ -1,0 +1,33 @@
+﻿【任务名】	网站白名单文件抓取
+【时间驱动】	30 22 * * *	运行超时1分钟	等待超时	210分钟
+【运行命令】 	cd /home/work/beidou-cron/bin; sh importsitewhitelistfile.sh
+【日志地址】	/home/work/beidou-cron/log/importsitewhitefile.log
+【变更库表】	无
+【任务依赖】  下游任务：549: 联盟站点文件导入
+
+========================================================================================
+【任务描述】
+1.	进入数据目录：/home/work/beidou-cron/data/unionsite/input
+2.	备份百度自有流量网站配置文件beidou_baidusite_data1.txt为beidou_baidusite_data1.txt.20110928（昨天日期时间戳，保留5天）
+3.	抓取文件及MD5，并进行校验
+	wget 
+	ftp://tc-sf-ct01.tc//home/work/var/sf-ct/filesvr/data/762/beidou_baidusite_data1.txt (.md5)
+4.	如果文件内容为空，或者列数不为15，则发报警，请PM检查
+	for nf in `awk -F'\t' '{print NF}' ${WHITE_SITE_FILE}`; do
+	    if [ $nf -ne 15 ]; then
+	        mv ${WHITE_SITE_FILE} ${WHITE_SITE_FILE}.error    
+	        alert 1 ${msg} 
+	    fi
+	done
+
+5.	遍历文件内容，如果发现文件中存在行业分类不为260或270的记录，则发报警，请PM检查
+
+==========================================================================================
+【报警内容】
+1.	进入数据目录***失败
+2.	wget文件***失败
+3.	beidou_baidusite_data1.txt文件为空，请PM检查
+4.	beidou_baidusite_data1.txt文件列数不为15，请PM检查
+5.	beidou_baidusite_data1.txt文件中存在行业分类不为260或270的记录，请PM检查
+
+
